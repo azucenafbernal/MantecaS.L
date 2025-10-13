@@ -1,5 +1,10 @@
 package com.mantecasl.accommodationapp.business.persistance;
 
-public class GreetingDAO {
-    
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import com.mantecasl.accommodationapp.business.entity.Greeting;
+
+@Repository
+public interface GreetingDAO extends JpaRepository<Greeting, Long> {
+
 }
