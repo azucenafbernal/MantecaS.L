@@ -6,7 +6,6 @@ import com.mantecasl.accommodationapp.business.entity.Usuario;
 
 @Repository
 public interface UsuarioDAO extends JpaRepository<Usuario, Long> {
-
     // Busca un usuario por su email
     Usuario findByEmail(String email);
     
