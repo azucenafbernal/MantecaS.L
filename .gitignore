@@ -65,3 +65,6 @@ test-output/
 # Others
 *.swp
 *.swo
+
+# Database
+database/
