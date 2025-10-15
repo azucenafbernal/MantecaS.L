@@ -1,6 +1,14 @@
 package com.mantecasl.accommodationapp.business.entity;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Usuario {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;  // ID autogenerado
+
     private String nombre;
     private String email;
     private String contrasena;
@@ -12,6 +20,15 @@ public class Usuario {
         this.nombre = nombre;
         this.email = email;
         this.contrasena = contrasena;
+    }
+
+    // Getters y setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNombre() {
@@ -37,5 +54,4 @@ public class Usuario {
     public void setContrasena(String contrasena) {
         this.contrasena = contrasena;
     }
-
 }

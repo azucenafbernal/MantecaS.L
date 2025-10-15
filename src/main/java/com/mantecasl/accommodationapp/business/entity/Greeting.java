@@ -1,22 +1,35 @@
 package com.mantecasl.accommodationapp.business.entity;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Greeting {
-    private String person;
-    private String content;
 
-    public String getPerson() {
-        return person;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String mensaje;
+
+    public Greeting() {}
+
+    public Greeting(String mensaje) {
+        this.mensaje = mensaje;
     }
 
-    public void setPerson(String person) {
-        this.person = person;
+    public Long getId() {
+        return id;
     }
 
-    public String getContent() {
-        return content;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public String getMensaje() {
+        return mensaje;
+    }
+
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
     }
 }
