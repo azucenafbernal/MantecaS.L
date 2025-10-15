@@ -6,5 +6,5 @@ import com.mantecasl.accommodationapp.business.entity.Reserva;
 
 @Repository
 public interface ReservaDAO extends JpaRepository<Reserva, Long>{
-    Reserva findByEmail(Long id);
+
 }
