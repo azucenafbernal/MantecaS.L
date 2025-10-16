@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - MantecaS.L</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .section {
+            padding: 30px;
+        }
+        .section h2 {
+            color: #4a00e0;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #333;
+        }
+        .info-value {
+            color: #555;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 15px;
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #3a00c0, #7e1dd2);
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #4a00e0;
+            border: 2px solid #4a00e0;
+        }
+        .btn-secondary:hover {
+            background: #4a00e0;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="header">
+            <h1>Mi Perfil</h1>
+        </div>
+        <div class="section">
+            <h2>Información del Usuario</h2>
+            <div class="info-item">
+                <span class="info-label">Nombre:</span>
+                <span class="info-value" th:text="${usuario.nombre}">Juan Pérez</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email:</span>
+                <span class="info-value" th:text="${usuario.email}">juan@correo.com</span>
+            </div>
+
+            <a href="#" class="btn btn-primary">Cambiar Contraseña</a>
+            <a href="#" class="btn btn-secondary">Añadir Método de Autenticación</a>
+        </div>
+
+        <div class="section">
+            <h2>Sesión</h2>
+            <a th:href="@{/logout}" class="btn btn-secondary">Cerrar Sesión</a>
+            <a th:href="@{/}" class="btn btn-primary">Volver al Inicio</a>
+        </div>
+
+        <div class="footer">
+            &copy; 2025 MantecaS.L — Todos los derechos reservados.
+        </div>
+    </div>
+</div>
+</body>
+</html>
