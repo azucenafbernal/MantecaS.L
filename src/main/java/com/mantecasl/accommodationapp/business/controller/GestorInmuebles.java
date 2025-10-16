@@ -1,9 +1,7 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.Inmueble;
-import com.mantecasl.accommodationapp.business.entity.Usuario;
-import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
-import com.mantecasl.accommodationapp.business.persistance.UsuarioDAO;
+import com.mantecasl.accommodationapp.business.entity.*;
+import com.mantecasl.accommodationapp.business.persistance.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,15 +24,15 @@ public class GestorInmuebles {
     
     //Completar los campos del registro de propiedad
     @PostMapping("/propiedades/registrar")
-public String registrarPropiedad(
-    @RequestParam String direccion,
-    @RequestParam double precioNoche,
-    @RequestParam String descripcion,
-    @RequestParam Integer capacidad,
-    @RequestParam String emailPropietario,
-    @RequestParam String telefonoContacto, 
-    @RequestParam String cuentaBancaria,
-    Model model) {    
+    public String registrarPropiedad(
+        @RequestParam String direccion,
+        @RequestParam double precioNoche,
+        @RequestParam String descripcion,
+        @RequestParam Integer capacidad,
+        @RequestParam String emailPropietario,
+        @RequestParam String telefonoContacto, 
+        @RequestParam String cuentaBancaria,
+        Model model) {    
 
     //Buscar el usuario por email
     Usuario usuario = usuarioDAO.findByEmail(emailPropietario);
@@ -42,13 +40,6 @@ public String registrarPropiedad(
     if (usuario == null) {
         model.addAttribute("error", "No se encontró un usuario con ese email. Debe registrarse primero.");
         return "registro-propiedad";
-    }
-    
-    //Si el usuario no es propietario, actualizar sus datos
-    if (!usuario.esPropietario()) {
-        usuario.setTelefonoContacto(telefonoContacto);
-        usuario.setCuentaBancaria(cuentaBancaria);
-        usuario = usuarioDAO.save(usuario);
     }
     
     //Crear y guardar el inmueble

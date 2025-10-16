@@ -3,13 +3,13 @@ package com.mantecasl.accommodationapp.business.entity;
 import jakarta.persistence.*;
 
 @Entity
-public class Inquilino {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Table(name = "inquilino")
+@PrimaryKeyJoinColumn(name = "usuario_id")
+public class Inquilino extends Usuario {
 
-    public Long getId() {
-        return id;
+    public Inquilino() {}
+
+    public Inquilino(String nombre, String email, String contrasena) {
+        super(nombre, email, contrasena);
     }
-    
 }
