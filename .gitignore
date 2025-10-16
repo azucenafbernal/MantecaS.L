@@ -66,5 +66,5 @@ test-output/
 *.swp
 *.swo
 
-
-/database/usuarios_db/
+# Database
+database/
