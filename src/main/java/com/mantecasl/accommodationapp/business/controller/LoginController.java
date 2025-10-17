@@ -30,6 +30,6 @@ public class LoginController {
         }
         // Aquí podrías agregar sesión, etc. Por ahora, vamos a un result.html
         model.addAttribute("usuario", encontrado);
-        return "result"; // result.html
+        return "resultLogin"; // resultLogin.html
     }
 }

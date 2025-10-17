@@ -152,6 +152,11 @@
                     <div th:if="${error}" class="error" th:text="${error}"></div>
 
                     <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" th:field="*{nombre}" class="input-field" placeholder="Tu nombre">
+                    </div>
+
+                    <div class="form-group">
                         <label for="email">Correo electrónico</label>
                         <input type="email" th:field="*{email}" class="input-field" placeholder="ejemplo@correo.com" required>
                     </div>
