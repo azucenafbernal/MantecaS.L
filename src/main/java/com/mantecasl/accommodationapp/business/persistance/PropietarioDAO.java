@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import com.mantecasl.accommodationapp.business.entity.Propietario;
 
 @Repository
-public interface PropietarioDAO extends JpaRepository<Propietario, Long>{
+public interface PropietarioDAO extends JpaRepository<Propietario, Long> {
 }

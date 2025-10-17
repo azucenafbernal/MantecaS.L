@@ -6,5 +6,4 @@ import com.mantecasl.accommodationapp.business.entity.Inquilino;
 
 @Repository
 public interface InquilinoDAO extends JpaRepository<Inquilino, Long> {
-    
 }

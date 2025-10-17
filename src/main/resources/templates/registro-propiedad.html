@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Propiedad</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        .input-field:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            outline: none;
+        }
+        
+        textarea.input-field {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 14px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-submit:hover {
+            background: linear-gradient(to right, #5a6fd8, #6a4190);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+            text-align: center;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #eee;
+        }
+        
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <h1>Registro de Propiedad</h1>
+                <p>Registra tu propiedad para empezar a alquilar</p>
+            </div>
+            
+            <div class="form-container">
+                <!-- Mensaje de error -->
+                <div th:if="${error}" class="error" th:text="${error}"></div>
+                
+                <form th:action="@{/propiedades/registrar}" method="post">
+                    <div class="form-group">
+                        <label for="emailPropietario">Email del Usuario *</label>
+                        <input type="email" id="emailPropietario" name="emailPropietario" 
+                            class="input-field" placeholder="usuario@ejemplo.com" required>
+                    </div>
+
+                    <!-- NUEVOS CAMPOS PARA DATOS DE PROPIETARIO -->
+                    <div class="form-group">
+                        <label for="telefonoContacto">Teléfono de Contacto *</label>
+                        <input type="tel" id="telefonoContacto" name="telefonoContacto" 
+                            class="input-field" placeholder="+34 123 456 789" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cuentaBancaria">Cuenta Bancaria (IBAN) *</label>
+                        <input type="text" id="cuentaBancaria" name="cuentaBancaria" 
+                            class="input-field" placeholder="ES12 3456 7890 1234 5678 9012" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="direccion">Dirección Completa *</label>
+                        <input type="text" id="direccion" name="direccion" 
+                               class="input-field" placeholder="Calle, número, ciudad, código postal" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="precioNoche">Precio por Noche (€) *</label>
+                        <input type="number" id="precioNoche" name="precioNoche" 
+                               class="input-field" placeholder="50.00" step="0.01" min="0" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="capacidad">Capacidad (personas) *</label>
+                        <input type="number" id="capacidad" name="capacidad" 
+                               class="input-field" placeholder="4" min="1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion">Descripción de la Propiedad</label>
+                        <textarea id="descripcion" name="descripcion" 
+                                  class="input-field" 
+                                  placeholder="Describe tu propiedad, características, ambiente..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Registrar Propiedad</button>
+                </form>
+            </div>
+            
+            <div class="footer">
+                <a th:href="@{/propiedades}">Ver todas las propiedades</a> | 
+                <a th:href="@{/usuarios}">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
