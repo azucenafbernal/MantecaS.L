@@ -16,8 +16,6 @@ public class Usuario {
     private String email;
     private String contrasena;
     
-    private String telefonoContacto;
-    private String cuentaBancaria;
     
     // Relación con inmuebles
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -59,30 +57,11 @@ public class Usuario {
     public void setContrasena(String contrasena) { 
         this.contrasena = contrasena; 
     }
-    
-    public String getTelefonoContacto() { 
-        return telefonoContacto; 
-    }
-    public void setTelefonoContacto(String telefonoContacto) { 
-        this.telefonoContacto = telefonoContacto; 
-    }
-    
-    public String getCuentaBancaria() { 
-        return cuentaBancaria; 
-    }
-    public void setCuentaBancaria(String cuentaBancaria) { 
-        this.cuentaBancaria = cuentaBancaria; 
-    }
-    
+
     public List<Inmueble> getInmuebles() { 
         return inmuebles; 
     }
     public void setInmuebles(List<Inmueble> inmuebles) { 
         this.inmuebles = inmuebles; 
-    }
-    
-    //Método para verificar si es propietario
-    public boolean esPropietario() {
-        return this.telefonoContacto != null && this.cuentaBancaria != null;
     }
 }

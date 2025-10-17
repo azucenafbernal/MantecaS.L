@@ -15,6 +15,9 @@ public class GestorInmuebles {
     @Autowired
     private UsuarioDAO usuarioDAO;
 
+    @Autowired
+    private PropietarioDAO propietarioDAO;
+
     //Mostrar formulario de registro de propiedad
     @GetMapping("/propiedades/registro")
     public String mostrarFormulario(Model model){
@@ -45,6 +48,16 @@ public class GestorInmuebles {
     //Crear y guardar el inmueble
     Inmueble inmueble = new Inmueble(direccion, precioNoche, descripcion, capacidad, usuario);
     Inmueble nuevoInmueble = inmuebleDAO.save(inmueble);
+
+    Propietario propietario = new Propietario();
+    propietario.setNombre(usuario.getNombre());
+    propietario.setEmail(usuario.getEmail());
+    propietario.setContrasena(usuario.getContrasena());
+    propietario.setTelefonoContacto(telefonoContacto);
+    propietario.setCuentaBancaria(cuentaBancaria);
+    propietario.setInmueble(nuevoInmueble);
+
+    propietarioDAO.save(propietario);
         
     model.addAttribute("inmueble", nuevoInmueble);
     model.addAttribute("usuario", usuario);
