@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MantecaS.L - Registro de Usuarios</title>
-    <title>Registro de Usuarios</title>
+    <title>Iniciar Sesión - MantecaS.L</title>
     <style>
         * {
             margin: 0;
@@ -141,22 +140,20 @@
     <div class="container">
         <div class="card">
             <div class="header">
-                <h1>MantecaS.L</h1>
-                <p>Regístrate y empieza a disfrutar</p>
-                <h1>Registro de Usuarios</h1>
-                <p>Crea tu cuenta en pocos segundos</p>
+                <h1>Iniciar Sesión</h1>
+                <p>Ingresa con tu correo y contraseña</p>
             </div>
 
             <div class="form-container">
                 <!-- Formulario Thymeleaf -->
-                <form th:action="@{/usuarios}" th:object="${usuario}" method="post">
+                <form th:action="@{/login}" th:object="${usuario}" method="post">
                     
                     <!-- Mensaje de error -->
                     <div th:if="${error}" class="error" th:text="${error}"></div>
 
                     <div class="form-group">
-                        <label for="nombre">Nombre completo</label>
-                        <input type="text" th:field="*{nombre}" class="input-field" placeholder="Ingresa tu nombre completo" required>
+                        <label for="nombre">Nombre</label>
+                        <input type="text" th:field="*{nombre}" class="input-field" placeholder="Tu nombre">
                     </div>
 
                     <div class="form-group">
@@ -166,16 +163,15 @@
 
                     <div class="form-group">
                         <label for="contrasena">Contraseña</label>
-                        <input type="password" th:field="*{contrasena}" class="input-field" placeholder="Crea una contraseña segura" required>
+                        <input type="password" th:field="*{contrasena}" class="input-field" placeholder="Tu contraseña" required>
                     </div>
 
-                    <button type="submit" class="btn-submit">Crear Cuenta</button>
+                    <button type="submit" class="btn-submit">Iniciar Sesión</button>
                 </form>
             </div>
 
             <div class="footer">
-                ¿Ya tienes una cuenta? <a th:href="@{/login}">Inicia sesión aquí</a>
-                ¿Ya tienes una cuenta? <a href="#">Inicia sesión aquí</a>
+                ¿No tienes una cuenta? <a th:href="@{/usuarios}">Regístrate aquí</a>
             </div>
         </div>
     </div>
