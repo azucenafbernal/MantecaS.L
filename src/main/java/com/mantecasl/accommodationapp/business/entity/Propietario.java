@@ -1,24 +1,53 @@
 package com.mantecasl.accommodationapp.business.entity;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@PrimaryKeyJoinColumn(name = "usuario_id")
-public class Propietario extends Usuario {
-
-    @OneToOne
-    @JoinColumn(name = "inmueble_id")
-    private Inmueble inmueble;
-
+@Table(name = "propietario")
+public class Propietario {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    //Relación OneToOne (1:1) con Usuario
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
+    
     private String telefonoContacto;
     private String cuentaBancaria;
+    
+    //Relación OneToMany con Inmuebles (Un propietario puede tener varios Inmuebles)
+    @OneToMany(mappedBy = "propietario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Inmueble> inmuebles = new ArrayList<>();
 
+    //Constructores
     public Propietario() {}
 
-    public Propietario(Inmueble inmueble, String telefonoContacto, String cuentaBancaria) {
-        this.inmueble= inmueble;
+    public Propietario(Usuario usuario, String telefonoContacto, String cuentaBancaria) {
+        this.usuario = usuario;
         this.telefonoContacto = telefonoContacto;
         this.cuentaBancaria = cuentaBancaria;
+    }
+
+    //Getters y Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 
     public String getTelefonoContacto() {
@@ -37,11 +66,27 @@ public class Propietario extends Usuario {
         this.cuentaBancaria = cuentaBancaria;
     }
 
-    public Inmueble getInmueble() {
-        return inmueble;
+    public List<Inmueble> getInmuebles() {
+        return inmuebles;
     }
 
-    public void setInmueble(Inmueble inmueble) {
-        this.inmueble = inmueble;
+    public void setInmuebles(List<Inmueble> inmuebles) {
+        this.inmuebles = inmuebles;
+    }
+
+    //Método auxiliar para agregar inmueble
+    public void agregarInmueble(Inmueble inmueble) {
+        inmuebles.add(inmueble);
+        inmueble.setPropietario(this);
+    }
+    
+    //Método para obtener el email del usuario (útil para la interfaz)
+    public String getEmailUsuario() {
+        return usuario != null ? usuario.getEmail() : null;
+    }
+    
+    //Método para obtener el nombre del usuario (útil para la interfaz)
+    public String getNombreUsuario() {
+        return usuario != null ? usuario.getNombre() : null;
     }
 }
