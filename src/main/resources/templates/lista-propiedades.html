@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Propiedades</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .property-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .property-header {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .property-id {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+        
+        .property-address {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .property-price {
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .property-content {
+            padding: 25px;
+        }
+        
+        .property-info {
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .info-value {
+            color: #6c757d;
+            text-align: right;
+            font-size: 14px;
+        }
+        
+        .property-description {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .description-text {
+            color: #495057;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .property-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-details {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-details:hover {
+            background: linear-gradient(to right, #5a6fd8, #6a4190);
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 14px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 10px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #5a6fd8, #6a4190);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            border-radius: 6px;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 10px;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+        
+        .no-properties {
+            text-align: center;
+            color: white;
+            padding: 60px 20px;
+        }
+        
+        .no-properties h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .no-properties p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 768px) {
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .property-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Catálogo de Propiedades</h1>
+            <p>Descubre los mejores alojamientos para tus vacaciones</p>
+        </div>
+        
+        <div th:if="${propiedades.empty}" class="no-properties">
+            <h2>No hay propiedades registradas aún</h2>
+            <p>Sé el primero en registrar una propiedad y empieza a alquilar</p>
+            <a th:href="@{/propiedades/registro}" class="btn-primary">Registrar Primera Propiedad</a>
+        </div>
+        
+        <div th:unless="${propiedades.empty}" class="properties-grid">
+            <div th:each="inmueble : ${propiedades}" class="property-card">
+                <div class="property-header">
+                    <div class="property-id">ID: <span th:text="${inmueble.id}">123</span></div>
+                    <div class="property-address" th:text="${inmueble.direccion}">Calle Ejemplo 123</div>
+                    <div class="property-price" th:text="|€${inmueble.precioNoche}/noche|">€50/noche</div>
+                </div>
+                
+                <div class="property-content">
+                    <div class="property-info">
+                        <div class="info-item">
+                            <span class="info-label">📍 Dirección:</span>
+                            <span class="info-value" th:text="${inmueble.direccion}">Calle Ejemplo 123</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">💰 Precio/noche:</span>
+                            <span class="info-value" th:text="|€${inmueble.precioNoche}|">€50.00</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">👥 Capacidad:</span>
+                            <span class="info-value" th:text="|${inmueble.capacidad} personas|">4 personas</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">👤 Propietario:</span>
+                            <span class="info-value" th:text="${inmueble.usuario.nombre}">Juan Pérez</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">📧 Contacto:</span>
+                            <span class="info-value" th:text="${inmueble.usuario.email}">juan@ejemplo.com</span>
+                        </div>
+                    </div>
+                    
+                    <div th:if="${inmueble.descripcion}" class="property-description">
+                        <div class="description-text" th:text="${inmueble.descripcion}">
+                            Hermosa propiedad con vistas al mar, perfecta para vacaciones en familia.
+                        </div>
+                    </div>
+                    
+                    <div class="property-actions">
+                        <a th:href="@{/propiedades/{id}(id=${inmueble.id})}" class="btn-details">
+                            Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <a th:href="@{/propiedades/registro}" class="btn-primary">➕ Registrar Nueva Propiedad</a>
+            <a th:href="@{/usuarios}" class="btn-secondary">🏠 Volver al Inicio</a>
+        </div>
+    </div>
+</body>
+</html>
