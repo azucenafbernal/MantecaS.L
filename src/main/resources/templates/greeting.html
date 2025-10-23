@@ -3,180 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MantecaS.L - Registro de Usuarios</title>
-    <title>Registro de Usuarios</title>
+    <title>Registro - MantecaS.L</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
 
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
         }
 
         .container {
-            width: 100%;
-            max-width: 450px;
+            width:100%;
+            max-width:500px;
+            border-radius:15px;
+            overflow:hidden;
+            box-shadow:0 15px 40px rgba(0,0,0,0.3);
+            background: white;
+            animation: fadeIn 0.8s ease-out;
         }
 
-        .card {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
+        @keyframes fadeIn {
+            from {opacity:0; transform: translateY(20px);}
+            to {opacity:1; transform: translateY(0);}
         }
 
         .header {
             background: linear-gradient(to right, #4a00e0, #8e2de2);
-            color: white;
-            padding: 25px 20px;
-            text-align: center;
+            color:white;
+            padding:30px 20px;
+            text-align:center;
         }
 
-        .header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
+        .header h1 {font-size:28px; margin-bottom:10px;}
+        .header p {font-size:14px; opacity:0.9;}
 
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+        .form-container {padding:30px;}
 
-        .form-container {
-            padding: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
-            font-size: 14px;
-        }
-
+        .form-group {margin-bottom:20px;}
+        label {display:block; margin-bottom:8px; font-weight:600; color:#333;}
         .input-field {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
+            width:100%;
+            padding:12px 15px;
+            border:1px solid #ddd;
+            border-radius:8px;
+            font-size:14px;
             transition: all 0.3s;
         }
-
-        .input-field:focus {
-            border-color: #4a00e0;
-            box-shadow: 0 0 0 2px rgba(74, 0, 224, 0.2);
-            outline: none;
-        }
+        .input-field:focus {border-color:#4a00e0; box-shadow:0 0 0 2px rgba(74,0,224,0.2); outline:none;}
 
         .btn-submit {
             background: linear-gradient(to right, #4a00e0, #8e2de2);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 14px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
+            color:white;
+            border:none;
+            border-radius:10px;
+            padding:14px;
+            width:100%;
+            font-size:16px;
+            font-weight:600;
+            cursor:pointer;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin-top:10px;
         }
+        .btn-submit:hover {background: linear-gradient(to right, #3a00c0, #7e1dd2); transform: translateY(-2px); box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+        .btn-submit:active {transform: translateY(0);}
 
-        .btn-submit:hover {
-            background: linear-gradient(to right, #3a00c0, #7e1dd2);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
+        .error {color:red; margin-bottom:15px; font-size:14px;}
 
-        .btn-submit:active {
-            transform: translateY(0);
+        .social-login {
+            display:flex;
+            justify-content:space-between;
+            margin-top:20px;
         }
-
-        .error {
-            color: red;
-            margin-bottom: 15px;
-            font-size: 14px;
+        .social-btn {
+            flex:1;
+            padding:12px 0;
+            border-radius:8px;
+            font-weight:600;
+            text-align:center;
+            cursor:pointer;
+            color:white;
+            margin:0 5px;
+            text-decoration:none;
+            transition: all 0.3s;
         }
+        .social-btn:first-child {background:#3b5998;}
+        .social-btn:last-child {background:#db4437;}
+        .social-btn:hover {opacity:0.9; transform:translateY(-2px);}
 
         .footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 14px;
-            color: #666;
-            border-top: 1px solid #eee;
+            text-align:center;
+            margin-top:25px;
+            font-size:14px;
+            color:#555;
         }
-
-        .footer a {
-            color: #4a00e0;
-            text-decoration: none;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                max-width: 100%;
-            }
-
-            .form-container {
-                padding: 20px;
-            }
-        }
+        .footer a {color:#4a00e0; text-decoration:none; font-weight:600;}
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>MantecaS.L</h1>
-                <p>Regístrate y empieza a disfrutar</p>
-                <h1>Registro de Usuarios</h1>
-                <p>Crea tu cuenta en pocos segundos</p>
+        <div class="header">
+            <h1>¡Bienvenido a MantecaS.L!</h1>
+            <p>Crea tu cuenta y empieza a explorar alojamientos únicos</p>
+        </div>
+
+        <div class="form-container">
+            <form th:action="@{/usuarios}" th:object="${usuario}" method="post">
+                <div th:if="${error}" class="error" th:text="${error}"></div>
+
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" th:field="*{nombre}" class="input-field" placeholder="Ingresa tu nombre completo" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input type="email" th:field="*{email}" class="input-field" placeholder="ejemplo@correo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena">Contraseña</label>
+                    <input type="password" th:field="*{contrasena}" class="input-field" placeholder="Crea una contraseña segura" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Crear Cuenta</button>
+            </form>
+
+            <div class="social-login">
+                <a href="#" class="social-btn">Facebook</a>
+                <a href="#" class="social-btn">Google</a>
             </div>
+        </div>
 
-            <div class="form-container">
-                <!-- Formulario Thymeleaf -->
-                <form th:action="@{/usuarios}" th:object="${usuario}" method="post">
-                    
-                    <!-- Mensaje de error -->
-                    <div th:if="${error}" class="error" th:text="${error}"></div>
-
-                    <div class="form-group">
-                        <label for="nombre">Nombre completo</label>
-                        <input type="text" th:field="*{nombre}" class="input-field" placeholder="Ingresa tu nombre completo" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Correo electrónico</label>
-                        <input type="email" th:field="*{email}" class="input-field" placeholder="ejemplo@correo.com" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="contrasena">Contraseña</label>
-                        <input type="password" th:field="*{contrasena}" class="input-field" placeholder="Crea una contraseña segura" required>
-                    </div>
-
-                    <button type="submit" class="btn-submit">Crear Cuenta</button>
-                </form>
-            </div>
-
-            <div class="footer">
-                ¿Ya tienes una cuenta? <a th:href="@{/login}">Inicia sesión aquí</a>
-                ¿Ya tienes una cuenta? <a href="#">Inicia sesión aquí</a>
-            </div>
+        <div class="footer">
+            ¿Ya tienes cuenta? <a th:href="@{/login}">Inicia sesión aquí</a>
         </div>
     </div>
 </body>
