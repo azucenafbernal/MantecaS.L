@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Funcionalidad en desarrollo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .card h1 {
+            font-size: 26px;
+            color: #4a00e0;
+            margin-bottom: 20px;
+        }
+
+        .card p {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .icon {
+            font-size: 60px;
+            color: #8e2de2;
+            margin-bottom: 20px;
+        }
+
+        .btn-home {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-home:hover {
+            background: linear-gradient(to right, #3a00c0, #7e1dd2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">🚧</div>
+        <h1>Funcionalidad en desarrollo</h1>
+        <p>Estamos trabajando en ello.<br>Manteca S.L.</p>
+        <a href="/" class="btn-home">Volver al inicio</a>
+    </div>
+</body>
+</html>

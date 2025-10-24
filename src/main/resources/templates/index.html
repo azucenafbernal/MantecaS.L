@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Manteca SL</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+        body {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/images/foto.jpg') center/cover no-repeat;
+            min-height:100vh; display:flex; flex-direction:column;
+        }
+        .navbar {
+            width:100%; padding:20px 40px; position:absolute; top:0; left:0; display:flex; justify-content:space-between; align-items:center;
+            color:white; font-weight:600; font-size:20px;
+        }
+        .navbar .logo {cursor:pointer; font-size:22px; font-weight:700;}
+        .navbar .user-menu {
+            display:flex; 
+            align-items:center; 
+            cursor:pointer; 
+            gap:10px; 
+            font-size:16px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+        }
+        .navbar .user-menu:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .navbar .user-menu i {font-size:20px;}
+        .hero {
+            margin-top:120px; display:flex; flex-direction:column; align-items:center; text-align:center; color:white;
+        }
+
+        .hero h1 {
+            font-size:36px;
+            font-weight:700;
+            margin-bottom:10px;
+            padding:15px 30px;
+            border-radius:15px;
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color:white;
+            display:inline-block;
+        }
+
+        .hero p {font-size:18px; opacity:0.9; margin-top:5px;}
+
+        .search-box {
+            margin-top:30px; background:white; border-radius:50px; display:flex; box-shadow:0 5px 20px rgba(0,0,0,0.2);
+            overflow:hidden; width:80%; max-width:900px;
+        }
+        .search-item {flex:1; padding:15px 20px; display:flex; flex-direction:column; justify-content:center;}
+        .search-item label {font-size:12px; font-weight:600; color:#555; margin-bottom:5px;}
+        .search-item input {border:none; outline:none; font-size:14px;}
+        .search-button {
+            background:linear-gradient(to right, #4a00e0, #8e2de2); color:white; border:none; padding:0 30px;
+            display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:600;
+            transition: all 0.3s ease;
+        }
+        .search-button:hover {background:#e03552;}
+
+        .btn-ver-catalogo {
+            display: inline-block;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            text-decoration: none;
+            padding: 16px 36px;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 12px;
+            margin-top: 30px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn-ver-catalogo::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.4s ease;
+        }
+
+        .btn-ver-catalogo:hover::after {
+            width: 100%;
+        }
+
+        .btn-ver-catalogo:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+        }
+
+        @media (max-width:768px) {
+            .search-box {flex-direction:column; border-radius:20px;}
+            .search-button {width:100%; padding:15px;}
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo" onclick="window.location.href='/'">Manteca SL</div>
+        <!-- Menú de usuario que cambia según si está logueado o no -->
+        <a th:href="${usuario != null ? '/resultLogin' : '/login'}" class="user-menu">
+            <i class="fa fa-user"></i> 
+            <span th:if="${usuario != null}" th:text="${usuario.nombre}">Usuario</span>
+            <span th:if="${usuario == null}">Iniciar sesión</span>
+        </a>
+    </div>
+
+    <div class="hero">
+        <h1>Encuentra tu próximo alojamiento</h1>
+        <p>Explora lugares únicos en todo el mundo con Manteca SL</p>
+
+        <div class="search-box">
+            <div class="search-item">
+                <label>¿Dónde?</label>
+                <input type="text" placeholder="Destino, ciudad...">
+            </div>
+            <div class="search-item">
+                <label>Entrada</label>
+                <input type="date">
+            </div>
+            <div class="search-item">
+                <label>Salida</label>
+                <input type="date">
+            </div>
+            <div class="search-item">
+                <label>Huéspedes</label>
+                <input type="number" placeholder="1" min="1">
+            </div>
+            <button class="search-button" onclick="window.location.href='/propiedad/CatalogoUsuariosOpcionBusqueda.html'">
+                Buscar
+            </button>
+        </div>
+
+        <button class="btn-ver-catalogo" onclick="window.location.href='/catalogo'">
+             Ver catálogo de alojamientos
+        </button>
+    </div>
+</body>
+</html>
