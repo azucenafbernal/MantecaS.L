@@ -122,27 +122,31 @@
         <h1>Encuentra tu próximo alojamiento</h1>
         <p>Explora lugares únicos en todo el mundo con Manteca SL</p>
 
-        <div class="search-box">
+        <form action="/catalogo" method="get" class="search-box">
             <div class="search-item">
                 <label>¿Dónde?</label>
-                <input type="text" placeholder="Destino, ciudad...">
+                <input type="text" name="ciudad" placeholder="Destino, ciudad...">
             </div>
+
             <div class="search-item">
                 <label>Entrada</label>
-                <input type="date">
+                <input type="date" name="fechaInicio">
             </div>
+
             <div class="search-item">
                 <label>Salida</label>
-                <input type="date">
+                <input type="date" name="fechaFin">
             </div>
+
             <div class="search-item">
                 <label>Huéspedes</label>
-                <input type="number" placeholder="1" min="1">
+                <input type="number" name="capacidad" placeholder="1" min="1">
             </div>
-            <button class="search-button" onclick="window.location.href='/propiedad/CatalogoUsuariosOpcionBusqueda.html'">
+
+            <button class="search-button" type="submit">
                 Buscar
             </button>
-        </div>
+        </form>
 
         <button class="btn-ver-catalogo" onclick="window.location.href='/catalogo'">
              Ver catálogo de alojamientos
