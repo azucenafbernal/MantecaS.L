@@ -185,21 +185,20 @@
         
         .btn-secondary {
             display: inline-block;
-            background: linear-gradient(135deg, #2575fc, #6a11cb); /* Gradiente del primero */
+            background: linear-gradient(135deg, #2575fc, #6a11cb);
             color: white;
             text-decoration: none;
-            padding: 12px 28px; /* Tamaño del secondary */
-            font-size: 16px;     /* Tamaño del secondary */
-            font-weight: 600;    /* Peso del secondary */
-            border: 2px solid white; /* Borde del secondary */
-            border-radius: 6px;       /* Radio del secondary */
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border: 2px solid white;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease; /* Transición del secondary */
-            margin: 0 10px;            /* Margen del secondary */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* Sombra del primero */
+            transition: all 0.3s ease;
+            margin: 0 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
             position: relative;
             overflow: hidden;
-
         }
         
         .btn-secondary:hover {
@@ -253,7 +252,7 @@
             <div th:each="inmueble : ${propiedades}" class="property-card">
                 <div class="property-header">
                     <div class="property-id">ID: <span th:text="${inmueble.id}">123</span></div>
-                    <div class="property-address" th:text="${inmueble.direccion}">Calle Ejemplo 123</div>
+                    <div class="property-address" th:text="${inmueble.calle} + ' ' + ${inmueble.numero} + ', ' + ${inmueble.ciudad} + ' ' + ${inmueble.codigoPostal}">Calle Ejemplo 123</div>
                     <div class="property-price" th:text="|€${inmueble.precioNoche}/noche|">€50/noche</div>
                 </div>
                 
@@ -261,7 +260,7 @@
                     <div class="property-info">
                         <div class="info-item">
                             <span class="info-label">📍 Dirección:</span>
-                            <span class="info-value" th:text="${inmueble.direccion}">Calle Ejemplo 123</span>
+                            <span class="info-value" th:text="${inmueble.calle} + ' ' + ${inmueble.numero} + ', ' + ${inmueble.ciudad} + ' ' + ${inmueble.codigoPostal}">Calle Ejemplo 123</span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">💰 Precio/noche:</span>
