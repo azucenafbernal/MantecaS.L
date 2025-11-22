@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Deseos</title>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 32px;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .property-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .property-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.20);
+        }
+
+        .property-header {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .property-content {
+            padding: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            background: #ff4e4e;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.2s ease;
+        }
+
+        .btn:hover {
+            background: #ff2e2e;
+        }
+
+        .empty-msg {
+            color: white;
+            text-align: center;
+            margin-top: 80px;
+            font-size: 22px;
+        }
+
+        a.volver {
+            color: white;
+            text-decoration: none;
+            display: block;
+            margin-top: 40px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>❤️ Mi Lista de Deseos</h1>
+
+    <div th:if="${favoritos.isEmpty()}" class="empty-msg">
+        No tienes propiedades en tu lista de deseos aún.
+        <br><br>
+        <a class="volver" th:href="@{/lista-propiedades}">Volver al catálogo</a>
+    </div>
+
+    <div th:unless="${favoritos.isEmpty()}" class="properties-grid">
+
+        <div th:each="fav : ${favoritos}" class="property-card">
+
+            <div class="property-header">
+                <h3 th:text="${fav.inmueble.direccion}"></h3>
+                <p th:text="|€${fav.inmueble.precioNoche}/noche|"></p>
+            </div>
+
+            <div class="property-content">
+
+                <p><strong>Capacidad:</strong>
+                    <span th:text="${fav.inmueble.capacidad}"></span> personas
+                </p>
+
+                <p><strong>Propietario:</strong>
+                    <span th:text="${fav.inmueble.usuario.nombre}"></span>
+                </p>
+
+                <form th:action="@{/favoritos/eliminar/{id}(id=${fav.inmueble.id})}" method="post">
+                    <button type="submit" class="btn">🗑 Eliminar de Favoritos</button>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+
+    <a class="volver" th:href="@{/}">Volver al inicio</a>
+</div>
+</body>
+</html>

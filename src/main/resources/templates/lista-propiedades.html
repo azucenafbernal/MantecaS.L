@@ -291,6 +291,12 @@
                         <a th:href="@{gestor/propiedad/{id}(id=${inmueble.id})}" class="btn-details">
                             Ver Detalles
                         </a>
+                        <form th:action="@{/favoritos/agregar/{idInmueble}(idInmueble=${inmueble.id})}" 
+                            method="post" style="flex: 1;">
+                            <button type="submit" class="btn-details" style="background: #ff6b6b;">
+                                ❤️ Añadir a Favoritos
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

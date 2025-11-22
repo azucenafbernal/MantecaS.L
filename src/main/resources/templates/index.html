@@ -110,7 +110,14 @@
 <body>
     <div class="navbar">
         <div class="logo" onclick="window.location.href='/'">Manteca SL</div>
-        <!-- Menú de usuario que cambia según si está logueado o no -->
+
+        <!-- 🔥 Botón de Favoritos añadido -->
+        <a href="/favoritos" class="user-menu" style="margin-right: 15px;">
+            <i class="fa fa-heart"></i>
+            <span>Favoritos</span>
+        </a>
+
+        <!-- Menú de usuario -->
         <a th:href="${usuario != null ? '/resultLogin' : '/login'}" class="user-menu">
             <i class="fa fa-user"></i> 
             <span th:if="${usuario != null}" th:text="${usuario.nombre}">Usuario</span>
