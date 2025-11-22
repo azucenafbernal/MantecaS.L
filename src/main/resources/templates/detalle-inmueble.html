@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Detalles de ' + ${inmueble.direccion}">Detalles</title>
+    <title th:text="'Detalles de la propiedad en ' + ${inmueble.calle} + ' ' + ${inmueble.numero} + ', ' + ${inmueble.ciudad} + ' ' + ${inmueble.codigoPostal}">Detalles</title>
     <style>
         body {
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -104,14 +104,14 @@
 <body>
     <div class="container">
         <div class="title">
-            <h1 th:text="'Detalles de la propiedad en ' + ${inmueble.direccion}"></h1>
+            <h1 th:text="'Detalles de la propiedad en ' + ${inmueble.calle} + ' ' + ${inmueble.numero} + ', ' + ${inmueble.ciudad} + ' ' + ${inmueble.codigoPostal}"></h1>
             <p>ID de propiedad: <span th:text="${inmueble.id}"></span></p>
         </div>
 
         <div class="details">
             <div class="detail-item">
                 <span>📍 Dirección:</span>
-                <p th:text="${inmueble.direccion}"></p>
+                <p th:text="${inmueble.calle} + ' ' + ${inmueble.numero} + ', ' + ${inmueble.ciudad} + ' ' + ${inmueble.codigoPostal}"></p>
             </div>
             <div class="detail-item">
                 <span>💰 Precio por noche:</span>
