@@ -124,6 +124,12 @@
         <!-- ✔️ Nuevo contenedor para agrupar favoritos + usuario -->
         <div class="right-menu">
 
+            <!-- Botón Mis Propiedades (solo cuando hay usuario logueado) -->
+            <a th:if="${usuario != null}" href="/mis-propiedades" class="user-menu">
+                <i class="fa fa-home"></i>
+                <span>Mis Propiedades</span>
+            </a>
+
             <!-- Botón Favoritos -->
             <a href="/favoritos" class="user-menu">
                 <i class="fa fa-heart"></i>
