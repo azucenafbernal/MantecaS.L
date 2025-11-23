@@ -138,8 +138,7 @@
 
         <div class="buttons">
             <a th:href="@{/propiedades}" class="btn">⬅ Volver al catálogo</a>
-            <a th:href="@{/reservas/nueva/{id}(id=${inmueble.id})}" class="btn-reserva">🏠 Reservar Ahora</a>
-            </a>
+            <a th:href="@{/reservar/{id}(id=${inmueble.id})}" class="btn">📅 Reservar</a>
         </div>
     </div>
 </body>
