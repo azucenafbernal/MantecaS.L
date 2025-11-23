@@ -99,7 +99,7 @@ public class GestorDisponibilidad {
             // Filtro de ciudad
             boolean pasaCiudad = true;
             if (ciudad != null && !ciudad.isEmpty()) {
-                pasaCiudad = inmueble.getDireccion().toLowerCase().contains(ciudad.toLowerCase());
+                pasaCiudad = inmueble.getCiudad().toLowerCase().contains(ciudad.toLowerCase());
             }
 
             // Filtro de capacidad
