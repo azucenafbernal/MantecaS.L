@@ -67,6 +67,12 @@
 			
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/JUnit/JUnit -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
