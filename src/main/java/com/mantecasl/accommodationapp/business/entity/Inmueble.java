@@ -109,4 +109,7 @@ public class Inmueble {
     public Usuario getUsuario() {
         return propietario != null ? propietario.getUsuario() : null;
     }
+    public String getDireccion() {
+    return calle + " " + numero + ", " + ciudad + " " + codigoPostal;
+}
 }

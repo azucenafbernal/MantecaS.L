@@ -53,7 +53,7 @@ public class PropiedadController {
                     
                     // Filtro por ciudad
                     if (ciudad != null && !ciudad.trim().isEmpty()) {
-                        coincide = coincide && inmueble.getDireccion().toLowerCase().contains(ciudad.toLowerCase());
+                        coincide = coincide && inmueble.getCiudad().toLowerCase().contains(ciudad.toLowerCase());
                     }
                     
                     // Filtro por capacidad
