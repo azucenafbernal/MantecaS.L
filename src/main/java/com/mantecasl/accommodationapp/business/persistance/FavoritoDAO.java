@@ -13,6 +13,8 @@ import java.util.List;
 public interface FavoritoDAO extends JpaRepository<Favorito, Long> {
 
     List<Favorito> findByUsuario(Usuario usuario);
+    
+    List<Favorito> findByInmuebleId(Long inmuebleId);
 
     boolean existsByUsuarioAndInmueble(Usuario usuario, Inmueble inmueble);
 
