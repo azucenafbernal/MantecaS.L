@@ -110,6 +110,6 @@ public class GestorInmuebles {
     public String verPropiedad(@PathVariable Long id, Model model) {
         Inmueble inmueble = inmuebleDAO.findById(id).orElseThrow(() -> new RuntimeException("Propiedad no encontrada"));
         model.addAttribute("inmueble", inmueble);
-        return "detalle-inmueble";
+        return "detalle-propiedad";
     }
 }
