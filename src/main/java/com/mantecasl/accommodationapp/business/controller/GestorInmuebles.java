@@ -33,10 +33,7 @@ public class GestorInmuebles {
     @PostMapping("/propiedades/registrar")
     @Transactional
     public String registrarPropiedad(
-        @RequestParam String calle,
-        @RequestParam String numero,
-        @RequestParam String ciudad,
-        @RequestParam String codigoPostal,
+        @RequestParam String direccion,
         @RequestParam double precioNoche,
         @RequestParam String descripcion,
         @RequestParam Integer capacidad,
@@ -46,48 +43,49 @@ public class GestorInmuebles {
         Model model) {    
 
         try {
-            // Buscar el usuario por email
+            //Buscar el usuario por email
             Usuario usuario = usuarioDAO.findByEmail(emailPropietario);
+            
             if (usuario == null) {
                 model.addAttribute("error", "No se encontró un usuario con ese email. Debe registrarse primero.");
                 return "registro-propiedad";
             }
-
-            // Buscar si ya existe un Propietario para este usuario
+            
+            //Buscar si ya existe un Propietario para este usuario
             Propietario propietario = propietarioDAO.findByUsuarioId(usuario.getId());
+            
             if (propietario == null) {
+                //Crear nuevo Propietario
                 propietario = new Propietario();
                 propietario.setUsuario(usuario);
                 propietario.setTelefonoContacto(telefonoContacto);
                 propietario.setCuentaBancaria(cuentaBancaria);
                 propietario = propietarioDAO.save(propietario);
             } else {
+                //Opcional: Actualizar datos si el propietario ya existe
                 propietario.setTelefonoContacto(telefonoContacto);
                 propietario.setCuentaBancaria(cuentaBancaria);
             }
 
-            // Crear y guardar el inmueble usando los campos separados
+            //Crear y guardar el inmueble
             Inmueble inmueble = new Inmueble();
-            inmueble.setCalle(calle);
-            inmueble.setNumero(numero);
-            inmueble.setCiudad(ciudad);
-            inmueble.setCodigoPostal(codigoPostal);
+            inmueble.setDireccion(direccion);
             inmueble.setPrecioNoche(precioNoche);
             inmueble.setDescripcion(descripcion);
             inmueble.setCapacidad(capacidad);
             inmueble.setPropietario(propietario);
-
+            
             Inmueble nuevoInmueble = inmuebleDAO.save(inmueble);
 
-            // Agregar el inmueble a la lista del propietario
+            //Agregar el inmueble a la lista del propietario
             propietario.agregarInmueble(nuevoInmueble);
 
-            // Mandar datos a la interfaz
+            //Mandar datos a la interfaz
             model.addAttribute("inmueble", nuevoInmueble);
             model.addAttribute("propietario", propietario);
             model.addAttribute("usuario", usuario);
             model.addAttribute("mensaje", "¡Propiedad registrada exitosamente!");
-
+                    
             return "resultado-propiedad";
 
         } catch (Exception e) {
@@ -95,7 +93,6 @@ public class GestorInmuebles {
             return "registro-propiedad";
         }
     }
-
 
     //Listar todas las propiedades
     @GetMapping("/propiedades")
@@ -110,6 +107,6 @@ public class GestorInmuebles {
     public String verPropiedad(@PathVariable Long id, Model model) {
         Inmueble inmueble = inmuebleDAO.findById(id).orElseThrow(() -> new RuntimeException("Propiedad no encontrada"));
         model.addAttribute("inmueble", inmueble);
-        return "detalle-inmueble";
+        return "detalle-propiedad";
     }
 }

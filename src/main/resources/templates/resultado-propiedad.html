@@ -3,142 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="'Detalles de la propiedad en ' + ${inmueble.calle} + ' ' + ${inmueble.numero}">Detalles</title>
+    <title>Propiedad Registrada</title>
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            min-height: 100vh;
+        * {
             margin: 0;
-            font-family: 'Segoe UI', sans-serif;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            padding: 30px;
-            color: #333;
+            align-items: center;
+            padding: 20px;
         }
+        
         .container {
-            background: #fff;
             width: 100%;
-            max-width: 900px;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            animation: fadeIn .6s ease-in-out;
+            max-width: 600px;
         }
-        @keyframes fadeIn {
-            from { opacity:0; transform:translateY(20px); }
-            to   { opacity:1; transform:translateY(0); }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
-        .title {
+        
+        .header {
+            background: linear-gradient(to right, #4ecdc4, #44a08d);
+            color: white;
+            padding: 25px 20px;
             text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .property-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
             margin-bottom: 25px;
         }
-        .title h1 {
-            color: #4a00e0;
-            font-size: 30px;
-            margin-bottom: 5px;
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9ecef;
         }
-        .title p {
+        
+        .info-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .info-value {
+            color: #6c757d;
+            text-align: right;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 14px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(to right, #3ebbb4, #3a907f);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: #4ecdc4;
+            border: 2px solid #4ecdc4;
+            border-radius: 6px;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+        
+        .btn-secondary:hover {
+            background: #4ecdc4;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
             font-size: 14px;
             color: #666;
-        }
-        .details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        .detail-item {
-            background: #f8f9fa;
-            padding: 18px;
-            border-radius: 12px;
-            transition: 0.3s;
-        }
-        .detail-item:hover {
-            background: #f1f3f5;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .detail-item span {
-            display: block;
-            font-weight: bold;
-            color: #555;
-            margin-bottom: 5px;
-        }
-        .description {
-            grid-column: 1 / -1;
-            background: #f1f3f5;
-            padding: 22px;
-            border-radius: 12px;
-            margin-top: 20px;
-        }
-        .description h3 {
-            margin-top: 0;
-            color: #4a00e0;
-        }
-        .buttons {
-            text-align: center;
-            margin-top: 30px;
-        }
-        .btn {
-            display: inline-block;
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: #fff;
-            padding: 12px 22px;
-            border-radius: 10px;
-            text-decoration: none;
-            margin: 0 8px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-        .btn:hover {
-            background: linear-gradient(to right, #5a6fd8, #6a4190);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-            transform: translateY(-3px);
-        }
-        @media (max-width: 768px) {
-            .details {
-                grid-template-columns: 1fr;
-            }
+            border-top: 1px solid #eee;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="title">
-            <h1 th:text="'Detalles de la propiedad en ' + ${inmueble.calle} + ' ' + ${inmueble.numero} + ', ' + ${inmueble.ciudad}">Detalles</h1>
-            <p>ID de propiedad: <span th:text="${inmueble.id}"></span></p>
-        </div>
-
-        <div class="details">
-            <div class="detail-item">
-                <span>📍 Dirección:</span>
-                <p th:text="${inmueble.calle} + ' ' + ${inmueble.numero} + ', ' + ${inmueble.ciudad} + ' ' + ${inmueble.codigoPostal}"></p>
+        <div class="card">
+            <div class="header">
+                <div class="success-icon">✅</div>
+                <h1>¡Propiedad Registrada Exitosamente!</h1>
+                <p>Tu propiedad ha sido registrada en el sistema</p>
             </div>
-            <div class="detail-item">
-                <span>💰 Precio por noche:</span>
-                <p th:text="|€${inmueble.precioNoche}|"></p>
+            
+            <div class="content">
+                <div class="property-info">
+                    <div class="info-item">
+                        <span class="info-label">ID de Propiedad:</span>
+                        <span class="info-value" th:text="${inmueble.id}">123</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Dirección:</span>
+                        <span class="info-value" th:text="${inmueble.direccion}">Calle Ejemplo 123</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Precio/Noche:</span>
+                        <span class="info-value" th:text="|€ ${inmueble.precioNoche}|">€50.00</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Capacidad:</span>
+                        <span class="info-value" th:text="|${inmueble.capacidad} personas|">4 personas</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Usuario:</span>
+                        <span class="info-value" th:text="${usuario.nombre}">Juan Pérez</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" th:text="${usuario.email}">juan@ejemplo.com</span>
+                    </div>
+                    <div th:if="${inmueble.descripcion}" class="info-item">
+                        <span class="info-label">Descripción:</span>
+                        <span class="info-value" th:text="${inmueble.descripcion}">Descripción...</span>
+                    </div>
+                </div>
+                
+                <a th:href="@{/propiedades/registro}" class="btn-primary">Registrar Otra Propiedad</a>
+                <a th:href="@{/propiedades}" class="btn-secondary">Ver Todas las Propiedades</a>
             </div>
-            <div class="detail-item">
-                <span>👥 Capacidad:</span>
-                <p th:text="${inmueble.capacidad} + ' personas'"></p>
+            
+            <div class="footer">
+                <p>¿Necesitas ayuda? <a href="#">Contáctanos</a></p>
             </div>
-            <div class="detail-item">
-                <span>👤 Propietario:</span>
-                <p th:text="${inmueble.usuario.nombre}"></p>
-            </div>
-            <div class="detail-item">
-                <span>📧 Email de contacto:</span>
-                <p th:text="${inmueble.usuario.email}"></p>
-            </div>
-        </div>
-
-        <div class="description" th:if="${inmueble.descripcion}">
-            <h3>📝 Descripción del inmueble:</h3>
-            <p th:text="${inmueble.descripcion}"></p>
-        </div>
-
-        <div class="buttons">
-            <a th:href="@{/propiedades}" class="btn">⬅ Volver al catálogo</a>
-            <a th:href="@{/reservar/{id}(id=${inmueble.id})}" class="btn">📅 Reservar</a>
         </div>
     </div>
 </body>

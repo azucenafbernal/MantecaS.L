@@ -9,10 +9,7 @@ public class Inmueble {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String calle;
-    private String numero;
-    private String ciudad;
-    private String codigoPostal;
+    private String direccion;
     private double precioNoche;
     private String descripcion;
     private Integer capacidad;
@@ -25,11 +22,8 @@ public class Inmueble {
     //Constructores
     public Inmueble() {}
     
-    public Inmueble(String calle, String numero, String ciudad, String codigoPostal, double precioNoche, String descripcion, Integer capacidad, Propietario propietario) {
-        this.calle = calle;
-        this.numero = numero;
-        this.ciudad = ciudad;
-        this.codigoPostal = codigoPostal;
+    public Inmueble(String direccion, double precioNoche, String descripcion, Integer capacidad, Propietario propietario) {
+        this.direccion = direccion;
         this.precioNoche = precioNoche;
         this.descripcion = descripcion;
         this.capacidad = capacidad;
@@ -37,11 +31,8 @@ public class Inmueble {
     }
     
     //Constructor alternativo para compatibilidad
-    public Inmueble(String calle, String numero, String ciudad, String codigoPostal, double precioNoche, String descripcion, Integer capacidad, Usuario usuario) {
-        this.calle = calle;
-        this.numero = numero;
-        this.ciudad = ciudad;
-        this.codigoPostal = codigoPostal;
+    public Inmueble(String direccion, double precioNoche, String descripcion, Integer capacidad, Usuario usuario) {
+        this.direccion = direccion;
         this.precioNoche = precioNoche;
         this.descripcion = descripcion;
         this.capacidad = capacidad;
@@ -56,29 +47,11 @@ public class Inmueble {
     public void setId(Long id) {
         this.id = id;
     }
-    public String getCalle() { 
-        return calle; 
+    public String getDireccion() { 
+        return direccion; 
     }
-    public void setCalle(String calle) { 
-        this.calle = calle; 
-    }
-    public String getNumero() { 
-        return numero; 
-    }
-    public void setNumero(String numero) { 
-        this.numero = numero; 
-    }
-    public String getCiudad() { 
-        return ciudad; 
-    }
-    public void setCiudad(String ciudad) { 
-        this.ciudad = ciudad; 
-    }
-    public String getCodigoPostal() { 
-        return codigoPostal; 
-    }
-    public void setCodigoPostal(String codigoPostal) { 
-        this.codigoPostal = codigoPostal; 
+    public void setDireccion(String direccion) { 
+        this.direccion = direccion; 
     }
     public double getPrecioNoche() { 
         return precioNoche; 
@@ -109,7 +82,4 @@ public class Inmueble {
     public Usuario getUsuario() {
         return propietario != null ? propietario.getUsuario() : null;
     }
-    public String getDireccion() {
-    return calle + " " + numero + ", " + ciudad + " " + codigoPostal;
-}
 }
