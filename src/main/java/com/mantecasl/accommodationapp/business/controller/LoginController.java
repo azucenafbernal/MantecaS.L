@@ -5,10 +5,7 @@ import com.mantecasl.accommodationapp.business.persistance.UsuarioDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-
+import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -19,7 +16,6 @@ public class LoginController {
 
     @GetMapping("/login")
     public String mostrarLogin(Model model, HttpSession session) {
-        //Si ya está logueado, redirigir a resultLogin
         if (session.getAttribute("usuario") != null) {
             return "redirect:/resultLogin";
         }
@@ -30,12 +26,15 @@ public class LoginController {
     @PostMapping("/login")
     public String procesarLogin(@ModelAttribute Usuario usuario, Model model, HttpSession session) {
         Usuario encontrado = usuarioDAO.findByEmail(usuario.getEmail());
+
         if (encontrado == null || !encontrado.getContrasena().equals(usuario.getContrasena())) {
             model.addAttribute("error", "Correo o contraseña incorrectos");
             return "login";
         }
-        //Guardar usuario en sesión
+
+        // GUARDAR USUARIO EN SESIÓN (LOGIN REAL)
         session.setAttribute("usuario", encontrado);
+
         return "redirect:/resultLogin";
     }
 
