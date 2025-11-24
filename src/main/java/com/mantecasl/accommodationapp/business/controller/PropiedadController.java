@@ -1,14 +1,14 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import java.util.List;
-
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.mantecasl.accommodationapp.business.entity.Inmueble;
-import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import java.util.List;
 
 @Controller
 public class PropiedadController {
@@ -17,10 +17,27 @@ public class PropiedadController {
     private InmuebleDAO inmuebleDAO;
 
     @GetMapping("/catalogo")
-    public String verCatalogo(Model model) {
+    public String verCatalogo(
+            @RequestParam(required = false) String ciudad,
+            @RequestParam(required = false) String fechaInicio,
+            @RequestParam(required = false) String fechaFin,
+            @RequestParam(required = false) Integer capacidad,
+            Model model) {
+        
         // Obtenemos todos los inmuebles de la base de datos
-        List<Inmueble> lista = inmuebleDAO.findAll();
-        model.addAttribute("propiedades", lista);
+        List<Inmueble> todasLasPropiedades = inmuebleDAO.findAll();
+        
+        // Filtrar según los parámetros recibidos
+        List<Inmueble> propiedadesFiltradas = filtrarPropiedades(todasLasPropiedades, ciudad, capacidad);
+        
+        model.addAttribute("propiedades", propiedadesFiltradas);
+        
+        // Pasar los filtros aplicados para mostrarlos en la vista
+        model.addAttribute("filtroCiudad", ciudad);
+        model.addAttribute("filtroCapacidad", capacidad);
+        model.addAttribute("filtroFechaInicio", fechaInicio);
+        model.addAttribute("filtroFechaFin", fechaFin);
+        
         return "lista-propiedades";
     }
     
