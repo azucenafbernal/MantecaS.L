@@ -6,5 +6,5 @@ import com.mantecasl.accommodationapp.business.entity.Inmueble;
 
 @Repository
 public interface InmuebleDAO extends JpaRepository<Inmueble, Long> {
-
+    
 }

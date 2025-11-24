@@ -6,7 +6,5 @@ import com.mantecasl.accommodationapp.business.entity.Reserva;
 
 @Repository
 public interface ReservaDAO extends JpaRepository<Reserva, Long>{
-    java.util.List<Reserva> findByInmuebleIdAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(
-            Long inmuebleId, java.time.LocalDate fechaFin, java.time.LocalDate fechaInicio);
 
 }
