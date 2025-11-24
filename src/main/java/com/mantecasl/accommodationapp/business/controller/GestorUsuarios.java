@@ -2,13 +2,11 @@ package com.mantecasl.accommodationapp.business.controller;
 
 import com.mantecasl.accommodationapp.business.entity.Usuario;
 import com.mantecasl.accommodationapp.business.persistance.UsuarioDAO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class GestorUsuarios {
@@ -19,7 +17,7 @@ public class GestorUsuarios {
     @GetMapping("/usuarios")
     public String mostrarFormulario(Model model) {
         model.addAttribute("usuario", new Usuario());
-        return "greeting";  // tu greeting.html
+        return "greeting"; // registro
     }
 
     @PostMapping("/usuarios")
@@ -30,7 +28,9 @@ public class GestorUsuarios {
         }
         Usuario nuevo = usuarioDAO.save(usuario);
         model.addAttribute("usuario", nuevo);
-        return "result"; // tu result.html
+
+        // después de registrarse, enviamos a login
+        model.addAttribute("mensaje", "Registro completado correctamente. Inicia sesión.");
+        return "login";
     }
-    
 }
