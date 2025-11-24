@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva de <span th:text="${inmueble.direccion}"></span></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .btn-reserva {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-reserva:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(135deg, #218838, #1ea085);
+        }
+        
+        .btn-volver {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-volver:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #5a6268, #3d4348);
+            color: white;
+        }
+        
+        .property-card, .form-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div class="container py-5">
+        <h1 class="mb-4 text-center">Reserva tu estancia</h1>
+
+        <!-- Mensajes de error -->
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Tarjeta del inmueble -->
+        <div class="card mb-4 property-card">
+            <div class="row g-0">
+                <div class="col-md-4">
+                    <img src="/images/foto.jpg" class="img-fluid rounded-start" alt="Foto del inmueble" style="height: 250px; object-fit: cover;">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h3 class="card-title" th:text="${inmueble.direccion}"></h3>
+                        <p class="card-text">
+                            <strong>📍 Dirección:</strong> <span th:text="${inmueble.direccion}"></span><br>
+                            <strong>👥 Capacidad:</strong> <span th:text="${inmueble.capacidad}"></span> personas<br>
+                            <strong>💰 Precio por noche:</strong> €<span th:text="${inmueble.precioNoche}"></span>
+                        </p>
+                        <div th:if="${inmueble.descripcion}">
+                            <strong>📝 Descripción:</strong> 
+                            <p class="card-text" th:text="${inmueble.descripcion}"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de reserva -->
+        <div class="card form-card">
+            <div class="card-body">
+                <h4 class="mb-3">📅 Selecciona tus fechas</h4>
+
+                <!-- CAMBIO IMPORTANTE: acción corregida -->
+                <form th:action="@{/reservas/confirmar}" method="post">
+                    <input type="hidden" name="inmuebleId" th:value="${inmueble.id}">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">📅 Fecha de entrada</label>
+                            <input type="date" name="fechaInicio" class="form-control" required
+                                   th:value="${fechaInicio}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">📅 Fecha de salida</label>
+                            <input type="date" name="fechaFin" class="form-control" required
+                                   th:value="${fechaFin}">
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">🎯 Tipo de reserva</label>
+                            <select name="directa" class="form-select" required>
+                                <option value="true">Reserva Directa</option>
+                                <option value="false">Reserva con Confirmación</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/inmueble/{id}(id=${inmueble.id})}" class="btn-volver">
+                            ⬅ Volver al detalle
+                        </a>
+                        <button type="submit" class="btn-reserva">
+                            🏠 Confirmar reserva
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
