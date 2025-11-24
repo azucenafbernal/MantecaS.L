@@ -120,24 +120,12 @@
 <body>
     <div class="navbar">
         <div class="logo" onclick="window.location.href='/'">Manteca SL</div>
-
-        <!-- ✔️ Nuevo contenedor para agrupar favoritos + usuario -->
-        <div class="right-menu">
-
-            <!-- Botón Favoritos -->
-            <a href="/favoritos" class="user-menu">
-                <i class="fa fa-heart"></i>
-                <span>Favoritos</span>
-            </a>
-
-            <!-- Menú de usuario -->
-            <a th:href="${usuario != null ? '/resultLogin' : '/login'}" class="user-menu">
-                <i class="fa fa-user"></i>
-                <span th:if="${usuario != null}" th:text="${usuario.nombre}">Usuario</span>
-                <span th:if="${usuario == null}">Iniciar sesión</span>
-            </a>
-
-        </div>
+        <!-- Menú de usuario que cambia según si está logueado o no -->
+        <a th:href="${usuario != null ? '/configuracion?idUsuario=' + usuario.id : '/login'}" class="user-menu">
+            <i class="fa fa-user"></i> 
+            <span th:if="${usuario != null}" th:text="${usuario.nombre}">Usuario</span>
+            <span th:if="${usuario == null}">Iniciar sesión</span>
+        </a>
     </div>
 
     <div class="hero">

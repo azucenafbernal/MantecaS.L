@@ -106,14 +106,14 @@
             <h2>Información del Usuario</h2>
             <div class="info-item">
                 <span class="info-label">Nombre:</span>
-                <span class="info-value" th:text="${usuario.nombre}">Juan Pérez</span>
+                <a th:href="@{/configuracion(idUsuario=${usuario.id})}" class="info-value" style="color: #4a00e0; text-decoration: none; cursor: pointer; font-weight: 600;" th:text="${usuario.nombre}">Juan Pérez</a>
             </div>
             <div class="info-item">
                 <span class="info-label">Email:</span>
                 <span class="info-value" th:text="${usuario.email}">juan@correo.com</span>
             </div>
 
-            <a href="#" class="btn btn-primary">Cambiar Contraseña</a>
+            <a th:href="@{/configuracion(idUsuario=${usuario.id})}" class="btn btn-primary">Configurar Cuenta</a>
             <a href="#" class="btn btn-secondary">Añadir Método de Autenticación</a>
         </div>
 
