@@ -12,24 +12,15 @@
             min-height:100vh; display:flex; flex-direction:column;
         }
         .navbar {
-            width:100%; padding:20px 40px; position:absolute; top:0; left:0; 
-            display:flex; justify-content:space-between; align-items:center;
+            width:100%; padding:20px 40px; position:absolute; top:0; left:0; display:flex; justify-content:space-between; align-items:center;
             color:white; font-weight:600; font-size:20px;
         }
         .navbar .logo {cursor:pointer; font-size:22px; font-weight:700;}
-
-        /* ✔️ Nuevo contenedor para mantener Favoritos + Usuario juntos */
-        .right-menu {
-            display: flex;
-            align-items: center;
-            gap: 15px; /* separación entre botones */
-        }
-
         .navbar .user-menu {
-            display:flex;
-            align-items:center;
-            cursor:pointer;
-            gap:10px;
+            display:flex; 
+            align-items:center; 
+            cursor:pointer; 
+            gap:10px; 
             font-size:16px;
             padding: 8px 16px;
             border-radius: 20px;
@@ -41,7 +32,6 @@
             background-color: rgba(255, 255, 255, 0.1);
         }
         .navbar .user-menu i {font-size:20px;}
-
         .hero {
             margin-top:120px; display:flex; flex-direction:column; align-items:center; text-align:center; color:white;
         }
@@ -60,8 +50,7 @@
         .hero p {font-size:18px; opacity:0.9; margin-top:5px;}
 
         .search-box {
-            margin-top:30px; background:white; border-radius:50px; 
-            display:flex; box-shadow:0 5px 20px rgba(0,0,0,0.2);
+            margin-top:30px; background:white; border-radius:50px; display:flex; box-shadow:0 5px 20px rgba(0,0,0,0.2);
             overflow:hidden; width:80%; max-width:900px;
         }
         .search-item {flex:1; padding:15px 20px; display:flex; flex-direction:column; justify-content:center;}
@@ -86,7 +75,7 @@
             margin-top: 30px;
             cursor: pointer;
             transition: all 0.4s ease;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
             position: relative;
             overflow: hidden;
             border: none;
@@ -103,7 +92,9 @@
             transition: all 0.4s ease;
         }
 
-        .btn-ver-catalogo:hover::after { width: 100%; }
+        .btn-ver-catalogo:hover::after {
+            width: 100%;
+        }
 
         .btn-ver-catalogo:hover {
             transform: translateY(-3px) scale(1.02);
@@ -116,7 +107,6 @@
         }
     </style>
 </head>
-
 <body>
     <div class="navbar">
         <div class="logo" onclick="window.location.href='/'">Manteca SL</div>
@@ -132,31 +122,27 @@
         <h1>Encuentra tu próximo alojamiento</h1>
         <p>Explora lugares únicos en todo el mundo con Manteca SL</p>
 
-        <form action="/catalogo" method="get" class="search-box">
+        <div class="search-box">
             <div class="search-item">
                 <label>¿Dónde?</label>
-                <input type="text" name="ciudad" placeholder="Destino, ciudad...">
+                <input type="text" placeholder="Destino, ciudad...">
             </div>
-
             <div class="search-item">
                 <label>Entrada</label>
-                <input type="date" name="fechaInicio">
+                <input type="date">
             </div>
-
             <div class="search-item">
                 <label>Salida</label>
-                <input type="date" name="fechaFin">
+                <input type="date">
             </div>
-
             <div class="search-item">
                 <label>Huéspedes</label>
-                <input type="number" name="capacidad" placeholder="1" min="1">
+                <input type="number" placeholder="1" min="1">
             </div>
-
-            <button class="search-button" type="submit">
+            <button class="search-button" onclick="window.location.href='/propiedad/CatalogoUsuariosOpcionBusqueda.html'">
                 Buscar
             </button>
-        </form>
+        </div>
 
         <button class="btn-ver-catalogo" onclick="window.location.href='/catalogo'">
              Ver catálogo de alojamientos
