@@ -48,6 +48,33 @@
             border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
+        
+        .login-alert {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            background: #e8f4fd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-step {
+            margin-bottom: 30px;
+        }
     </style>
 </head>
 
@@ -57,6 +84,20 @@
 
         <!-- Mensajes de error -->
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Verificación de sesión -->
+        <div th:if="${usuario == null}" class="login-alert text-center">
+            <h4>🔐 Inicia sesión para continuar</h4>
+            <p>Necesitas tener una cuenta para realizar una reserva</p>
+            
+            <!-- Usar "from" en lugar de "redirect" -->
+            <a th:href="@{'/login?from=' + ${fromUrl}}" class="btn btn-primary">
+                🚪 Iniciar Sesión
+            </a>
+            <a th:href="@{/registro}" class="btn btn-outline-secondary ms-2">
+                📝 Registrarse
+            </a>
+        </div>
 
         <!-- Tarjeta del inmueble -->
         <div class="card mb-4 property-card">
@@ -81,38 +122,108 @@
             </div>
         </div>
 
-        <!-- Formulario de reserva -->
-        <div class="card form-card">
-            <div class="card-body">
-                <h4 class="mb-3">📅 Selecciona tus fechas</h4>
+        <!-- Información del usuario logueado -->
+        <div th:if="${usuario != null}" class="user-info">
+            <h5>👤 Información del usuario</h5>
+            <p class="mb-1"><strong>Nombre:</strong> <span th:text="${usuario.nombre}"></span></p>
+            <p class="mb-1"><strong>Email:</strong> <span th:text="${usuario.email}"></span></p>
+            <p class="mb-0"><small class="text-muted">Si necesitas actualizar tu información, ve a tu perfil</small></p>
+        </div>
 
-                <!-- CAMBIO IMPORTANTE: acción corregida -->
+        <!-- Formulario de reserva (solo visible si está logueado) -->
+        <div th:if="${usuario != null}" class="card form-card">
+            <div class="card-body">
                 <form th:action="@{/reservas/confirmar}" method="post">
                     <input type="hidden" name="inmuebleId" th:value="${inmueble.id}">
+                    <input type="hidden" name="usuarioId" th:value="${usuario.id}">
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">📅 Fecha de entrada</label>
-                            <input type="date" name="fechaInicio" class="form-control" required
-                                   th:value="${fechaInicio}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">📅 Fecha de salida</label>
-                            <input type="date" name="fechaFin" class="form-control" required
-                                   th:value="${fechaFin}">
-                        </div>
-                    </div>
-
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label">🎯 Tipo de reserva</label>
-                            <select name="directa" class="form-select" required>
-                                <option value="true">Reserva Directa</option>
-                                <option value="false">Reserva con Confirmación</option>
-                            </select>
+                    <!-- Paso 1: Fechas de la reserva -->
+                    <div class="form-step">
+                        <h4 class="section-title">📅 Selecciona tus fechas</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha de entrada</label>
+                                <input type="date" name="fechaInicio" class="form-control" required
+                                       th:value="${fechaInicio}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha de salida</label>
+                                <input type="date" name="fechaFin" class="form-control" required
+                                       th:value="${fechaFin}">
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Paso 2: Información del inquilino -->
+                    <div class="form-step">
+                        <h4 class="section-title">👤 Información del inquilino</h4>
+                        
+                        <!-- Si ya es inquilino, mostrar info existente -->
+                        <div th:if="${inquilino != null}" class="alert alert-info">
+                            <p><strong>Información guardada:</strong> Usaremos tus datos de inquilino existentes.</p>
+                            <p class="mb-1"><strong>Teléfono:</strong> <span th:text="${inquilino.telefono}"></span></p>
+                            <p class="mb-0"><strong>Documento:</strong> <span th:text="${inquilino.documentoIdentidad}"></span></p>
+                        </div>
+                        
+                        <!-- Campos para nuevo inquilino o actualización -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">📞 Teléfono de contacto *</label>
+                                <input type="tel" name="telefono" class="form-control" required
+                                       th:value="${inquilino != null} ? ${inquilino.telefono} : ''"
+                                       placeholder="Ej: +34 612 345 678">
+                                <div class="form-text">Necesitamos tu teléfono para contactarte</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">🆔 Documento de identidad *</label>
+                                <input type="text" name="documentoIdentidad" class="form-control" required
+                                       th:value="${inquilino != null} ? ${inquilino.documentoIdentidad} : ''"
+                                       placeholder="DNI, NIE o Pasaporte">
+                                <div class="form-text">Para verificar tu identidad</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label class="form-label">💬 Observaciones (opcional)</label>
+                                <textarea name="observaciones" class="form-control" rows="3" 
+                                          placeholder="Información adicional, necesidades especiales, etc."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso 3: Tipo de reserva -->
+                    <div class="form-step">
+                        <h4 class="section-title">🎯 Tipo de reserva</h4>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Selecciona el tipo de reserva</label>
+                                <select name="directa" class="form-select" required>
+                                    <option value="true">Reserva Directa</option>
+                                    <option value="false">Reserva con Confirmación</option>
+                                </select>
+                                <div class="form-text">
+                                    <strong>Directa:</strong> Reserva inmediata<br>
+                                    <strong>Con confirmación:</strong> Espera aprobación del propietario
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Resumen y confirmación -->
+                    <div class="form-step">
+                        <h4 class="section-title">✅ Resumen de la reserva</h4>
+                        <div class="alert alert-warning">
+                            <h6>⚠️ Antes de confirmar, verifica:</h6>
+                            <ul class="mb-0">
+                                <li>Las fechas seleccionadas son correctas</li>
+                                <li>Tu información de contacto está actualizada</li>
+                                <li>Has leído las condiciones de cancelación</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
                     <div class="d-flex justify-content-between mt-4">
                         <a th:href="@{/inmueble/{id}(id=${inmueble.id})}" class="btn-volver">
                             ⬅ Volver al detalle
@@ -124,6 +235,33 @@
                 </form>
             </div>
         </div>
+
+        <!-- Mensaje si no está logueado -->
+        <div th:if="${usuario == null}" class="text-center mt-4">
+            <p class="text-muted">Una vez que inicies sesión, podrás completar el formulario de reserva</p>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validación de fechas en el cliente
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInicio = document.querySelector('input[name="fechaInicio"]');
+            const fechaFin = document.querySelector('input[name="fechaFin"]');
+            
+            // Establecer fecha mínima como hoy
+            const today = new Date().toISOString().split('T')[0];
+            fechaInicio.min = today;
+            fechaFin.min = today;
+            
+            // Actualizar fecha mínima de fin cuando cambia la de inicio
+            fechaInicio.addEventListener('change', function() {
+                fechaFin.min = this.value;
+                if (fechaFin.value && fechaFin.value < this.value) {
+                    fechaFin.value = this.value;
+                }
+            });
+        });
+    </script>
 </body>
 </html>
