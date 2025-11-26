@@ -2,7 +2,6 @@ package com.mantecasl.accommodationapp.business.entity;
 
 import java.sql.Date;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity

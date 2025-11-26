@@ -1,4 +1,4 @@
-package com.mantecasl.accommodationapp.business.controller;
+/*package com.mantecasl.accommodationapp.business.controller;
 
 import com.mantecasl.accommodationapp.business.entity.Disponibilidad;
 import com.mantecasl.accommodationapp.business.entity.Inmueble;
@@ -71,4 +71,4 @@ public class ReservaController {
             return "reserva-inmueble";
         }
     }
-}
+}*/

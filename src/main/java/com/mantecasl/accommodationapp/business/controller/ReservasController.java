@@ -21,65 +21,48 @@ public class ReservasController {
     private GestorDisponibilidad gestorDisponibilidad;
 
     @Autowired
-    private GestorReservas gestorReservas;
-
-    @Autowired
     private InmuebleDAO inmuebleDAO;
 
-    // Formulario de reserva
-    @GetMapping("/reservas/nueva/{inmuebleId}")
-    public String mostrarFormularioReserva(@PathVariable Long inmuebleId, 
-                                        @RequestParam(required = false) String fechaInicio,
-                                        @RequestParam(required = false) String fechaFin,
-                                        HttpSession session,
-                                        Model model) {
-        
+    @GetMapping("/nueva/{inmuebleId}")
+    public String mostrarFormularioReserva(
+            @PathVariable Long inmuebleId,
+            @RequestParam(required = false) String fechaInicio,
+            @RequestParam(required = false) String fechaFin,
+            HttpSession session,
+            Model model) {
+
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        
+
+        if (usuario == null) {
+            return "redirect:/login?from=/reservas/nueva/" + inmuebleId;
+        }
+
         Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
-        if (!inmuebleOpt.isPresent()) {
+        if (inmuebleOpt.isEmpty()) {
             return "redirect:/";
         }
 
+        model.addAttribute("usuario", usuario);
         model.addAttribute("inmueble", inmuebleOpt.get());
         model.addAttribute("fechaInicio", fechaInicio);
         model.addAttribute("fechaFin", fechaFin);
-        model.addAttribute("usuario", usuario);
-        
-        // Pasar la URL actual como "from"
-        String currentUrl = "/reservas/nueva/" + inmuebleId;
-        if (fechaInicio != null && !fechaInicio.isEmpty()) {
-            currentUrl += "?fechaInicio=" + fechaInicio;
-            if (fechaFin != null && !fechaFin.isEmpty()) {
-                currentUrl += "&fechaFin=" + fechaFin;
-            }
-        }
-        model.addAttribute("fromUrl", currentUrl);
 
         return "reserva-inmueble";
     }
 
-    // Procesar reserva
-    @PostMapping("/reservas/confirmar")
+    @PostMapping("/confirmar")
     public String confirmarReserva(
             @RequestParam Long inmuebleId,
             @RequestParam String fechaInicio,
             @RequestParam String fechaFin,
             @RequestParam boolean directa,
-            HttpSession session,  
+            HttpSession session,
             Model model) {
-        
-        // OBTENER USUARIO DE LA SESIÓN
+
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-        
-        // Verificar que el usuario está logueado
+
         if (usuario == null) {
-            model.addAttribute("error", "Debes iniciar sesión para realizar una reserva");
-            Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
-            if (inmuebleOpt.isPresent()) {
-                model.addAttribute("inmueble", inmuebleOpt.get());
-            }
-            return "reserva-inmueble";
+            return "redirect:/login?from=/reservas/nueva/" + inmuebleId;
         }
 
         try {
@@ -87,8 +70,8 @@ public class ReservasController {
             Date inicio = fechas[0];
             Date fin = fechas[1];
 
-            // Crear la reserva usando el usuario de la sesión
-            Disponibilidad reserva = gestorDisponibilidad.crearReserva(inmuebleId, inicio, fin, directa);
+            Disponibilidad reserva = gestorDisponibilidad.crearReserva(
+                    inmuebleId, inicio, fin, directa);
 
             model.addAttribute("reserva", reserva);
             model.addAttribute("inmueble", reserva.getInmueble());
@@ -99,11 +82,10 @@ public class ReservasController {
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
-            if (inmuebleOpt.isPresent()) {
-                model.addAttribute("inmueble", inmuebleOpt.get());
-            }
-            model.addAttribute("usuario", usuario); 
+            inmuebleOpt.ifPresent(i -> model.addAttribute("inmueble", i));
+            model.addAttribute("usuario", usuario);
             return "reserva-inmueble";
         }
     }
 }
+
