@@ -1,7 +1,7 @@
 package com.mantecasl.accommodationapp.business.controller;
 
 import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.*;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -22,6 +22,15 @@ public class ReservasController {
 
     @Autowired
     private InmuebleDAO inmuebleDAO;
+
+    @Autowired
+    private ReservaDAO reservaDAO;
+
+    @Autowired
+    private InquilinoDAO inquilinoDAO;
+
+    @Autowired
+    private DisponibilidadDAO disponibilidadDAO; // Añadir este DAO
 
     @GetMapping("/nueva/{inmuebleId}")
     public String mostrarFormularioReserva(
@@ -56,6 +65,9 @@ public class ReservasController {
             @RequestParam String fechaInicio,
             @RequestParam String fechaFin,
             @RequestParam boolean directa,
+            @RequestParam String telefono,
+            @RequestParam String documentoIdentidad,
+            @RequestParam String metodoPago,
             HttpSession session,
             Model model) {
 
@@ -66,16 +78,66 @@ public class ReservasController {
         }
 
         try {
+            // Validar fechas
             Date[] fechas = gestorDisponibilidad.validarFechas(fechaInicio, fechaFin);
             Date inicio = fechas[0];
             Date fin = fechas[1];
 
-            Disponibilidad reserva = gestorDisponibilidad.crearReserva(
-                    inmuebleId, inicio, fin, directa);
+            // Obtener el inmueble
+            Inmueble inmueble = inmuebleDAO.findById(inmuebleId)
+                    .orElseThrow(() -> new RuntimeException("Inmueble no encontrado"));
 
+            // VERIFICAR DISPONIBILIDAD ANTES DE CONTINUAR
+            if (!gestorDisponibilidad.verificarDisponibilidad(inmuebleId, inicio, fin)) {
+                throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas. Por favor, elige otras fechas.");
+            }
+
+            // CREAR DISPONIBILIDAD (BLOQUEAR FECHAS) - AÑADIDO
+            Disponibilidad disponibilidad = new Disponibilidad();
+            disponibilidad.setInmueble(inmueble);
+            disponibilidad.setFechaInicio(inicio);
+            disponibilidad.setFechaFin(fin);
+            disponibilidad.setDirecta(directa);
+            disponibilidad.setDisponible(false); // false = reservado
+            
+            // Calcular precio para la disponibilidad
+            long nochesDisponibilidad = (fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24);
+            double precioDisponibilidad = nochesDisponibilidad * inmueble.getPrecioNoche();
+            disponibilidad.setPrecio(precioDisponibilidad);
+            
+            disponibilidadDAO.save(disponibilidad);
+
+            // Buscar o crear inquilino
+            Inquilino inquilino = inquilinoDAO.findByUsuario(usuario).orElseGet(() -> {
+                Inquilino nuevo = new Inquilino(usuario, telefono, documentoIdentidad);
+                nuevo.setMetodoPago(metodoPago);
+                nuevo.setInmueble(inmueble); 
+                return inquilinoDAO.save(nuevo);
+            });
+
+            // Actualizar inquilino existente si es necesario
+            inquilino.setTelefono(telefono);
+            inquilino.setDocumentoIdentidad(documentoIdentidad);
+            inquilino.setMetodoPago(metodoPago);
+            inquilino.setInmueble(inmueble);
+            inquilinoDAO.save(inquilino);
+
+            // Calcular precio total para la reserva
+            long noches = (fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24);
+            double precioTotal = noches * inmueble.getPrecioNoche();
+
+            // Crear reserva
+            Reserva reserva = new Reserva(inmueble, inquilino, inicio, fin, precioTotal);
+            if (directa) {
+                reserva.confirmar();
+            }
+            reservaDAO.save(reserva);
+
+            // Pasar datos a la vista (tanto reserva como disponibilidad si lo necesitas)
             model.addAttribute("reserva", reserva);
-            model.addAttribute("inmueble", reserva.getInmueble());
-            model.addAttribute("mensaje", "¡Reserva confirmada con éxito!");
+            model.addAttribute("disponibilidad", disponibilidad); // AÑADIDO
+            model.addAttribute("inmueble", inmueble);
+            model.addAttribute("mensaje", "¡Reserva guardada correctamente!");
 
             return "confirmacion-reserva";
 
@@ -84,8 +146,10 @@ public class ReservasController {
             Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
             inmuebleOpt.ifPresent(i -> model.addAttribute("inmueble", i));
             model.addAttribute("usuario", usuario);
+            model.addAttribute("fechaInicio", fechaInicio); // Mantener las fechas en caso de error
+            model.addAttribute("fechaFin", fechaFin);
+
             return "reserva-inmueble";
         }
     }
 }
-

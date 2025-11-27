@@ -1,19 +1,24 @@
 package com.mantecasl.accommodationapp.business.entity;
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "inquilinos")
+@Table(name = "inquilino")
 public class Inquilino {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    //Relación con Usuario
+    @OneToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
+
+    //Relación con Inmueble
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inmueble_id", nullable = false)
+    private Inmueble inmueble;
 
     @Column(nullable = false)
     private String telefono;
@@ -21,14 +26,17 @@ public class Inquilino {
     @Column(nullable = false)
     private String documentoIdentidad;
 
-    private String preferencias;
-    private Integer valoracionPromedio;
+    @Column(nullable = false)
+    private String metodoPago;
 
-    @OneToMany(mappedBy = "inquilino", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Reserva> reservas = new ArrayList<>();
-
-    // Constructores
     public Inquilino() {}
+
+    public Inquilino(Usuario usuario, String telefono, String documentoIdentidad, String metodoPago) {
+        this.usuario = usuario;
+        this.telefono = telefono;
+        this.documentoIdentidad = documentoIdentidad;
+        this.metodoPago = metodoPago;
+    }
 
     public Inquilino(Usuario usuario, String telefono, String documentoIdentidad) {
         this.usuario = usuario;
@@ -53,6 +61,14 @@ public class Inquilino {
         this.usuario = usuario;
     }
 
+    public Inmueble getInmueble() {
+        return inmueble;
+    }
+
+    public void setInmueble(Inmueble inmueble) {
+        this.inmueble = inmueble;
+    }
+
     public String getTelefono() {
         return telefono;
     }
@@ -69,23 +85,15 @@ public class Inquilino {
         this.documentoIdentidad = documentoIdentidad;
     }
 
-    public String getPreferencias() {
-        return preferencias;
+    public String getMetodoPago() {
+        return metodoPago;
     }
 
-    public void setPreferencias(String preferencias) {
-        this.preferencias = preferencias;
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
     }
 
-    public Integer getValoracionPromedio() {
-        return valoracionPromedio;
-    }
-
-    public void setValoracionPromedio(Integer valoracionPromedio) {
-        this.valoracionPromedio = valoracionPromedio;
-    }
-
-    public List<Reserva> getReservas() {
+    /*public List<Reserva> getReservas() {
         return reservas;
     }
 
@@ -97,7 +105,7 @@ public class Inquilino {
     public void agregarReserva(Reserva reserva) {
         reservas.add(reserva);
         reserva.setInquilino(this);
-    }
+    }*/
 
     public String getNombreCompleto() {
         return usuario != null ? usuario.getNombre() : "";

@@ -53,11 +53,8 @@
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>📅 Fecha de salida:</strong> <span th:text="${reserva.fechaFin}"></span></p>
-                                    <p><strong>💰 Precio total:</strong> €<span th:text="${#numbers.formatDecimal(reserva.precio, 1, 2)}"></span></p>
-                                    <p><strong>🎯 Tipo:</strong> 
-                                        <span th:if="${reserva.directa}">Reserva Directa</span>
-                                        <span th:if="${!reserva.directa}">Reserva con Confirmación</span>
-                                    </p>
+                                    <p><strong>💰 Precio total:</strong> €<span th:text="${#numbers.formatDecimal(reserva.precioTotal, 1, 2)}"></span></p>
+                                    <p><strong>📊 Estado:</strong> <span th:text="${reserva.estado}"></span></p>
                                 </div>
                             </div>
                         </div>

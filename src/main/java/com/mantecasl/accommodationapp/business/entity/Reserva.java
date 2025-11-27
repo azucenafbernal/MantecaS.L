@@ -37,7 +37,6 @@ public class Reserva {
     private LocalDateTime fechaConfirmacion;
     private LocalDateTime fechaCancelacion;
 
-    @Column(columnDefinition = "TEXT")
     private String observaciones;
 
     // Constructores

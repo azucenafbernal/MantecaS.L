@@ -2,7 +2,6 @@ package com.mantecasl.accommodationapp.business.controller;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,18 +56,13 @@ public class GestorDisponibilidad {
             throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
         }
 
-        // Calcular precio total CORRECTAMENTE
-        long dias = ChronoUnit.DAYS.between(inicio.toLocalDate(), fin.toLocalDate());
-        double total = dias * inmueble.getPrecioNoche();
-
         // Crear la disponibilidad (reserva)
         Disponibilidad reserva = new Disponibilidad();
         reserva.setInmueble(inmueble);
         reserva.setFechaInicio(inicio);
         reserva.setFechaFin(fin);
         reserva.setDirecta(esDirecta);
-        reserva.setPrecio(total);
-        reserva.setDisponible(false); // IMPORTANTE: false = reservado
+        reserva.setDisponible(false); 
 
         return disponibilidadDAO.save(reserva);
     }
@@ -79,10 +73,10 @@ public class GestorDisponibilidad {
         
         for (Disponibilidad reserva : reservasExistentes) {
             if (seSolapan(reserva.getFechaInicio(), reserva.getFechaFin(), inicio, fin)) {
-                return false; // Hay solapamiento
+                return false;
             }
         }
-        return true; // No hay solapamientos
+        return true;
     }
 
     // Método auxiliar para verificar solapamiento

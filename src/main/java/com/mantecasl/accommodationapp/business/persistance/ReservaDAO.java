@@ -10,23 +10,18 @@ import java.sql.Date;
 import java.util.List;
 
 @Repository
-public interface ReservaDAO extends JpaRepository<Reserva, Long>{
+public interface ReservaDAO extends JpaRepository<Reserva, Long> {
+    
+    // Para verificar disponibilidad
+    @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId " +
+           "AND r.estado IN ('PENDIENTE', 'CONFIRMADA') " +
+           "AND ((r.fechaInicio BETWEEN :inicio AND :fin) OR " +
+           "(r.fechaFin BETWEEN :inicio AND :fin) OR " +
+           "(r.fechaInicio <= :inicio AND r.fechaFin >= :fin))")
+    List<Reserva> findReservasActivasEnRango(@Param("inmuebleId") Long inmuebleId, 
+                                           @Param("inicio") Date inicio, 
+                                           @Param("fin") Date fin);
+    
     List<Reserva> findByInmuebleId(Long inmuebleId);
-    List<Reserva> findByInquilinoId(Long inquilinoId);
-    List<Reserva> findByEstado(String estado);
-    
-    @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId AND r.estado IN ('CONFIRMADA', 'PENDIENTE') " +
-           "AND r.fechaInicio <= :fechaFin AND r.fechaFin >= :fechaInicio")
-    List<Reserva> findReservasActivasEnRango(
-        @Param("inmuebleId") Long inmuebleId,
-        @Param("fechaInicio") Date fechaInicio,
-        @Param("fechaFin") Date fechaFin
-    );
-    
-    @Query("SELECT r FROM Reserva r WHERE r.inquilino.usuario.id = :usuarioId")
-    List<Reserva> findByUsuarioId(@Param("usuarioId") Long usuarioId);
-
-    java.util.List<Reserva> findByInmuebleIdAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(
-            Long inmuebleId, java.time.LocalDate fechaFin, java.time.LocalDate fechaInicio);
-
+    List<Reserva> findByInquilinoUsuarioId(Long usuarioId);
 }

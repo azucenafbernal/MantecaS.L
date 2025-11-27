@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/reservas")
-public class ReservaController {
+public class DisponibilidadController {
 
     @Autowired
     private GestorDisponibilidad gestorDisponibilidad;
@@ -22,9 +22,9 @@ public class ReservaController {
     @Autowired
     private InmuebleDAO inmuebleDAO;
 
-    // Mostrar formulario de reserva
+    //Mostrar formulario de reserva
     @GetMapping("/nueva/{inmuebleId}")
-    public String mostrarFormularioReserva(@PathVariable Long inmuebleId, Model model) {
+    public String mostrarFormularioDisponibilidad(@PathVariable Long inmuebleId, Model model) {
         Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
         if (!inmuebleOpt.isPresent()) {
             return "redirect:/";
@@ -36,7 +36,7 @@ public class ReservaController {
 
     // Procesar reserva
     @PostMapping("/confirmar")
-    public String confirmarReserva(
+    public String confirmarDisponibilidad(
             @RequestParam Long inmuebleId,
             @RequestParam String fechaInicio,
             @RequestParam String fechaFin,
@@ -50,11 +50,11 @@ public class ReservaController {
             Date fin = fechas[1];
 
             // Crear la reserva
-            Disponibilidad reserva = gestorDisponibilidad.crearReserva(inmuebleId, inicio, fin, directa);
+            Disponibilidad disponibilidad = gestorDisponibilidad.crearReserva(inmuebleId, inicio, fin, directa);
 
             // Pasar datos a la vista de confirmación
-            model.addAttribute("reserva", reserva);
-            model.addAttribute("inmueble", reserva.getInmueble());
+            model.addAttribute("disponibilidad", disponibilidad);
+            model.addAttribute("inmueble", disponibilidad.getInmueble());
             model.addAttribute("mensaje", "¡Reserva confirmada con éxito!");
 
             return "confirmacion-reserva";

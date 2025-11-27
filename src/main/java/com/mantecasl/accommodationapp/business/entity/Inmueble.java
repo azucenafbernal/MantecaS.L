@@ -110,6 +110,6 @@ public class Inmueble {
         return propietario != null ? propietario.getUsuario() : null;
     }
     public String getDireccion() {
-    return calle + " " + numero + ", " + ciudad + " " + codigoPostal;
-}
+        return calle + " " + numero + ", " + ciudad + " " + codigoPostal;
+    }
 }
