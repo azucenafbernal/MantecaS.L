@@ -253,26 +253,6 @@
             margin-bottom: 30px;
         }
         
-        .no-properties .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 14px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        }
-        
-        .no-properties .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-        
         @media (max-width: 768px) {
             .properties-grid {
                 grid-template-columns: 1fr;
@@ -305,9 +285,6 @@
         <div th:if="${propiedades == null or propiedades.empty}" class="no-properties">
             <h2>No tienes propiedades publicadas</h2>
             <p>Comienza publicando tu primer alojamiento</p>
-            <a th:href="@{/propiedades/registro}" class="btn-primary">
-                ➕ Registrar Primera Propiedad
-            </a>
         </div>
         
         <!-- GRID DE PROPIEDADES -->
@@ -357,7 +334,6 @@
             </div>
         </div>
         
-        <!-- FOOTER ELEGANTE CON BOTONES CENTRADOS -->
         <div class="footer">
             <div class="footer-buttons">
                 <a th:href="@{/propiedades/registro}" class="btn-footer">
