@@ -264,6 +264,7 @@
         .btn-footer.secondary {
             background: linear-gradient(135deg, #2575fc, #6a11cb);
             border: 2px solid rgba(255, 255, 255, 0.3);
+        }
         .btn-secondary {
             display: inline-block;
             background: linear-gradient(135deg, #2575fc, #6a11cb);
@@ -365,7 +366,7 @@
             <p>Descubre los mejores alojamientos para tus vacaciones</p>
         </div>
         
-        <!-- SECCIÓN ELEGANTE DE FILTROS ACTIVOS -->
+
         <div th:if="${filtroCiudad != null or filtroCapacidad != null}" class="filtros-activos">
             <div class="filtros-header">
                 <h3>🎯 Filtros aplicados</h3>
@@ -389,14 +390,14 @@
             </div>
         </div>
         
-        <!-- MENSAJE CUANDO NO HAY PROPIEDADES -->
+
         <div th:if="${propiedades.empty}" class="no-properties">
             <h2>No hay propiedades que coincidan con tu búsqueda</h2>
             <p>Intenta modificar los filtros o ver todas las propiedades disponibles</p>
             <a th:href="@{/catalogo}" class="btn-primary">Ver todas las propiedades</a>
         </div>
         
-        <!-- GRID DE PROPIEDADES -->
+
         <div th:unless="${propiedades.empty}" class="properties-grid">
             <div th:each="inmueble : ${propiedades}" class="property-card">
                 <div class="property-header">
@@ -421,11 +422,21 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">👤 Propietario:</span>
-                            <span class="info-value" th:text="${inmueble.propietario.usuario.nombre}">Juan Pérez</span>
+                            <span class="info-value" 
+                                  th:text="${inmueble.propietario != null && inmueble.propietario.usuario != null} ? 
+                                           ${inmueble.propietario.usuario.nombre} : 
+                                           'Propietario no disponible'">
+                                Juan Pérez
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">📧 Contacto:</span>
-                            <span class="info-value" th:text="${inmueble.propietario.usuario.email}">juan@ejemplo.com</span>
+                            <span class="info-value" 
+                                  th:text="${inmueble.propietario != null && inmueble.propietario.usuario != null} ? 
+                                           ${inmueble.propietario.usuario.email} : 
+                                           'Contacto no disponible'">
+                                juan@ejemplo.com
+                            </span>
                         </div>
                     </div>
                     
@@ -450,7 +461,7 @@
             </div>
         </div>
         
-        <!-- FOOTER ELEGANTE CON BOTONES CENTRADOS -->
+
         <div class="footer">
             <div class="footer-buttons">
                 <a th:href="@{/propiedades/registro}" class="btn-footer">

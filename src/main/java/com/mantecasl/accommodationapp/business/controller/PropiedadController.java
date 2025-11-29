@@ -27,8 +27,13 @@ public class PropiedadController {
         // Obtenemos todos los inmuebles de la base de datos
         List<Inmueble> todasLasPropiedades = inmuebleDAO.findAll();
         
+        // FILTRAR: Solo propiedades que tengan propietario (evitar propiedades eliminadas)
+        List<Inmueble> propiedadesValidas = todasLasPropiedades.stream()
+                .filter(inmueble -> inmueble.getPropietario() != null)
+                .toList(); // Manteniendo tu formato .toList()
+        
         // Filtrar según los parámetros recibidos
-        List<Inmueble> propiedadesFiltradas = filtrarPropiedades(todasLasPropiedades, ciudad, capacidad);
+        List<Inmueble> propiedadesFiltradas = filtrarPropiedades(propiedadesValidas, ciudad, capacidad);
         
         model.addAttribute("propiedades", propiedadesFiltradas);
         

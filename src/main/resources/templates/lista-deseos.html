@@ -142,7 +142,9 @@
                     </p>
 
                     <p><strong>Propietario:</strong>
-                        <span th:text="${fav.inmueble.usuario.nombre}"></span>
+                        <span th:text="${fav.inmueble != null && fav.inmueble.usuario != null} ? 
+                                      ${fav.inmueble.usuario.nombre} : 
+                                      'Propietario no disponible'"></span>
                     </p>
                 </div>
             </a>
