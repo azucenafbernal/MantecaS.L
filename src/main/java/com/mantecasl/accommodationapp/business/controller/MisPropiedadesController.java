@@ -61,11 +61,9 @@ public class MisPropiedadesController {
         Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
         if (inmueble != null && inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
             try {
-                // Eliminar reservas y favoritos asociados primero
+                // Eliminar reservas, favoritos y pagos asociados
                 reservaDAO.deleteByInmuebleId(id);
-                favoritoDAO.deleteByInmuebleId(id);
-                // NO eliminar pagos porque no tienen relación con inmueble
-                
+                favoritoDAO.deleteByInmuebleId(id);                
                 // Finalmente eliminar la propiedad
                 inmuebleDAO.delete(inmueble);
                 

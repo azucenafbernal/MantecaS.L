@@ -32,7 +32,7 @@ public class LoginController {
             return "login";
         }
 
-        // GUARDAR USUARIO EN SESIÓN (LOGIN REAL)
+        // guardar usuario en sesion
         session.setAttribute("usuario", encontrado);
 
         return "redirect:/resultLogin";

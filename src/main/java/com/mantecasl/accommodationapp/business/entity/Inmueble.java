@@ -24,7 +24,7 @@ public class Inmueble {
     @JoinColumn(name = "propietario_id")
     private Propietario propietario;
     
-    // ⭐ NUEVA RELACIÓN: Añade esta línea ⭐
+    
     @OneToMany(mappedBy = "inmueble", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorito> favoritos = new ArrayList<>();
     
@@ -118,7 +118,7 @@ public class Inmueble {
         this.favoritos = favoritos;
     }
 
-    //Método para obtener el usuario del propietario
+    //Metodo para obtener el usuario del propietario
     public Usuario getUsuario() {
         return propietario != null ? propietario.getUsuario() : null;
     }

@@ -24,9 +24,7 @@ public class FavoritoController {
     @Autowired
     private InmuebleDAO inmuebleDAO;
 
-    // ==========================================
-    // MOSTRAR LISTA DE FAVORITOS - CORREGIDO
-    // ==========================================
+    // MOSTRAR LISTA DE FAVORITOS 
     @GetMapping
     public String mostrarFavoritos(HttpSession session, Model model) {
 
@@ -60,9 +58,8 @@ public class FavoritoController {
         return "lista-deseos";
     }
 
-    // ==========================================
+
     // AGREGAR FAVORITO
-    // ==========================================
     @PostMapping("/agregar/{idInmueble}")
     public String agregarFavorito(@PathVariable Long idInmueble, HttpSession session, Model model) {
 
@@ -88,9 +85,7 @@ public class FavoritoController {
         return "redirect:/favoritos";
     }
 
-    // ==========================================
     // ELIMINAR FAVORITO
-    // ==========================================
     @PostMapping("/eliminar/{id}")
     public String eliminarFavorito(@PathVariable Long id, HttpSession session) {
 
