@@ -18,11 +18,10 @@
         }
         .navbar .logo {cursor:pointer; font-size:22px; font-weight:700;}
 
-        /* ✔️ Nuevo contenedor para mantener Favoritos + Usuario juntos */
         .right-menu {
             display: flex;
             align-items: center;
-            gap: 15px; /* separación entre botones */
+            gap: 15px; 
         }
 
         .navbar .user-menu {
@@ -147,17 +146,25 @@
 <body>
     <div class="navbar">
         <div class="logo" onclick="window.location.href='/'">Manteca SL</div>
-        <!-- Menú derecho con Favoritos y Usuario -->
+
+        
         <div class="right-menu">
-            <!-- ✔️ NUEVO: Botón Lista de Deseados -->
-            <a th:if="${usuario != null}" href="/favoritos" class="favorites-btn" title="Mi lista de deseados">
+
+            <!-- Boton Mis Propiedades (solo cuando hay usuario logueado) -->
+            <a th:if="${usuario != null}" href="/mis-propiedades" class="user-menu">
+                <i class="fa fa-home"></i>
+                <span>Mis Propiedades</span>
+            </a>
+
+            <!-- Boton Favoritos -->
+            <a href="/favoritos" class="user-menu">
                 <i class="fa fa-heart"></i>
                 <span>Favoritos</span>
             </a>
-            
-            <!-- Menú de usuario que cambia según si está logueado o no -->
-            <a th:href="${usuario != null ? '/configuracion?idUsuario=' + usuario.id : '/login'}" class="user-menu">
-                <i class="fa fa-user"></i> 
+
+            <!-- Menu de usuario -->
+            <a th:href="${usuario != null ? '/resultLogin' : '/login'}" class="user-menu">
+                <i class="fa fa-user"></i>
                 <span th:if="${usuario != null}" th:text="${usuario.nombre}">Usuario</span>
                 <span th:if="${usuario == null}">Iniciar sesión</span>
             </a>

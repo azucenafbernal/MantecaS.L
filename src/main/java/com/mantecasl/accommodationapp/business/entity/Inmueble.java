@@ -1,6 +1,8 @@
 package com.mantecasl.accommodationapp.business.entity;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "inmueble")
@@ -21,6 +23,10 @@ public class Inmueble {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "propietario_id")
     private Propietario propietario;
+    
+    
+    @OneToMany(mappedBy = "inmueble", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorito> favoritos = new ArrayList<>();
     
     //Constructores
     public Inmueble() {}
@@ -105,11 +111,19 @@ public class Inmueble {
         this.propietario = propietario;
     }
 
-    //Método para obtener el usuario del propietario
+    public List<Favorito> getFavoritos() {
+        return favoritos;
+    }
+    public void setFavoritos(List<Favorito> favoritos) {
+        this.favoritos = favoritos;
+    }
+
+    //Metodo para obtener el usuario del propietario
     public Usuario getUsuario() {
         return propietario != null ? propietario.getUsuario() : null;
     }
+    
     public String getDireccion() {
-    return calle + " " + numero + ", " + ciudad + " " + codigoPostal;
-}
+        return calle + " " + numero + ", " + ciudad + " " + codigoPostal;
+    }
 }

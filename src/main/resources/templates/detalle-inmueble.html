@@ -123,11 +123,15 @@
             </div>
             <div class="detail-item">
                 <span>👤 Propietario:</span>
-                <p th:text="${inmueble.usuario.nombre}"></p>
+                <p th:text="${inmueble != null && inmueble.usuario != null} ? 
+                           ${inmueble.usuario.nombre} : 
+                           'Propietario no disponible'"></p>
             </div>
             <div class="detail-item">
                 <span>📧 Email de contacto:</span>
-                <p th:text="${inmueble.usuario.email}"></p>
+                <p th:text="${inmueble != null && inmueble.usuario != null} ? 
+                           ${inmueble.usuario.email} : 
+                           'Contacto no disponible'"></p>
             </div>
         </div>
 
