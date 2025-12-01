@@ -1,8 +1,18 @@
 package com.mantecasl.accommodationapp.business.entity;
 
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "inmueble")
@@ -24,6 +34,11 @@ public class Inmueble {
     @JoinColumn(name = "propietario_id")
     private Propietario propietario;
     
+    @OneToMany(mappedBy = "inmueble", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> reservas = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "inmueble", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Disponibilidad> disponibilidades = new ArrayList<>();
     
     @OneToMany(mappedBy = "inmueble", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorito> favoritos = new ArrayList<>();
@@ -116,6 +131,20 @@ public class Inmueble {
     }
     public void setFavoritos(List<Favorito> favoritos) {
         this.favoritos = favoritos;
+    }
+
+    public List<Reserva> getReservas() {
+        return reservas;
+    }
+    public void setReservas(List<Reserva> reservas) {
+        this.reservas = reservas;
+    }
+
+    public List<Disponibilidad> getDisponibilidades() {
+        return disponibilidades;
+    }
+    public void setDisponibilidades(List<Disponibilidad> disponibilidades) {
+        this.disponibilidades = disponibilidades;
     }
 
     //Metodo para obtener el usuario del propietario

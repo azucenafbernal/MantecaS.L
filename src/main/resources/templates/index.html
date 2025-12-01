@@ -41,6 +41,67 @@
         }
         .navbar .user-menu i {font-size:20px;}
 
+        /* Dropdown menu styles */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .user-dropdown .user-menu {
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: rgba(30, 30, 30, 0.95);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            padding: 8px 0;
+            z-index: 1000;
+            border-radius: 8px;
+            border-top: 3px solid #4a00e0;
+            margin-top: 10px;
+        }
+
+        .dropdown-content a {
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-content a:first-child {
+            border-radius: 5px 5px 0 0;
+        }
+
+        .dropdown-content a:last-child {
+            border-radius: 0 0 5px 5px;
+        }
+
+        .dropdown-content a:hover {
+            background-color: rgba(74, 0, 224, 0.3);
+            padding-left: 25px;
+        }
+
+        .dropdown-content i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .user-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
         .navbar .favorites-btn {
             display: flex;
             align-items: center;
@@ -163,10 +224,28 @@
             </a>
 
             <!-- Menu de usuario -->
-            <a th:href="${usuario != null ? '/resultLogin' : '/login'}" class="user-menu">
+            <div th:if="${usuario != null}" class="user-dropdown">
+                <div class="user-menu" style="cursor: pointer;">
+                    <i class="fa fa-user"></i>
+                    <span th:text="${usuario.nombre}">Usuario</span>
+                    <i class="fa fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                </div>
+                <div class="dropdown-content">
+                    <a th:href="@{/configuracion(idUsuario=${usuario.id})}" style="cursor: pointer;">
+                        <i class="fa fa-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                    <a href="/logout" style="cursor: pointer;">
+                        <i class="fa fa-sign-out"></i>
+                        <span>Cerrar sesión</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Botón de login si no hay usuario -->
+            <a th:if="${usuario == null}" href="/login" class="user-menu">
                 <i class="fa fa-user"></i>
-                <span th:if="${usuario != null}" th:text="${usuario.nombre}">Usuario</span>
-                <span th:if="${usuario == null}">Iniciar sesión</span>
+                <span>Iniciar sesión</span>
             </a>
         </div>
     </div>
@@ -205,5 +284,37 @@
              Ver catálogo de alojamientos
         </button>
     </div>
+
+    <script>
+        // User dropdown menu toggle
+        const userDropdown = document.querySelector('.user-dropdown');
+        const userMenu = document.querySelector('.user-dropdown .user-menu');
+        const dropdownContent = document.querySelector('.dropdown-content');
+
+        if (userMenu && dropdownContent) {
+            // Click to toggle
+            userMenu.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+            });
+
+            // Click outside to close
+            document.addEventListener('click', function(e) {
+                if (!userDropdown || !userDropdown.contains(e.target)) {
+                    if (userDropdown) {
+                        userDropdown.classList.remove('active');
+                    }
+                }
+            });
+
+            // Close when clicking a dropdown link
+            dropdownContent.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', function() {
+                    userDropdown.classList.remove('active');
+                });
+            });
+        }
+    </script>
 </body>
 </html>
