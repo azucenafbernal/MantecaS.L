@@ -41,6 +41,33 @@
         }
         .navbar .user-menu i {font-size:20px;}
 
+        .navbar .favorites-btn {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            gap: 8px;
+            font-size: 16px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+        }
+
+        .navbar .favorites-btn:hover {
+            background-color: rgba(255, 107, 157, 0.3);
+            transform: scale(1.05);
+        }
+
+        .navbar .favorites-btn i {
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar .favorites-btn:hover i {
+            color: #ff6b9d;
+        }
+
         .hero {
             margin-top:120px; display:flex; flex-direction:column; align-items:center; text-align:center; color:white;
         }
@@ -141,7 +168,6 @@
                 <span th:if="${usuario != null}" th:text="${usuario.nombre}">Usuario</span>
                 <span th:if="${usuario == null}">Iniciar sesión</span>
             </a>
-
         </div>
     </div>
 

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración de la cuenta - MantecaS.L</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        .header {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .section {
+            padding: 30px;
+        }
+        .section h2 {
+            color: #4a00e0;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 8px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #4a00e0;
+            box-shadow: 0 0 5px rgba(74, 0, 224, 0.3);
+        }
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(to right, #3a00c0, #7e1dd2);
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #ff3838;
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #4a00e0;
+            border: 2px solid #4a00e0;
+        }
+        .btn-secondary:hover {
+            background: #4a00e0;
+            color: white;
+        }
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        hr {
+            border: none;
+            height: 1px;
+            background: #eee;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a th:href="@{/}" class="back-link">← Volver al Inicio</a>
+    
+    <div class="card">
+        <div class="header">
+            <h1>Configuración de cuenta</h1>
+        </div>
+
+<form th:action="@{/configuracion/actualizarUsuario}" th:object="${usuario}" method="post">
+    <div class="section">
+        <h2>Datos Personales</h2>
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" th:field="*{nombre}" required />
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" th:field="*{email}" required />
+        </div>
+
+        <div class="form-group">
+            <label for="contrasena">Contraseña</label>
+            <input id="contrasena" type="password" th:field="*{contrasena}" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+    </div>
+</form>
+
+<div class="card" th:if="${propietario != null}">
+    <div class="section">
+        <h2>Datos de Propietario</h2>
+
+        <form th:action="@{/configuracion/actualizarPropietario}" method="post">
+            <input type="hidden" name="usuarioId" th:value="${usuario.id}"/>
+
+            <div class="form-group">
+                <label for="telefono">Teléfono de Contacto</label>
+                <input id="telefono" name="telefono" type="tel" th:value="${propietario.telefonoContacto}" placeholder="Ej: +34 612 345 678" />
+            </div>
+
+            <div class="form-group">
+                <label for="cuenta">Número de Cuenta Bancaria (IBAN)</label>
+                <input id="cuenta" name="cuenta" th:value="${propietario.cuentaBancaria}" placeholder="Ej: ES9121000418450200051332" />
+            </div>
+
+            <hr>
+
+            <div class="form-group">
+                <label for="creditcard">Número de Tarjeta de Crédito</label>
+                <input id="creditcard" name="creditcard" type="text" th:value="${propietario.numeroTarjeta}" placeholder="Ej: 4532 1488 0343 6467" maxlength="19" />
+            </div>
+
+            <div class="form-group">
+                <label for="expiry">Fecha de Vencimiento</label>
+                <input id="expiry" name="expiry" type="text" th:value="${propietario.fechaVencimiento}" placeholder="MM/YY" maxlength="5" />
+            </div>
+
+            <div class="form-group">
+                <label for="cvv">CVV</label>
+                <input id="cvv" name="cvv" type="password" placeholder="Ej: 123" maxlength="4" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Actualizar información de pago</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="section">
+        <h2>Acciones Adicionales</h2>
+
+        <form th:action="@{/configuracion/logout}" method="post">
+            <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
+        </form>
+
+        <form th:action="@{/configuracion/eliminarCuenta}" method="post">
+            <input type="hidden" name="idUsuario" th:value="${usuario.id}" />
+            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.');">Eliminar cuenta</button>
+        </form>
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>
