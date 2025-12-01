@@ -44,9 +44,7 @@ public class PropiedadController {
                 .toList(); // Manteniendo tu formato .toList()
         
         // Filtrar según los parámetros recibidos
-        List<Inmueble> propiedadesFiltradas = filtrarPropiedades(propiedadesValidas, ciudad, capacidad);
-        
-        model.addAttribute("propiedades", propiedadesFiltradas);
+        List<Inmueble> propiedadesFiltradas = new ArrayList<>(propiedadesValidas);
         
         // ✔️ Si hay fechas especificadas, filtrar por disponibilidad
         if (fechaInicio != null && !fechaInicio.isEmpty() && 
@@ -71,24 +69,16 @@ public class PropiedadController {
                     return "lista-propiedades";
                 }
 
-                // Obtener todos los inmuebles
-                List<Inmueble> todosInmuebles = inmuebleDAO.findAll();
-                
                 // Filtrar solo los que estén disponibles en las fechas solicitadas
-                for (Inmueble inmueble : todosInmuebles) {
-                    if (gestorDisponibilidad.verificarDisponibilidad(inmueble.getId(), sqlInicio, sqlFin)) {
-                        propiedadesFiltradas.add(inmueble);
-                    }
-                }
+                propiedadesFiltradas = propiedadesFiltradas.stream()
+                    .filter(inmueble -> gestorDisponibilidad.verificarDisponibilidad(inmueble.getId(), sqlInicio, sqlFin))
+                    .collect(Collectors.toList());
 
             } catch (Exception e) {
                 model.addAttribute("error", "Formato de fecha inválido: " + e.getMessage());
                 model.addAttribute("propiedades", new ArrayList<>());
                 return "lista-propiedades";
             }
-        } else {
-            // Sin fechas, obtener todas las propiedades
-            propiedadesFiltradas = inmuebleDAO.findAll();
         }
 
         // ✔️ Filtrar por ciudad si se especifica
