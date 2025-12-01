@@ -68,6 +68,11 @@ public class ReservasController {
             @RequestParam String telefono,
             @RequestParam String documentoIdentidad,
             @RequestParam String metodoPago,
+            @RequestParam(required = false) String numeroTarjeta,
+            @RequestParam(required = false) String fechaCaducidad,
+            @RequestParam(required = false) String cvv,
+            @RequestParam(required = false) String paypalEmail,
+
             HttpSession session,
             Model model) {
 
@@ -131,6 +136,16 @@ public class ReservasController {
             if (directa) {
                 reserva.confirmar();
             }
+            if (metodoPago.equals("TARJETA")) {
+                reserva.setNumeroTarjeta(numeroTarjeta);
+                reserva.setFechaCaducidad(fechaCaducidad);
+                reserva.setCvv(cvv);
+            }
+
+            if (metodoPago.equals("PAYPAL")) {
+                reserva.setPaypalEmail(paypalEmail);
+            }
+
             reservaDAO.save(reserva);
 
             // Pasar datos a la vista (tanto reserva como disponibilidad si lo necesitas)
