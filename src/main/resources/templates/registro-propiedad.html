@@ -139,6 +139,65 @@
                 padding: 20px;
             }
         }
+
+        /* Phone Input Component Styles */
+        .form-group .phone-input-box {
+            display: flex !important;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        .prefix-dropdown-with-flag {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+            font-size: 15px;
+            white-space: nowrap;
+            flex-shrink: 0 !important;
+            width: auto;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .prefix-dropdown-with-flag:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            outline: none;
+        }
+
+        #telefonoCompleto {
+            flex: 1 1 auto !important;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 15px;
+            width: auto;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        #telefonoCompleto:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-group .phone-input-box {
+                flex-wrap: wrap;
+            }
+
+            .prefix-dropdown-with-flag,
+            #telefonoCompleto {
+                width: 100%;
+                height: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -161,11 +220,8 @@
                     </div>
 
                     <!-- NUEVOS CAMPOS PARA DATOS DE PROPIETARIO -->
-                    <div class="form-group">
-                        <label for="telefonoContacto">Teléfono de Contacto *</label>
-                        <input type="tel" id="telefonoContacto" name="telefonoContacto" 
-                            class="input-field" placeholder="+34 123 456 789" required>
-                    </div>
+                    <div th:replace="~{components/phone-input :: phone-input}"></div>
+                    <input type="hidden" id="telefonoConPrefijo" name="telefonoContacto">
 
                     <div class="form-group">
                         <label for="cuentaBancaria">Cuenta Bancaria (IBAN) *</label>
@@ -231,5 +287,20 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Capturar el número de teléfono con prefijo en el formulario de registro
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const fullPhone = window.getFullPhoneNumber ? window.getFullPhoneNumber() : '';
+                    if (fullPhone) {
+                        document.getElementById('telefonoConPrefijo').value = fullPhone;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

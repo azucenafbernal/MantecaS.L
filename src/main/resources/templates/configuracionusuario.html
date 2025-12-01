@@ -170,6 +170,64 @@
             border: 1px solid #2ed573;
             color: #00a152;
         }
+        
+        /* Phone Input Component Styles */
+        .form-group .phone-input-box {
+            display: flex !important;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        .prefix-dropdown-with-flag {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            flex-shrink: 0 !important;
+            width: auto;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .prefix-dropdown-with-flag:focus {
+            border-color: #4a00e0;
+            box-shadow: 0 0 5px rgba(74, 0, 224, 0.3);
+            outline: none;
+        }
+
+        #telefonoCompleto {
+            flex: 1 1 auto !important;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: auto;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        #telefonoCompleto:focus {
+            border-color: #4a00e0;
+            box-shadow: 0 0 5px rgba(74, 0, 224, 0.3);
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-group .phone-input-box {
+                flex-wrap: wrap;
+            }
+
+            .prefix-dropdown-with-flag,
+            #telefonoCompleto {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -210,6 +268,9 @@
             <input type="hidden" name="usuarioId" th:value="${usuario.id}"/>
 
             <h3 style="color: #666; margin-bottom: 15px; font-size: 14px;">📞 Contacto</h3>
+            <div th:if="${propietario?.telefonoContacto}" style="margin-bottom: 15px; padding: 10px; background-color: #f0f0f0; border-radius: 6px;">
+                <strong>Teléfono actual:</strong> <span th:text="${propietario.telefonoContacto}"></span>
+            </div>
             <div th:replace="~{components/phone-input :: phone-input}"></div>
             <input type="hidden" id="telefonoConPrefijo" name="telefono">
 
@@ -217,7 +278,14 @@
         </form>
 
         <button type="button" class="btn btn-secondary" style="margin-bottom: 15px; margin-top: 20px;" onclick="document.getElementById('bankAccountModal').style.display='flex'">🏦 Configurar Cuenta Bancaria</button>
+        <div th:if="${propietario?.cuentaBancaria}" style="margin-bottom: 15px; padding: 10px; background-color: #f0f0f0; border-radius: 6px; font-size: 14px;">
+            <strong>Cuenta Bancaria:</strong> <span th:text="'***' + ${propietario.cuentaBancaria.substring(propietario.cuentaBancaria.length() - 3)}"></span>
+        </div>
+        
         <button type="button" class="btn btn-secondary" style="margin-bottom: 15px;" onclick="document.getElementById('creditCardModal').style.display='flex'">💳 Configurar Tarjeta de Crédito</button>
+        <div th:if="${propietario?.numeroTarjeta}" style="margin-bottom: 15px; padding: 10px; background-color: #f0f0f0; border-radius: 6px; font-size: 14px;">
+            <strong>Tarjeta de Crédito:</strong> <span th:text="'*** *** *** ' + ${propietario.numeroTarjeta.substring(propietario.numeroTarjeta.length() - 3)}"></span>
+        </div>
     </div>
 </div>
 
@@ -333,11 +401,19 @@
             <strong>Advertencia:</strong> Esta acción es <strong>irreversible</strong>. Se eliminarán todos tus datos de forma permanente.
         </div>
         
-        <form th:action="@{/configuracion/eliminarCuenta}" method="post">
+        <form id="deleteForm" th:onsubmit="return handleDeleteSubmit(event, [[${usuario.id}]])">
             <input type="hidden" name="idUsuario" th:value="${usuario.id}" />
             <button type="submit" class="btn btn-danger" style="margin-bottom: 10px;">Sí, eliminar mi cuenta</button>
             <button type="button" class="btn btn-secondary" onclick="document.getElementById('deleteAccountModal').style.display='none'">Cancelar</button>
         </form>
+    </div>
+</div>
+
+<!-- Modal para confirmar eliminación exitosa -->
+<div id="deleteSuccessModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="color: #2ed573; text-align: center;">✅ Cuenta Eliminada</div>
+        <p style="text-align: center; margin: 20px 0; color: #333;">Tu cuenta ha sido eliminada correctamente. Serás redirigido al inicio...</p>
     </div>
 </div>
 
@@ -370,6 +446,47 @@
             document.getElementById('telefonoConPrefijo').value = fullPhone;
         }
     });
+
+    // Manejar eliminación de cuenta con AJAX
+    function handleDeleteSubmit(event, userId) {
+        event.preventDefault();
+        
+        console.log('Iniciando eliminación de cuenta para usuario:', userId);
+        
+        const params = new URLSearchParams();
+        params.append('idUsuario', userId);
+        
+        fetch('/configuracion/eliminarCuenta', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (response.ok) {
+                console.log('Eliminación exitosa');
+                // Mostrar modal de éxito
+                document.getElementById('deleteAccountModal').style.display = 'none';
+                document.getElementById('deleteSuccessModal').style.display = 'flex';
+                
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                console.log('Error en respuesta:', response.statusText);
+                alert('Error al eliminar la cuenta. Por favor intenta de nuevo.');
+            }
+        })
+        .catch(error => {
+            console.error('Error en fetch:', error);
+            alert('Error al eliminar la cuenta. Por favor intenta de nuevo: ' + error);
+        });
+        
+        return false;
+    }
 </script>
 
 </body>

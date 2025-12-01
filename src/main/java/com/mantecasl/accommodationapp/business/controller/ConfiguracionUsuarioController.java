@@ -1,6 +1,9 @@
 package com.mantecasl.accommodationapp.business.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,8 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.mantecasl.accommodationapp.business.entity.Favorito;
 import com.mantecasl.accommodationapp.business.entity.Propietario;
 import com.mantecasl.accommodationapp.business.entity.Usuario;
+import com.mantecasl.accommodationapp.business.persistance.FavoritoDAO;
 import com.mantecasl.accommodationapp.business.persistance.PropietarioDAO;
 import com.mantecasl.accommodationapp.business.persistance.UsuarioDAO;
 
@@ -25,6 +30,9 @@ public class ConfiguracionUsuarioController {
 
     @Autowired
     private PropietarioDAO propietarioDAO;
+
+    @Autowired
+    private FavoritoDAO favoritoDAO;
 
     /** Muestra la página de configuración */
     @GetMapping
@@ -246,15 +254,33 @@ public class ConfiguracionUsuarioController {
 
     /** Eliminar cuenta */
     @PostMapping("/eliminarCuenta")
-    public String eliminarCuenta(@RequestParam Long idUsuario, Model model, HttpSession session) {
+    public ResponseEntity<String> eliminarCuenta(@RequestParam Long idUsuario, HttpSession session) {
         try {
+            System.out.println("Eliminando cuenta para usuario ID: " + idUsuario);
+            
+            // 1. Eliminar favoritos del usuario
+            List<Favorito> favoritos = favoritoDAO.findByUsuarioId(idUsuario);
+            if (favoritos != null && !favoritos.isEmpty()) {
+                System.out.println("Eliminando " + favoritos.size() + " favoritos del usuario");
+                favoritoDAO.deleteAll(favoritos);
+            }
+            
+            // 2. Eliminar propietario asociado (y sus inmuebles en cascada)
+            Propietario propietario = propietarioDAO.findByUsuarioId(idUsuario);
+            if (propietario != null) {
+                System.out.println("Eliminando propietario ID: " + propietario.getId());
+                propietarioDAO.delete(propietario);
+            }
+            
+            // 3. Eliminar usuario
             usuarioDAO.deleteById(idUsuario);
             session.invalidate();
-            model.addAttribute("mensaje", "Tu cuenta ha sido eliminada correctamente.");
-            return "cuenta_eliminada"; 
+            System.out.println("Cuenta eliminada correctamente");
+            return ResponseEntity.ok("Cuenta eliminada correctamente");
         } catch (Exception e) {
-            model.addAttribute("error", "Error al eliminar la cuenta: " + e.getMessage());
-            return "error";
+            System.err.println("Error al eliminar cuenta: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error al eliminar la cuenta: " + e.getMessage());
         }
     }
 
