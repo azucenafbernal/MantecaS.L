@@ -170,56 +170,12 @@
             border: 1px solid #2ed573;
             color: #00a152;
         }
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 16px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 2000;
-            animation: slideIn 0.3s ease-out;
-            max-width: 400px;
-        }
-        .notification-success {
-            background-color: #2ed573;
-            color: white;
-            border: 1px solid #1da652;
-        }
-        .notification-error {
-            background-color: #ff4757;
-            color: white;
-            border: 1px solid #ff3838;
-        }
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <a th:href="@{/}" class="back-link">← Volver al Inicio</a>
-    
-    <!-- Notification -->
-    <div id="notification" class="notification" style="display: none;"></div>
     
     <div class="card">
         <div class="header">
@@ -273,10 +229,7 @@
             <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
         </form>
 
-        <form th:action="@{/configuracion/eliminarCuenta}" method="post" th:onsubmit="return handleDeleteAccount(event, [[${usuario.id}]])">
-            <input type="hidden" name="idUsuario" th:value="${usuario.id}" />
-            <button type="submit" class="btn btn-danger">Eliminar cuenta</button>
-        </form>
+        <button type="button" class="btn btn-danger" onclick="document.getElementById('deleteAccountModal').style.display='flex'">Eliminar cuenta</button>
     </div>
 </div>
 
@@ -370,12 +323,31 @@
     </div>
 </div>
 
+<!-- Modal para eliminar cuenta -->
+<div id="deleteAccountModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('deleteAccountModal').style.display='none'">&times;</span>
+        <div class="modal-header" style="color: #ff4757;">⚠️ Eliminar Cuenta</div>
+        
+        <div style="margin-bottom: 20px; padding: 15px; background-color: #ffe0e0; border: 1px solid #ff4757; border-radius: 6px; color: #d32f2f;">
+            <strong>Advertencia:</strong> Esta acción es <strong>irreversible</strong>. Se eliminarán todos tus datos de forma permanente.
+        </div>
+        
+        <form th:action="@{/configuracion/eliminarCuenta}" method="post">
+            <input type="hidden" name="idUsuario" th:value="${usuario.id}" />
+            <button type="submit" class="btn btn-danger" style="margin-bottom: 10px;">Sí, eliminar mi cuenta</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('deleteAccountModal').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
 <script>
     // Cerrar modales al hacer clic fuera de ellos
     window.onclick = function(event) {
         const passwordModal = document.getElementById('passwordModal');
         const creditCardModal = document.getElementById('creditCardModal');
         const bankAccountModal = document.getElementById('bankAccountModal');
+        const deleteAccountModal = document.getElementById('deleteAccountModal');
         
         if (event.target === passwordModal) {
             passwordModal.style.display = 'none';
@@ -386,6 +358,9 @@
         if (event.target === bankAccountModal) {
             bankAccountModal.style.display = 'none';
         }
+        if (event.target === deleteAccountModal) {
+            deleteAccountModal.style.display = 'none';
+        }
     }
     
     // Capturar el número de teléfono con prefijo en el formulario de propietario
@@ -395,37 +370,6 @@
             document.getElementById('telefonoConPrefijo').value = fullPhone;
         }
     });
-
-    // Función para mostrar notificaciones
-    function showNotification(message, type = 'success') {
-        const notification = document.getElementById('notification');
-        notification.textContent = message;
-        notification.className = `notification notification-${type}`;
-        notification.style.display = 'block';
-        
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease-out forwards';
-        }, 4000);
-    }
-
-    // Función para manejar la eliminación de cuenta
-    function handleDeleteAccount(event, userId) {
-        const confirmed = confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.');
-        
-        if (confirmed) {
-            // Mostrar notificación de éxito
-            showNotification('Tu cuenta ha sido eliminada correctamente. Serás redirigido en 3 segundos...', 'success');
-            
-            // Redirigir después de 3 segundos
-            setTimeout(() => {
-                event.target.submit();
-            }, 3000);
-            
-            return false; // Prevenir envío inmediato
-        }
-        
-        return false; // Prevenir envío si no está confirmado
-    }
 </script>
 
 </body>

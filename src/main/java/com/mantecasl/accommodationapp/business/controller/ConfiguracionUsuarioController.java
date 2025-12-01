@@ -246,9 +246,16 @@ public class ConfiguracionUsuarioController {
 
     /** Eliminar cuenta */
     @PostMapping("/eliminarCuenta")
-    public String eliminarCuenta(@RequestParam Long idUsuario) {
-        usuarioDAO.deleteById(idUsuario);
-        return "cuenta_eliminada"; 
+    public String eliminarCuenta(@RequestParam Long idUsuario, Model model, HttpSession session) {
+        try {
+            usuarioDAO.deleteById(idUsuario);
+            session.invalidate();
+            model.addAttribute("mensaje", "Tu cuenta ha sido eliminada correctamente.");
+            return "cuenta_eliminada"; 
+        } catch (Exception e) {
+            model.addAttribute("error", "Error al eliminar la cuenta: " + e.getMessage());
+            return "error";
+        }
     }
 
     /** Cerrar sesión */
