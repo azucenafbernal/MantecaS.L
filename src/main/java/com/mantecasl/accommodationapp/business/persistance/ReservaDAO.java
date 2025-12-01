@@ -24,4 +24,7 @@ public interface ReservaDAO extends JpaRepository<Reserva, Long> {
     
     List<Reserva> findByInmuebleId(Long inmuebleId);
     List<Reserva> findByInquilinoUsuarioId(Long usuarioId);
+
+    @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId AND r.estado = :estado")
+    List<Reserva> findByInmuebleIdAndEstado(@Param("inmuebleId") Long inmuebleId, @Param("estado") String estado);
 }

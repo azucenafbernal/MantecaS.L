@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,13 @@ public class GestorDisponibilidad {
     private DisponibilidadDAO disponibilidadDAO;
 
     @Autowired
+    private ReservaDAO reservaDAO;
+
+    @Autowired
     private InmuebleDAO inmuebleDAO;
+
+    @Autowired
+    private SolicitudReservaDAO solicitudReservaDAO;
 
     // Validar fechas
     public Date[] validarFechas(String fechaInicio, String fechaFin) {
@@ -82,6 +89,45 @@ public class GestorDisponibilidad {
     // Método auxiliar para verificar solapamiento
     private boolean seSolapan(Date inicio1, Date fin1, Date inicio2, Date fin2) {
         return (inicio1.before(fin2) && inicio2.before(fin1));
+    }
+
+    // Añade este método al GestorDisponibilidad
+    public boolean verificarDisponibilidadParaSolicitud(Long inmuebleId, Date inicio, Date fin) {
+        // Obtener disponibilidades bloqueadas
+        List<Disponibilidad> disponibilidadesBloqueadas = 
+            disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(inmuebleId);
+        
+        // Obtener reservas confirmadas
+        List<Reserva> reservasConfirmadas = 
+            reservaDAO.findByInmuebleIdAndEstado(inmuebleId, "CONFIRMADA");
+        
+        // Obtener solicitudes aprobadas que ya tienen reserva
+        List<SolicitudReserva> solicitudesAprobadas = solicitudReservaDAO
+            .findByInmuebleIdAndEstado(inmuebleId, "APROBADA")
+            .stream()
+            .filter(s -> s.getReserva() != null)
+            .collect(Collectors.toList());
+        
+        // Verificar solapamientos
+        for (Disponibilidad d : disponibilidadesBloqueadas) {
+            if (seSolapan(d.getFechaInicio(), d.getFechaFin(), inicio, fin)) {
+                return false;
+            }
+        }
+        
+        for (Reserva r : reservasConfirmadas) {
+            if (seSolapan(r.getFechaInicio(), r.getFechaFin(), inicio, fin)) {
+                return false;
+            }
+        }
+        
+        for (SolicitudReserva s : solicitudesAprobadas) {
+            if (seSolapan(s.getFechaInicio(), s.getFechaFin(), inicio, fin)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     // Buscar inmuebles disponibles

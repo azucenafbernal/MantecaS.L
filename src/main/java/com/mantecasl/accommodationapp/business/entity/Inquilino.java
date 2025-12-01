@@ -29,6 +29,12 @@ public class Inquilino {
     @Column(nullable = false)
     private String metodoPago;
 
+    // Datos de pago (opcionales, dependiendo del método)
+    private String numeroTarjeta;
+    private String fechaCaducidad;
+    private String cvv;
+    private String paypalEmail;
+
     public Inquilino() {}
 
     public Inquilino(Usuario usuario, String telefono, String documentoIdentidad, String metodoPago) {
@@ -38,74 +44,57 @@ public class Inquilino {
         this.metodoPago = metodoPago;
     }
 
-    public Inquilino(Usuario usuario, String telefono, String documentoIdentidad) {
-        this.usuario = usuario;
-        this.telefono = telefono;
-        this.documentoIdentidad = documentoIdentidad;
-    }
-
     // Getters y Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
+    public Inmueble getInmueble() { return inmueble; }
+    public void setInmueble(Inmueble inmueble) { this.inmueble = inmueble; }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
 
-    public Inmueble getInmueble() {
-        return inmueble;
-    }
+    public String getDocumentoIdentidad() { return documentoIdentidad; }
+    public void setDocumentoIdentidad(String documentoIdentidad) { this.documentoIdentidad = documentoIdentidad; }
 
-    public void setInmueble(Inmueble inmueble) {
-        this.inmueble = inmueble;
-    }
+    public String getMetodoPago() { return metodoPago; }
+    public void setMetodoPago(String metodoPago) { this.metodoPago = metodoPago; }
 
-    public String getTelefono() {
-        return telefono;
-    }
+    public String getNumeroTarjeta() { return numeroTarjeta; }
+    public void setNumeroTarjeta(String numeroTarjeta) { this.numeroTarjeta = numeroTarjeta; }
 
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
+    public String getFechaCaducidad() { return fechaCaducidad; }
+    public void setFechaCaducidad(String fechaCaducidad) { this.fechaCaducidad = fechaCaducidad; }
 
-    public String getDocumentoIdentidad() {
-        return documentoIdentidad;
-    }
+    public String getCvv() { return cvv; }
+    public void setCvv(String cvv) { this.cvv = cvv; }
 
-    public void setDocumentoIdentidad(String documentoIdentidad) {
-        this.documentoIdentidad = documentoIdentidad;
-    }
+    public String getPaypalEmail() { return paypalEmail; }
+    public void setPaypalEmail(String paypalEmail) { this.paypalEmail = paypalEmail; }
 
-    public String getMetodoPago() {
-        return metodoPago;
-    }
-
-    public void setMetodoPago(String metodoPago) {
+    // Método para actualizar datos de pago según el método seleccionado
+    public void actualizarDatosPago(String metodoPago, String numeroTarjeta, 
+                                   String fechaCaducidad, String cvv, String paypalEmail) {
         this.metodoPago = metodoPago;
+        
+        // Limpiar datos anteriores
+        this.numeroTarjeta = null;
+        this.fechaCaducidad = null;
+        this.cvv = null;
+        this.paypalEmail = null;
+        
+        // Establecer nuevos datos según el método
+        if ("TARJETA".equals(metodoPago)) {
+            this.numeroTarjeta = numeroTarjeta;
+            this.fechaCaducidad = fechaCaducidad;
+            this.cvv = cvv;
+        } else if ("PAYPAL".equals(metodoPago)) {
+            this.paypalEmail = paypalEmail;
+        }
     }
-
-    /*public List<Reserva> getReservas() {
-        return reservas;
-    }
-
-    public void setReservas(List<Reserva> reservas) {
-        this.reservas = reservas;
-    }
-
-    // Métodos de negocio
-    public void agregarReserva(Reserva reserva) {
-        reservas.add(reserva);
-        reserva.setInquilino(this);
-    }*/
 
     public String getNombreCompleto() {
         return usuario != null ? usuario.getNombre() : "";

@@ -11,7 +11,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/reservas")
@@ -30,7 +32,10 @@ public class ReservasController {
     private InquilinoDAO inquilinoDAO;
 
     @Autowired
-    private DisponibilidadDAO disponibilidadDAO; // Añadir este DAO
+    private SolicitudReservaDAO solicitudReservaDAO;
+
+    @Autowired
+    private DisponibilidadDAO disponibilidadDAO;
 
     @GetMapping("/nueva/{inmuebleId}")
     public String mostrarFormularioReserva(
@@ -72,7 +77,7 @@ public class ReservasController {
             @RequestParam(required = false) String fechaCaducidad,
             @RequestParam(required = false) String cvv,
             @RequestParam(required = false) String paypalEmail,
-
+            @RequestParam(required = false) String observaciones,
             HttpSession session,
             Model model) {
 
@@ -92,67 +97,70 @@ public class ReservasController {
             Inmueble inmueble = inmuebleDAO.findById(inmuebleId)
                     .orElseThrow(() -> new RuntimeException("Inmueble no encontrado"));
 
-            // VERIFICAR DISPONIBILIDAD ANTES DE CONTINUAR
-            if (!gestorDisponibilidad.verificarDisponibilidad(inmuebleId, inicio, fin)) {
-                throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas. Por favor, elige otras fechas.");
-            }
-
-            // CREAR DISPONIBILIDAD (BLOQUEAR FECHAS) - AÑADIDO
-            Disponibilidad disponibilidad = new Disponibilidad();
-            disponibilidad.setInmueble(inmueble);
-            disponibilidad.setFechaInicio(inicio);
-            disponibilidad.setFechaFin(fin);
-            disponibilidad.setDirecta(directa);
-            disponibilidad.setDisponible(false); // false = reservado
-            
-            // Calcular precio para la disponibilidad
-            long nochesDisponibilidad = (fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24);
-            double precioDisponibilidad = nochesDisponibilidad * inmueble.getPrecioNoche();
-            disponibilidad.setPrecio(precioDisponibilidad);
-            
-            disponibilidadDAO.save(disponibilidad);
-
             // Buscar o crear inquilino
             Inquilino inquilino = inquilinoDAO.findByUsuario(usuario).orElseGet(() -> {
-                Inquilino nuevo = new Inquilino(usuario, telefono, documentoIdentidad);
-                nuevo.setMetodoPago(metodoPago);
+                Inquilino nuevo = new Inquilino(usuario, telefono, documentoIdentidad, metodoPago);
                 nuevo.setInmueble(inmueble); 
                 return inquilinoDAO.save(nuevo);
             });
 
-            // Actualizar inquilino existente si es necesario
+            // Actualizar inquilino existente con datos de pago
             inquilino.setTelefono(telefono);
             inquilino.setDocumentoIdentidad(documentoIdentidad);
-            inquilino.setMetodoPago(metodoPago);
             inquilino.setInmueble(inmueble);
+            inquilino.actualizarDatosPago(metodoPago, numeroTarjeta, fechaCaducidad, cvv, paypalEmail);
             inquilinoDAO.save(inquilino);
 
-            // Calcular precio total para la reserva
+            // Calcular precio total
             long noches = (fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24);
             double precioTotal = noches * inmueble.getPrecioNoche();
 
-            // Crear reserva
-            Reserva reserva = new Reserva(inmueble, inquilino, inicio, fin, precioTotal);
             if (directa) {
+                
+                if (!gestorDisponibilidad.verificarDisponibilidad(inmuebleId, inicio, fin)) {
+                    throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
+                }
+
+                Disponibilidad disponibilidad = new Disponibilidad();
+                disponibilidad.setInmueble(inmueble);
+                disponibilidad.setFechaInicio(inicio);
+                disponibilidad.setFechaFin(fin);
+                disponibilidad.setDirecta(true);
+                disponibilidad.setDisponible(false);
+                disponibilidad.setPrecio(precioTotal);
+                disponibilidadDAO.save(disponibilidad);
+
+                Reserva reserva = new Reserva(inmueble, inquilino, inicio, fin, precioTotal);
                 reserva.confirmar();
-            }
-            if (metodoPago.equals("TARJETA")) {
-                reserva.setNumeroTarjeta(numeroTarjeta);
-                reserva.setFechaCaducidad(fechaCaducidad);
-                reserva.setCvv(cvv);
+                reservaDAO.save(reserva);
+
+                model.addAttribute("reserva", reserva);
+                model.addAttribute("disponibilidad", disponibilidad);
+                model.addAttribute("mensaje", "¡Reserva confirmada exitosamente!");
+                model.addAttribute("esDirecta", true);
+
+            } else {
+                
+                List<SolicitudReserva> solicitudesExistentes = solicitudReservaDAO.findAll().stream()
+                    .filter(s -> s.getInmueble().getId().equals(inmuebleId) &&
+                                s.getEstado().equals("PENDIENTE") &&
+                                seSolapan(s.getFechaInicio(), s.getFechaFin(), inicio, fin))
+                    .collect(Collectors.toList());
+                
+                if (!solicitudesExistentes.isEmpty()) {
+                    throw new RuntimeException("Ya existe una solicitud pendiente para estas fechas. Espera la respuesta del propietario.");
+                }
+
+                SolicitudReserva solicitud = new SolicitudReserva(inquilino, inmueble, inicio, fin, precioTotal);
+                solicitud.setObservacionesInquilino(observaciones);
+                solicitudReservaDAO.save(solicitud);
+
+                model.addAttribute("solicitud", solicitud);
+                model.addAttribute("mensaje", "¡Solicitud de reserva enviada! El propietario la revisará pronto.");
+                model.addAttribute("esDirecta", false);
             }
 
-            if (metodoPago.equals("PAYPAL")) {
-                reserva.setPaypalEmail(paypalEmail);
-            }
-
-            reservaDAO.save(reserva);
-
-            // Pasar datos a la vista (tanto reserva como disponibilidad si lo necesitas)
-            model.addAttribute("reserva", reserva);
-            model.addAttribute("disponibilidad", disponibilidad); // AÑADIDO
             model.addAttribute("inmueble", inmueble);
-            model.addAttribute("mensaje", "¡Reserva guardada correctamente!");
 
             return "confirmacion-reserva";
 
@@ -161,10 +169,14 @@ public class ReservasController {
             Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
             inmuebleOpt.ifPresent(i -> model.addAttribute("inmueble", i));
             model.addAttribute("usuario", usuario);
-            model.addAttribute("fechaInicio", fechaInicio); // Mantener las fechas en caso de error
+            model.addAttribute("fechaInicio", fechaInicio);
             model.addAttribute("fechaFin", fechaFin);
 
             return "reserva-inmueble";
         }
+    }
+
+    private boolean seSolapan(Date inicio1, Date fin1, Date inicio2, Date fin2) {
+        return (inicio1.before(fin2) && inicio2.before(fin1));
     }
 }
