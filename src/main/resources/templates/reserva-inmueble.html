@@ -434,22 +434,37 @@
                         </div>
                     </div>
 
-                    <!-- Paso 3: Tipo de reserva -->
+<!-- Reemplaza el Paso 3: Tipo de reserva con esto -->
+
+                    <!-- Paso 3: Información del tipo de reserva -->
                     <div class="form-step">
                         <h4 class="section-title">🎯 Tipo de reserva</h4>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label">Selecciona el tipo de reserva</label>
-                                <select name="directa" class="form-select" required>
-                                    <option value="true">Reserva Directa</option>
-                                    <option value="false">Reserva con Confirmación</option>
-                                </select>
-                                <div class="form-text">
-                                    <strong>Directa:</strong> Reserva inmediata<br>
-                                    <strong>Con confirmación:</strong> Espera aprobación del propietario
-                                </div>
+                        <div class="alert" th:classappend="${inmueble.reservaDirecta} ? 'alert-success' : 'alert-info'">
+                            <div th:if="${inmueble.reservaDirecta}">
+                                <h5>🏠 Reserva Directa</h5>
+                                <p>Este alojamiento utiliza <strong>reserva directa</strong>. Al confirmar la reserva:</p>
+                                <ul>
+                                    <li>✅ Tu pago se procesará inmediatamente</li>
+                                    <li>✅ La reserva se confirmará al instante</li>
+                                    <li>✅ No necesitas esperar aprobación del propietario</li>
+                                </ul>
+                                <p class="mb-0"><strong>Nota:</strong> Al hacer clic en "Confirmar reserva" se realizará el pago.</p>
+                            </div>
+                            <div th:unless="${inmueble.reservaDirecta}">
+                                <h5>⏳ Reserva por Confirmación</h5>
+                                <p>Este alojamiento utiliza <strong>reserva por confirmación</strong>. Al solicitar la reserva:</p>
+                                <ul>
+                                    <li>📨 Enviarás una solicitud al propietario</li>
+                                    <li>⏰ El propietario tiene 24h para responder</li>
+                                    <li>💳 Solo pagarás cuando el propietario apruebe tu solicitud</li>
+                                    <li>❌ Puedes cancelar la solicitud si aún no ha sido aprobada</li>
+                                </ul>
+                                <p class="mb-0"><strong>Nota:</strong> Al hacer clic en "Confirmar reserva" enviarás una solicitud de reserva.</p>
                             </div>
                         </div>
+                        
+                        <!-- Campo oculto para enviar el tipo de reserva -->
+                        <input type="hidden" name="esDirecta" th:value="${inmueble.reservaDirecta}">
                     </div>
 
                     <!-- Paso 4: Método de pago -->

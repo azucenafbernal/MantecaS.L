@@ -56,8 +56,12 @@ public class ReservasController {
             return "redirect:/";
         }
 
+        Inmueble inmueble = inmuebleOpt.get();
+        
+        // Añadir al modelo si el inmueble tiene reserva directa o por confirmación
+        model.addAttribute("esReservaDirecta", inmueble.isReservaDirecta());
         model.addAttribute("usuario", usuario);
-        model.addAttribute("inmueble", inmuebleOpt.get());
+        model.addAttribute("inmueble", inmueble);
         model.addAttribute("fechaInicio", fechaInicio);
         model.addAttribute("fechaFin", fechaFin);
 
@@ -69,7 +73,7 @@ public class ReservasController {
             @RequestParam Long inmuebleId,
             @RequestParam String fechaInicio,
             @RequestParam String fechaFin,
-            @RequestParam boolean directa,
+            // REMOVER: @RequestParam boolean directa,  // YA NO SE NECESITA
             @RequestParam String telefono,
             @RequestParam String documentoIdentidad,
             @RequestParam String metodoPago,
@@ -93,9 +97,12 @@ public class ReservasController {
             Date inicio = fechas[0];
             Date fin = fechas[1];
 
-            // Obtener el inmueble
+            // Obtener el inmueble con su configuración de reserva
             Inmueble inmueble = inmuebleDAO.findById(inmuebleId)
                     .orElseThrow(() -> new RuntimeException("Inmueble no encontrado"));
+            
+            // OBTENER EL TIPO DE RESERVA DEL INMUEBLE, NO DEL FORMULARIO
+            boolean esReservaDirecta = inmueble.isReservaDirecta();
 
             // Buscar o crear inquilino
             Inquilino inquilino = inquilinoDAO.findByUsuario(usuario).orElseGet(() -> {
@@ -115,32 +122,35 @@ public class ReservasController {
             long noches = (fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24);
             double precioTotal = noches * inmueble.getPrecioNoche();
 
-            if (directa) {
-                
+            // USAR esReservaDirecta (del inmueble) en lugar de directa (del formulario)
+            if (esReservaDirecta) {
+                // RESERVA DIRECTA
                 if (!gestorDisponibilidad.verificarDisponibilidad(inmuebleId, inicio, fin)) {
                     throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
                 }
 
+                // Crear disponibilidad bloqueada
                 Disponibilidad disponibilidad = new Disponibilidad();
                 disponibilidad.setInmueble(inmueble);
                 disponibilidad.setFechaInicio(inicio);
                 disponibilidad.setFechaFin(fin);
-                disponibilidad.setDirecta(true);
+                disponibilidad.setDirecta(true); // Siempre true para reserva directa
                 disponibilidad.setDisponible(false);
                 disponibilidad.setPrecio(precioTotal);
                 disponibilidadDAO.save(disponibilidad);
 
+                // Crear reserva confirmada inmediatamente
                 Reserva reserva = new Reserva(inmueble, inquilino, inicio, fin, precioTotal);
                 reserva.confirmar();
                 reservaDAO.save(reserva);
 
                 model.addAttribute("reserva", reserva);
                 model.addAttribute("disponibilidad", disponibilidad);
-                model.addAttribute("mensaje", "¡Reserva confirmada exitosamente!");
+                model.addAttribute("mensaje", "¡Reserva confirmada y pagada exitosamente!");
                 model.addAttribute("esDirecta", true);
 
             } else {
-                
+                // RESERVA POR CONFIRMACIÓN
                 List<SolicitudReserva> solicitudesExistentes = solicitudReservaDAO.findAll().stream()
                     .filter(s -> s.getInmueble().getId().equals(inmuebleId) &&
                                 s.getEstado().equals("PENDIENTE") &&
@@ -151,12 +161,18 @@ public class ReservasController {
                     throw new RuntimeException("Ya existe una solicitud pendiente para estas fechas. Espera la respuesta del propietario.");
                 }
 
+                // Verificar disponibilidad para solicitud
+                if (!gestorDisponibilidad.verificarDisponibilidadParaSolicitud(inmuebleId, inicio, fin)) {
+                    throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
+                }
+
+                // Crear solicitud pendiente de aprobación
                 SolicitudReserva solicitud = new SolicitudReserva(inquilino, inmueble, inicio, fin, precioTotal);
                 solicitud.setObservacionesInquilino(observaciones);
                 solicitudReservaDAO.save(solicitud);
 
                 model.addAttribute("solicitud", solicitud);
-                model.addAttribute("mensaje", "¡Solicitud de reserva enviada! El propietario la revisará pronto.");
+                model.addAttribute("mensaje", "¡Solicitud de reserva enviada! El propietario la revisará pronto. Solo pagarás cuando sea aprobada.");
                 model.addAttribute("esDirecta", false);
             }
 
@@ -167,7 +183,11 @@ public class ReservasController {
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
             Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
-            inmuebleOpt.ifPresent(i -> model.addAttribute("inmueble", i));
+            if (inmuebleOpt.isPresent()) {
+                Inmueble inmueble = inmuebleOpt.get();
+                model.addAttribute("inmueble", inmueble);
+                model.addAttribute("esReservaDirecta", inmueble.isReservaDirecta());
+            }
             model.addAttribute("usuario", usuario);
             model.addAttribute("fechaInicio", fechaInicio);
             model.addAttribute("fechaFin", fechaFin);

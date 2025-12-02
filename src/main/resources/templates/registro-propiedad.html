@@ -9,158 +9,314 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: 
+                linear-gradient(135deg, rgba(35, 54, 73, 0.85) 0%, rgba(38, 65, 99, 0.85) 100%),
+                url('/images/fondoazul.jpg') center/cover no-repeat fixed;
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
+            color: #9eaabe;
         }
-        
+
         .container {
-            width: 100%;
-            max-width: 600px;
-        }
-        
-        .card {
-            background-color: white;
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(52, 84, 110, 0.95);
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            border: 1px solid rgba(116, 130, 150, 0.6);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.6s ease-out;
         }
-        
+
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(20px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
         .header {
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: white;
-            padding: 25px 20px;
             text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(116, 130, 150, 0.3);
         }
-        
+
         .header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 5px;
+            font-size: 32px;
+            font-weight: 700;
+            color: #a3b6dd;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
-        
+
         .header p {
             font-size: 14px;
-            opacity: 0.9;
+            color: #c1c9d6;
         }
-        
-        .form-container {
-            padding: 30px;
+
+        .error {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff6b6b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(220, 53, 69, 0.5);
+            text-align: center;
         }
-        
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #4299e1;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(66, 153, 225, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            font-size: 20px;
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
-        
-        label {
+
+        .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #333;
+            color: #c5cdda;
             font-size: 14px;
         }
-        
+
         .input-field {
             width: 100%;
             padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            background: rgba(197, 205, 218, 0.1);
+            border: 1px solid rgba(116, 130, 150, 0.4);
+            border-radius: 8px;
+            color: #e2e8f0;
             font-size: 15px;
             transition: all 0.3s;
         }
-        
+
         .input-field:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+            border-color: #4299e1;
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
             outline: none;
+            background: rgba(197, 205, 218, 0.15);
         }
-        
+
+        .input-field::placeholder {
+            color: #8a96a6;
+        }
+
         textarea.input-field {
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
         }
-        
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        /* ESTILOS PARA LOS RADIO BUTTONS */
+        .radio-options {
+            background: rgba(197, 205, 218, 0.08);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 10px;
+            border: 1px solid rgba(116, 130, 150, 0.3);
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: flex-start; /* Alinea verticalmente al inicio */
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 12px;
+            border-radius: 6px;
+        }
+
+        .radio-option:hover {
+            background: rgba(66, 153, 225, 0.1);
+        }
+
+        .radio-option input[type="radio"] {
+            margin: 3px 12px 0 5px; /* Ajustado para alinear con el texto */
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0; /* Evita que se encoja */
+        }
+
+        .radio-label {
+            flex: 1;
+        }
+
+        .radio-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 4px;
+        }
+
+        .radio-description {
+            color: #a0aec0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-directa {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .badge-confirmacion {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+        }
+
+        /* Información adicional */
+        .info-box {
+            background: rgba(66, 153, 225, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .info-box h4 {
+            color: #4299e1;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box ul {
+            padding-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .info-box li {
+            color: #c1c9d6;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
         .btn-submit {
-            background: linear-gradient(to right, #667eea, #764ba2);
+            background: linear-gradient(135deg, #4299e1, #3182ce);
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 14px;
+            border-radius: 8px;
+            padding: 16px 30px;
             width: 100%;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
         }
-        
+
         .btn-submit:hover {
-            background: linear-gradient(to right, #5a6fd8, #6a4190);
+            background: linear-gradient(135deg, #3182ce, #2c5282);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 6px 18px rgba(66, 153, 225, 0.4);
         }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #f5c6cb;
-            text-align: center;
-        }
-        
+
         .footer {
             text-align: center;
-            padding: 20px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(116, 130, 150, 0.3);
             font-size: 14px;
-            color: #666;
-            border-top: 1px solid #eee;
+            color: #8a96a6;
         }
-        
+
         .footer a {
-            color: #667eea;
+            color: #4299e1;
             text-decoration: none;
+            transition: color 0.2s;
         }
-        
-        @media (max-width: 480px) {
+
+        .footer a:hover {
+            color: #63b3ed;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
             .container {
-                max-width: 100%;
+                padding: 20px;
             }
             
-            .form-container {
-                padding: 20px;
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .radio-option {
+                padding: 10px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>Registro de Propiedad</h1>
-                <p>Registra tu propiedad para empezar a alquilar</p>
-            </div>
-            
-            <div class="form-container">
-                <!-- Mensaje de error -->
-                <div th:if="${error}" class="error" th:text="${error}"></div>
-                
-                <form th:action="@{/propiedades/registrar}" method="post">
-                    <div class="form-group">
-                        <label for="emailPropietario">Email del Usuario *</label>
-                        <input type="email" id="emailPropietario" name="emailPropietario" 
-                            class="input-field" placeholder="usuario@ejemplo.com" required>
-                    </div>
+        <div class="header">
+            <h1>🏠 Registro de Propiedad</h1>
+            <p>Completa el formulario para registrar tu propiedad y empezar a alquilar</p>
+        </div>
 
-                    <!-- NUEVOS CAMPOS PARA DATOS DE PROPIETARIO -->
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+
+        <form th:action="@{/propiedades/registrar}" method="post">
+            <!-- SECCIÓN 1: Datos del Propietario -->
+            <div class="form-section">
+                <h2 class="section-title">👤 Datos del Propietario</h2>
+                
+                <div class="form-group">
+                    <label for="emailPropietario">Email del Usuario *</label>
+                    <input type="email" id="emailPropietario" name="emailPropietario" 
+                        class="input-field" placeholder="usuario@ejemplo.com" required>
+                </div>
+
+                <div class="row">
                     <div class="form-group">
                         <label for="telefonoContacto">Teléfono de Contacto *</label>
                         <input type="tel" id="telefonoContacto" name="telefonoContacto" 
@@ -172,36 +328,47 @@
                         <input type="text" id="cuentaBancaria" name="cuentaBancaria" 
                             class="input-field" placeholder="ES12 3456 7890 1234 5678 9012" required>
                     </div>
+                </div>
+            </div>
 
-                    <!-- DIRECCIÓN SEPARADA -->
-                    <div class="form-group" style="display: flex; gap: 10px;">
-                        <div style="flex: 2;">
-                            <label for="calle">Calle *</label>
-                            <input type="text" id="calle" name="calle"
-                                class="input-field" placeholder="Ej: Avenida del Sol" required>
-                        </div>
-
-                        <div style="flex: 1;">
-                            <label for="numero">Número *</label>
-                            <input type="text" id="numero" name="numero"
-                                class="input-field" placeholder="12B" required>
-                        </div>
+            <!-- SECCIÓN 2: Dirección de la Propiedad -->
+            <div class="form-section">
+                <h2 class="section-title">📍 Dirección de la Propiedad</h2>
+                
+                <div class="row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="calle">Calle *</label>
+                        <input type="text" id="calle" name="calle"
+                            class="input-field" placeholder="Ej: Avenida del Sol" required>
                     </div>
 
-                    <div class="form-group" style="display: flex; gap: 10px;">
-                        <div style="flex: 2;">
-                            <label for="ciudad">Ciudad *</label>
-                            <input type="text" id="ciudad" name="ciudad"
-                                class="input-field" placeholder="Madrid" required>
-                        </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="numero">Número *</label>
+                        <input type="text" id="numero" name="numero"
+                            class="input-field" placeholder="12B" required>
+                    </div>
+                </div>
 
-                        <div style="flex: 1;">
-                            <label for="codigoPostal">Código Postal *</label>
-                            <input type="text" id="codigoPostal" name="codigoPostal"
-                                class="input-field" placeholder="28080" required>
-                        </div>
+                <div class="row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="ciudad">Ciudad *</label>
+                        <input type="text" id="ciudad" name="ciudad"
+                            class="input-field" placeholder="Madrid" required>
                     </div>
 
+                    <div class="form-group" style="flex: 1;">
+                        <label for="codigoPostal">Código Postal *</label>
+                        <input type="text" id="codigoPostal" name="codigoPostal"
+                            class="input-field" placeholder="28080" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: Detalles del Alquiler -->
+            <div class="form-section">
+                <h2 class="section-title">💰 Detalles del Alquiler</h2>
+                
+                <div class="row">
                     <div class="form-group">
                         <label for="precioNoche">Precio por Noche (€) *</label>
                         <input type="number" id="precioNoche" name="precioNoche" 
@@ -213,22 +380,80 @@
                         <input type="number" id="capacidad" name="capacidad" 
                                class="input-field" placeholder="4" min="1" required>
                     </div>
+                </div>
+            </div>
 
-                    <div class="form-group">
-                        <label for="descripcion">Descripción de la Propiedad</label>
-                        <textarea id="descripcion" name="descripcion" 
-                                  class="input-field" 
-                                  placeholder="Describe tu propiedad, características, ambiente..."></textarea>
+            <!-- SECCIÓN 4: Tipo de Reserva -->
+            <div class="form-section">
+                <h2 class="section-title">🎯 Tipo de Reserva</h2>
+                
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" name="reservaDirecta" id="directa" value="true" checked>
+                        <div class="radio-label">
+                            <div class="radio-title">
+                                <span>Reserva Directa</span>
+                                <span class="badge badge-directa">Recomendado</span>
+                            </div>
+                            <div class="radio-description">
+                                Los usuarios pueden reservar y pagar inmediatamente. La reserva se confirma automáticamente.
+                            </div>
+                        </div>
                     </div>
+                    
+                    <div class="radio-option">
+                        <input type="radio" name="reservaDirecta" id="confirmacion" value="false">
+                        <div class="radio-label">
+                            <div class="radio-title">
+                                <span>Reserva por Confirmación</span>
+                                <span class="badge badge-confirmacion">Mayor Control</span>
+                            </div>
+                            <div class="radio-description">
+                                Los usuarios solicitan reserva y tú decides aprobarla o rechazarla antes del pago.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h4>💡 Información importante</h4>
+                    <ul>
+                        <li><strong>Reserva Directa:</strong> Más reservas, menos trabajo administrativo</li>
+                        <li><strong>Reserva por Confirmación:</strong> Mayor control sobre quién se aloja</li>
+                        <li>Puedes cambiar esta configuración más adelante</li>
+                        <li>Esta opción se mostrará claramente a los usuarios</li>
+                    </ul>
+                </div>
+            </div>
 
-                    <button type="submit" class="btn-submit">Registrar Propiedad</button>
-                </form>
+            <!-- SECCIÓN 5: Descripción -->
+            <div class="form-section">
+                <h2 class="section-title">📝 Descripción de la Propiedad</h2>
+                
+                <div class="form-group">
+                    <label for="descripcion">Describe tu propiedad para los usuarios</label>
+                    <textarea id="descripcion" name="descripcion" 
+                              class="input-field" 
+                              placeholder="Describe tu propiedad, características principales, ambiente, comodidades, servicios incluidos, normas de la casa..."></textarea>
+                    <div style="font-size: 12px; color: #8a96a6; margin-top: 5px;">
+                        Una buena descripción aumenta las probabilidades de alquiler.
+                    </div>
+                </div>
             </div>
-            
-            <div class="footer">
-                <a th:href="@{/propiedades}">Ver todas las propiedades</a> | 
-                <a th:href="@{/}">Volver al inicio</a>
-            </div>
+
+            <button type="submit" class="btn-submit">
+                <span>🏠 Registrar Propiedad</span>
+            </button>
+        </form>
+
+        <div class="footer">
+            <p>
+                <a th:href="@{/propiedades}">📋 Ver todas las propiedades</a> • 
+                <a th:href="@{/}">🏠 Volver al inicio</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">
+                Todos los campos marcados con * son obligatorios
+            </p>
         </div>
     </div>
 </body>
