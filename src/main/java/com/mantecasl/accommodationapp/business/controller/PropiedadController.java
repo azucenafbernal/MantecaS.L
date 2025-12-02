@@ -10,10 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.mantecasl.accommodationapp.business.entity.Inmueble;
-import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.entity.*;
+import com.mantecasl.accommodationapp.business.persistance.*;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 
 @Controller
 public class PropiedadController {
@@ -24,9 +29,12 @@ public class PropiedadController {
     @Autowired
     private GestorDisponibilidad gestorDisponibilidad;
 
-    /**
-     * Catálogo con filtros de disponibilidad, ciudad y capacidad
-     */
+    @Autowired
+    private ReservaDAO reservaDAO;
+
+    @Autowired
+    private GestorNotificaciones notificacion;
+
     @GetMapping("/catalogo")
     public String verCatalogo(
             @RequestParam(required = false) String ciudad,
@@ -37,7 +45,6 @@ public class PropiedadController {
         
         List<Inmueble> propiedadesFiltradas = new ArrayList<>();
         
-        // ✔️ Si hay fechas especificadas, filtrar por disponibilidad
         if (fechaInicio != null && !fechaInicio.isEmpty() && 
             fechaFin != null && !fechaFin.isEmpty()) {
             
@@ -80,7 +87,6 @@ public class PropiedadController {
             propiedadesFiltradas = inmuebleDAO.findAll();
         }
 
-        // ✔️ Filtrar por ciudad si se especifica
         if (ciudad != null && !ciudad.isEmpty()) {
             propiedadesFiltradas = propiedadesFiltradas.stream()
                 .filter(inmueble -> inmueble.getCiudad() != null && 
@@ -88,7 +94,6 @@ public class PropiedadController {
                 .collect(Collectors.toList());
         }
 
-        // ✔️ Filtrar por capacidad si se especifica
         if (capacidad != null && capacidad > 0) {
             propiedadesFiltradas = propiedadesFiltradas.stream()
                 .filter(inmueble -> inmueble.getCapacidad() >= capacidad)
@@ -107,5 +112,43 @@ public class PropiedadController {
         }
 
         return "lista-propiedades";
+    }
+
+    @PostMapping("/propiedades/{id}/eliminar")
+    @Transactional
+    public String eliminarPropiedad(@PathVariable Long id, HttpSession session, Model model) {
+        try {
+            Usuario usuario = (Usuario) session.getAttribute("usuario");
+            Inmueble inmueble = inmuebleDAO.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Propiedad no encontrada"));
+            
+            // Verificar que el usuario es el propietario
+            if (!inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
+                model.addAttribute("error", "No tienes permiso para eliminar esta propiedad");
+                return "redirect:/propiedades/" + id;
+            }
+            
+            // Obtener reservas futuras
+            List<Reserva> reservasFuturas = reservaDAO.findReservasFuturasByInmueble(id);
+            
+            // NOTIFICAR ELIMINACIÓN
+            notificacion.notificarEliminacionPropiedad(inmueble, reservasFuturas);
+            
+            // Reembolsar pagos (implementar tu lógica de reembolso)
+            for (Reserva reserva : reservasFuturas) {
+                // Lógica de reembolso aquí
+                notificacion.crearNotificacionPagoDevuelto(reserva, reserva.getPrecioTotal());
+            }
+            
+            // Eliminar el inmueble
+            inmuebleDAO.delete(inmueble);
+            
+            model.addAttribute("mensaje", "Propiedad eliminada correctamente. Se han notificado a los inquilinos afectados.");
+            return "redirect:/propiedades";
+            
+        } catch (Exception e) {
+            model.addAttribute("error", "Error al eliminar propiedad: " + e.getMessage());
+            return "redirect:/propiedades/" + id;
+        }
     }
 }

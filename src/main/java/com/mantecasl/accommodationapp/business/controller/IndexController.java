@@ -21,10 +21,12 @@ public class IndexController {
     
     @Autowired
     private InmuebleDAO inmuebleDAO;
+    
+    @Autowired
+    private GestorNotificaciones gestorNotificaciones; // CAMBIAR
 
     @GetMapping({ "/", "/index" })
     public String mostrarIndex(Model model, HttpSession session) {
-        // Obtener usuario de la sesión si existe
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         
         if (usuario != null) {
@@ -33,7 +35,6 @@ public class IndexController {
             // Verificar si es propietario
             var propietario = propietarioDAO.findByUsuarioId(usuario.getId());
             if (propietario != null) {
-                // Obtener IDs de inmuebles del propietario
                 var inmuebleIds = inmuebleDAO.findAll().stream()
                     .filter(inmueble -> 
                         inmueble.getPropietario() != null && 
@@ -41,7 +42,6 @@ public class IndexController {
                     .map(inmueble -> inmueble.getId())
                     .collect(Collectors.toList());
                 
-                // Contar solicitudes pendientes manualmente
                 long numeroPendientes = solicitudReservaDAO.findAll().stream()
                     .filter(solicitud -> 
                         inmuebleIds.contains(solicitud.getInmueble().getId()) &&
@@ -54,6 +54,11 @@ public class IndexController {
                 model.addAttribute("esPropietario", false);
                 model.addAttribute("numeroNotificacionesPendientes", 0);
             }
+            
+            // CONTAR NOTIFICACIONES NO LEÍDAS
+            long notificacionesNoLeidas = gestorNotificaciones.contarNotificacionesNoLeidas(usuario);
+            model.addAttribute("notificacionesNoLeidas", notificacionesNoLeidas);
+            
         }
         
         return "index";

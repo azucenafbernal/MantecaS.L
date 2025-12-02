@@ -12,7 +12,6 @@ import java.util.List;
 @Repository
 public interface ReservaDAO extends JpaRepository<Reserva, Long> {
     
-    // Para verificar disponibilidad
     @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId " +
            "AND r.estado IN ('PENDIENTE', 'CONFIRMADA') " +
            "AND ((r.fechaInicio BETWEEN :inicio AND :fin) OR " +
@@ -27,4 +26,23 @@ public interface ReservaDAO extends JpaRepository<Reserva, Long> {
 
     @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId AND r.estado = :estado")
     List<Reserva> findByInmuebleIdAndEstado(@Param("inmuebleId") Long inmuebleId, @Param("estado") String estado);
+        
+    @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId AND r.fechaInicio >= CURRENT_DATE")
+    List<Reserva> findReservasFuturasByInmueble(@Param("inmuebleId") Long inmuebleId);
+    
+    @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId " +
+           "AND r.fechaInicio >= CURRENT_DATE " +
+           "AND r.estado = :estado")
+    List<Reserva> findReservasFuturasByInmuebleAndEstado(@Param("inmuebleId") Long inmuebleId, 
+                                                         @Param("estado") String estado);
+    
+    default List<Reserva> findReservasConfirmadasFuturasByInmueble(Long inmuebleId) {
+        return findReservasFuturasByInmuebleAndEstado(inmuebleId, "CONFIRMADA");
+    }
+    
+    @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId " +
+           "AND r.fechaInicio >= :hoy " +
+           "AND r.estado = 'CONFIRMADA'")
+    List<Reserva> findReservasConfirmadasFuturasDesdeFecha(@Param("inmuebleId") Long inmuebleId,
+                                                           @Param("hoy") Date hoy);
 }

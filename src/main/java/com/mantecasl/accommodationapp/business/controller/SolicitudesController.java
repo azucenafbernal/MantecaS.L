@@ -33,6 +33,9 @@ public class SolicitudesController {
     private PropietarioDAO propietarioDAO;
 
     @Autowired
+    private GestorNotificaciones notificacion;
+
+    @Autowired
     private InmuebleDAO inmuebleDAO;
 
     @GetMapping("/reserva/{id}")
@@ -161,14 +164,14 @@ public class SolicitudesController {
         disponibilidad.setPrecio(solicitud.getPrecioTotal());
         disponibilidadDAO.save(disponibilidad);
 
+        notificacion.crearNotificacionSolicitudAprobada(solicitud);
+
         return "redirect:/propietario/notificaciones?exito=Solicitud+aprobada";
     }
 
     //Rechazar Solicitud
     @PostMapping("/reserva/{id}/rechazar")
-    public String rechazarSolicitud(@PathVariable Long id,
-                                    @RequestParam String motivo,
-                                    HttpSession session) {
+    public String rechazarSolicitud(@PathVariable Long id, @RequestParam String motivo, HttpSession session) {
 
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         if (usuario == null) return "redirect:/login";
@@ -184,10 +187,10 @@ public class SolicitudesController {
             return "redirect:/";
         }
 
-        //Cambiar estado a RECHAZADA
         solicitud.rechazar(motivo);
         solicitudReservaDAO.save(solicitud);
 
+        notificacion.crearNotificacionSolicitudRechazada(solicitud, motivo);
         return "redirect:/propietario/notificaciones?exito=Solicitud+rechazada";
     }
 }

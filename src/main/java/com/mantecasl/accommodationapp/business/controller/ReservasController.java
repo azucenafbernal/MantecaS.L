@@ -37,6 +37,9 @@ public class ReservasController {
     @Autowired
     private DisponibilidadDAO disponibilidadDAO;
 
+    @Autowired
+    private GestorNotificaciones notificacion;
+
     @GetMapping("/nueva/{inmuebleId}")
     public String mostrarFormularioReserva(
             @PathVariable Long inmuebleId,
@@ -73,7 +76,6 @@ public class ReservasController {
             @RequestParam Long inmuebleId,
             @RequestParam String fechaInicio,
             @RequestParam String fechaFin,
-            // REMOVER: @RequestParam boolean directa,  // YA NO SE NECESITA
             @RequestParam String telefono,
             @RequestParam String documentoIdentidad,
             @RequestParam String metodoPago,
@@ -124,7 +126,6 @@ public class ReservasController {
 
             // USAR esReservaDirecta (del inmueble) en lugar de directa (del formulario)
             if (esReservaDirecta) {
-                // RESERVA DIRECTA
                 if (!gestorDisponibilidad.verificarDisponibilidad(inmuebleId, inicio, fin)) {
                     throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
                 }
@@ -148,6 +149,8 @@ public class ReservasController {
                 model.addAttribute("disponibilidad", disponibilidad);
                 model.addAttribute("mensaje", "¡Reserva confirmada y pagada exitosamente!");
                 model.addAttribute("esDirecta", true);
+
+                notificacion.crearNotificacionReservaDirecta(reserva);
 
             } else {
                 // RESERVA POR CONFIRMACIÓN

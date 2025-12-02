@@ -50,6 +50,7 @@
             transition: all 0.3s ease;
         }
 
+        /* Botón de Mensajes/Notificaciones */
         .messages-btn:hover {
             background-color: rgba(66, 153, 225, 0.3);
             border-color: rgba(66, 153, 225, 0.5);
@@ -59,43 +60,7 @@
             color: #4299e1;
         }
 
-        .favorites-btn:hover {
-            background-color: rgba(255, 107, 157, 0.3);
-            border-color: rgba(255, 107, 157, 0.5);
-        }
-
-        .favorites-btn:hover i {
-            color: #ff6b9d;
-        }
-
-        .notifications-btn {
-            position: relative;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: linear-gradient(135deg, #ff4757, #ff3838);
-            color: white;
-            font-size: 11px;
-            font-weight: bold;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #1a1a2e;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
+        /* Botón de Notificaciones Propietario */
         .notifications-btn:hover {
             background-color: rgba(56, 178, 172, 0.3);
             border-color: rgba(56, 178, 172, 0.5);
@@ -105,6 +70,17 @@
             color: #38b2ac;
         }
 
+        /* Botón de Favoritos */
+        .favorites-btn:hover {
+            background-color: rgba(255, 107, 157, 0.3);
+            border-color: rgba(255, 107, 157, 0.5);
+        }
+
+        .favorites-btn:hover i {
+            color: #ff6b9d;
+        }
+
+        /* Botón de Usuario */
         .user-menu:hover {
             background-color: rgba(108, 92, 231, 0.3);
             border-color: rgba(108, 92, 231, 0.5);
@@ -112,6 +88,45 @@
 
         .user-menu:hover i {
             color: #6c5ce7;
+        }
+
+        /* Badges para notificaciones */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid #1a1a2e;
+            animation: pulse 2s infinite;
+        }
+
+        .messages-badge {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+        }
+
+        .notifications-badge {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Contenedor con posición relativa para los badges */
+        .menu-btn-with-badge {
+            position: relative;
         }
 
         .hero {
@@ -200,15 +215,27 @@
     <div class="logo" onclick="window.location.href='/'">Manteca SL</div>
 
     <div class="right-menu">
-        <!--Botón de notificaciones -->
+        <!-- Botón de Mensajes/Notificaciones (PARA TODOS LOS USUARIOS) -->
+        <a th:if="${usuario != null}" 
+           href="/notificaciones" 
+           class="menu-btn menu-btn-with-badge messages-btn" 
+           title="Mis notificaciones">
+            <i class="fa fa-envelope"></i>
+            <span>Mensajes</span>
+            <th:block th:if="${notificacionesNoLeidas != null and notificacionesNoLeidas > 0}">
+                <span class="notification-badge messages-badge" th:text="${notificacionesNoLeidas}"></span>
+            </th:block>
+        </a>
+
+        <!-- Botón de Notificaciones de Propietario (SOLO PARA PROPIETARIOS) -->
         <a th:if="${usuario != null and esPropietario}" 
            href="/propietario/notificaciones" 
-           class="menu-btn notifications-btn" 
-           title="Notificaciones">
+           class="menu-btn menu-btn-with-badge notifications-btn" 
+           title="Solicitudes de reserva">
             <i class="fa fa-bell"></i>
-            <span>Notificaciones</span>
+            <span>Solicitudes</span>
             <th:block th:if="${numeroNotificacionesPendientes != null and numeroNotificacionesPendientes > 0}">
-                <span class="notification-badge" th:text="${numeroNotificacionesPendientes}"></span>
+                <span class="notification-badge notifications-badge" th:text="${numeroNotificacionesPendientes}"></span>
             </th:block>
         </a>
 
