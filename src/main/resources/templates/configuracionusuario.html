@@ -5,118 +5,171 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuración de la cuenta - MantecaS.L</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: 
+                linear-gradient(135deg, rgba(35, 54, 73, 0.85) 0%, rgba(38, 65, 99, 0.85) 100%),
+                url('/images/fondoazul.jpg') center/cover no-repeat fixed;
             min-height: 100vh;
             padding: 20px;
+            color: #e2e8f0;
         }
+
         .container {
-            max-width: 600px;
+            max-width: 900px;
             margin: 0 auto;
         }
+
+        .back-link {
+            color: #a3b6dd;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #c1c9d6;
+            transform: translateX(-4px);
+        }
+
         .card {
-            background-color: white;
+            background: rgba(52, 84, 110, 0.9);
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(116, 130, 150, 0.5);
+            backdrop-filter: blur(10px);
+            color: #e2e8f0;
             margin-bottom: 20px;
         }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+            background: rgba(52, 84, 110, 0.95);
+        }
+
         .header {
-            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            background: linear-gradient(135deg, rgba(45, 55, 72, 0.9) 0%, rgba(74, 85, 104, 0.9) 100%);
             color: white;
             padding: 25px 20px;
             text-align: center;
+            border-bottom: 1px solid rgba(116, 130, 150, 0.3);
         }
+
         .header h1 {
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 28px;
+            font-weight: 700;
+            color: #a3b6dd;
         }
+
         .section {
             padding: 30px;
         }
+
         .section h2 {
-            color: #4a00e0;
+            color: #a3b6dd;
             font-size: 18px;
             margin-bottom: 15px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(116, 130, 150, 0.3);
+            padding-bottom: 12px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            color: #333;
+            margin-bottom: 8px;
+            color: #c1c9d6;
             font-weight: 600;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
             font-size: 14px;
         }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(116, 130, 150, 0.5);
+            border-radius: 8px;
+            font-size: 14px;
+            background: rgba(45, 55, 72, 0.5);
+            color: #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
         .form-group input:focus {
             outline: none;
-            border-color: #4a00e0;
-            box-shadow: 0 0 5px rgba(74, 0, 224, 0.3);
+            border-color: #4299e1;
+            background: rgba(45, 55, 72, 0.7);
+            box-shadow: 0 0 8px rgba(66, 153, 225, 0.4);
         }
+
         .btn {
             display: inline-block;
             width: 100%;
-            padding: 12px;
-            border-radius: 6px;
+            padding: 14px;
+            border-radius: 8px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             font-size: 16px;
             border: none;
             cursor: pointer;
             margin-top: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
+
         .btn-primary {
-            background: linear-gradient(to right, #4a00e0, #8e2de2);
+            background: #4299e1;
             color: white;
         }
+
         .btn-primary:hover {
-            background: linear-gradient(to right, #3a00c0, #7e1dd2);
+            background: #3182ce;
             transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
         }
+
         .btn-danger {
-            background: #ff4757;
+            background: #f56565;
             color: white;
         }
+
         .btn-danger:hover {
-            background: #ff3838;
+            background: #e53e3e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 101, 101, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(45, 55, 72, 0.8);
+            color: #4299e1;
+            border: 1px solid #4299e1;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(66, 153, 225, 0.2);
+            border-color: #4299e1;
             transform: translateY(-2px);
         }
-        .btn-secondary {
-            background: transparent;
-            color: #4a00e0;
-            border: 2px solid #4a00e0;
-        }
-        .btn-secondary:hover {
-            background: #4a00e0;
-            color: white;
-        }
-        .back-link {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
+
         hr {
             border: none;
             height: 1px;
-            background: #eee;
+            background: rgba(116, 130, 150, 0.3);
             margin: 20px 0;
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -125,50 +178,60 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.6);
             align-items: center;
             justify-content: center;
         }
+
         .modal-content {
-            background-color: white;
+            background: rgba(52, 84, 110, 0.95);
             border-radius: 12px;
             padding: 30px;
             width: 90%;
             max-width: 500px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(116, 130, 150, 0.5);
+            backdrop-filter: blur(10px);
         }
+
         .modal-header {
             font-size: 20px;
-            font-weight: 600;
-            color: #4a00e0;
+            font-weight: 700;
+            color: #a3b6dd;
             margin-bottom: 20px;
         }
+
         .close-modal {
             float: right;
             font-size: 28px;
             font-weight: bold;
-            color: #999;
+            color: #9eaabe;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
+
         .close-modal:hover {
-            color: #333;
+            color: #c1c9d6;
         }
+
         .alert {
             padding: 12px 15px;
             margin-bottom: 15px;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 500;
         }
+
         .alert-error {
-            background-color: #ffe0e0;
-            border: 1px solid #ff4757;
-            color: #d32f2f;
+            background-color: rgba(245, 101, 101, 0.2);
+            border: 1px solid rgba(245, 101, 101, 0.5);
+            color: #fbb6ce;
         }
+
         .alert-success {
-            background-color: #e0ffe0;
-            border: 1px solid #2ed573;
-            color: #00a152;
+            background-color: rgba(72, 187, 120, 0.2);
+            border: 1px solid rgba(72, 187, 120, 0.5);
+            color: #9ae6b4;
         }
         
         /* Phone Input Component Styles */
@@ -181,10 +244,10 @@
         }
 
         .prefix-dropdown-with-flag {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background-color: white;
+            padding: 12px 12px;
+            border: 1px solid rgba(116, 130, 150, 0.5);
+            border-radius: 8px;
+            background-color: rgba(45, 55, 72, 0.5);
             cursor: pointer;
             font-size: 14px;
             white-space: nowrap;
@@ -193,28 +256,33 @@
             display: flex;
             align-items: center;
             transition: all 0.3s;
+            color: #e2e8f0;
         }
 
         .prefix-dropdown-with-flag:focus {
-            border-color: #4a00e0;
-            box-shadow: 0 0 5px rgba(74, 0, 224, 0.3);
+            border-color: #4299e1;
+            background: rgba(45, 55, 72, 0.7);
+            box-shadow: 0 0 8px rgba(66, 153, 225, 0.4);
             outline: none;
         }
 
         #telefonoCompleto {
             flex: 1 1 auto !important;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 12px;
+            border: 1px solid rgba(116, 130, 150, 0.5);
+            border-radius: 8px;
             font-size: 14px;
             width: auto;
             box-sizing: border-box;
             transition: all 0.3s;
+            background: rgba(45, 55, 72, 0.5);
+            color: #e2e8f0;
         }
 
         #telefonoCompleto:focus {
-            border-color: #4a00e0;
-            box-shadow: 0 0 5px rgba(74, 0, 224, 0.3);
+            border-color: #4299e1;
+            background: rgba(45, 55, 72, 0.7);
+            box-shadow: 0 0 8px rgba(66, 153, 225, 0.4);
             outline: none;
         }
 
