@@ -28,6 +28,8 @@ public class Inmueble {
     private double precioNoche;
     private String descripcion;
     private Integer capacidad;
+
+    private boolean reservaDirecta = true; 
     
     //Relación con Propietario (Un propietario puede tener asociados muchos inmuebles)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,7 +48,7 @@ public class Inmueble {
     //Constructores
     public Inmueble() {}
     
-    public Inmueble(String calle, String numero, String ciudad, String codigoPostal, double precioNoche, String descripcion, Integer capacidad, Propietario propietario) {
+    public Inmueble(String calle, String numero, String ciudad, String codigoPostal, double precioNoche, String descripcion, Integer capacidad, boolean reservaDirecta, Propietario propietario) {
         this.calle = calle;
         this.numero = numero;
         this.ciudad = ciudad;
@@ -107,6 +109,12 @@ public class Inmueble {
     public void setPrecioNoche(double precioNoche) {
          this.precioNoche = precioNoche; 
     }
+    public boolean isReservaDirecta() {
+        return reservaDirecta;
+    }
+    public void setReservaDirecta(boolean reservaDirecta) {
+        this.reservaDirecta = reservaDirecta;
+    }
     public String getDescripcion() { 
         return descripcion; 
     }
@@ -156,3 +164,4 @@ public class Inmueble {
         return calle + " " + numero + ", " + ciudad + " " + codigoPostal;
     }
 }
+

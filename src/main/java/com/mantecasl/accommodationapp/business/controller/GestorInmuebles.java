@@ -39,6 +39,7 @@ public class GestorInmuebles {
         @RequestParam String codigoPostal,
         @RequestParam double precioNoche,
         @RequestParam String descripcion,
+        @RequestParam boolean reservaDirecta,
         @RequestParam Integer capacidad,
         @RequestParam String emailPropietario,
         @RequestParam String telefonoContacto, 
@@ -75,6 +76,7 @@ public class GestorInmuebles {
             inmueble.setPrecioNoche(precioNoche);
             inmueble.setDescripcion(descripcion);
             inmueble.setCapacidad(capacidad);
+            inmueble.setReservaDirecta(reservaDirecta);
             inmueble.setPropietario(propietario);
 
             Inmueble nuevoInmueble = inmuebleDAO.save(inmueble);

@@ -15,28 +15,40 @@ public class LoginController {
     private UsuarioDAO usuarioDAO;
 
     @GetMapping("/login")
-    public String mostrarLogin(Model model, HttpSession session) {
+    public String mostrarLogin(Model model, HttpSession session, @RequestParam(required = false) String from) {
         if (session.getAttribute("usuario") != null) {
             return "redirect:/resultLogin";
         }
         model.addAttribute("usuario", new Usuario());
+        model.addAttribute("from", from);
         return "login";
     }
 
     @PostMapping("/login")
-    public String procesarLogin(@ModelAttribute Usuario usuario, Model model, HttpSession session) {
+    public String procesarLogin(
+            @ModelAttribute Usuario usuario,
+            Model model,
+            HttpSession session,
+            @RequestParam(required = false) String from) {
+
         Usuario encontrado = usuarioDAO.findByEmail(usuario.getEmail());
 
         if (encontrado == null || !encontrado.getContrasena().equals(usuario.getContrasena())) {
             model.addAttribute("error", "Correo o contraseña incorrectos");
+            model.addAttribute("from", from);
             return "login";
         }
 
         // guardar usuario en sesion
         session.setAttribute("usuario", encontrado);
 
-        return "redirect:/resultLogin";
+        if (from != null && !from.isEmpty()) {
+            return "redirect:" + from;
+        }
+
+        return "redirect:/";
     }
+
 
     @GetMapping("/resultLogin")
     public String mostrarResultLogin(HttpSession session, Model model) {

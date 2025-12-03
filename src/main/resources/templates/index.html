@@ -21,6 +21,10 @@
         .right-menu {
             display: flex;
             align-items: center;
+            gap: 12px;
+        }
+
+        .menu-btn {
             gap: 15px; 
         }
 
@@ -113,20 +117,98 @@
             transition: all 0.3s ease;
             text-decoration: none;
             color: white;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .navbar .favorites-btn:hover {
-            background-color: rgba(255, 107, 157, 0.3);
-            transform: scale(1.05);
+        .menu-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .navbar .favorites-btn i {
-            font-size: 20px;
+        .menu-btn i {
+            font-size: 18px;
             transition: all 0.3s ease;
         }
 
-        .navbar .favorites-btn:hover i {
+        /* Botón de Mensajes/Notificaciones */
+        .messages-btn:hover {
+            background-color: rgba(66, 153, 225, 0.3);
+            border-color: rgba(66, 153, 225, 0.5);
+        }
+
+        .messages-btn:hover i {
+            color: #4299e1;
+        }
+
+        /* Botón de Notificaciones Propietario */
+        .notifications-btn:hover {
+            background-color: rgba(56, 178, 172, 0.3);
+            border-color: rgba(56, 178, 172, 0.5);
+        }
+
+        .notifications-btn:hover i {
+            color: #38b2ac;
+        }
+
+        /* Botón de Favoritos */
+        .favorites-btn:hover {
+            background-color: rgba(255, 107, 157, 0.3);
+            border-color: rgba(255, 107, 157, 0.5);
+        }
+
+        .favorites-btn:hover i {
             color: #ff6b9d;
+        }
+
+        /* Botón de Usuario */
+        .user-menu:hover {
+            background-color: rgba(108, 92, 231, 0.3);
+            border-color: rgba(108, 92, 231, 0.5);
+        }
+
+        .user-menu:hover i {
+            color: #6c5ce7;
+        }
+
+        /* Badges para notificaciones */
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid #1a1a2e;
+            animation: pulse 2s infinite;
+        }
+
+        .messages-badge {
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+        }
+
+        .notifications-badge {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Contenedor con posición relativa para los badges */
+        .menu-btn-with-badge {
+            position: relative;
         }
 
         .hero {
@@ -198,6 +280,11 @@
         }
 
         @media (max-width:768px) {
+            .navbar { padding: 15px 20px; }
+            .right-menu { gap: 8px; }
+            .menu-btn { padding: 6px 12px; font-size: 14px; }
+            .menu-btn span { display: none; }
+            .menu-btn i { font-size: 16px; }
             .search-box {flex-direction:column; border-radius:20px;}
             .search-button {width:100%; padding:15px;}
         }
@@ -250,40 +337,104 @@
         </div>
     </div>
 
-    <div class="hero">
-        <h1>Encuentra tu próximo alojamiento</h1>
-        <p>Explora lugares únicos en todo el mundo con Manteca SL</p>
+<div class="navbar">
+    <div class="logo" onclick="window.location.href='/'">Manteca SL</div>
 
-        <form action="/catalogo" method="get" class="search-box">
-            <div class="search-item">
-                <label>¿Dónde?</label>
-                <input type="text" name="ciudad" placeholder="Destino, ciudad...">
-            </div>
+    <div class="right-menu">
+        <!-- Botón de Mensajes/Notificaciones (PARA TODOS LOS USUARIOS) -->
+        <a th:if="${usuario != null}" 
+           href="/notificaciones" 
+           class="menu-btn menu-btn-with-badge messages-btn" 
+           title="Mis notificaciones">
+            <i class="fa fa-envelope"></i>
+            <span>Mensajes</span>
+            <th:block th:if="${notificacionesNoLeidas != null and notificacionesNoLeidas > 0}">
+                <span class="notification-badge messages-badge" th:text="${notificacionesNoLeidas}"></span>
+            </th:block>
+        </a>
 
-            <div class="search-item">
-                <label>Entrada</label>
-                <input type="date" name="fechaInicio">
-            </div>
+        <!-- Botón de Notificaciones de Propietario (SOLO PARA PROPIETARIOS) -->
+        <a th:if="${usuario != null and esPropietario}" 
+           href="/propietario/notificaciones" 
+           class="menu-btn menu-btn-with-badge notifications-btn" 
+           title="Solicitudes de reserva">
+            <i class="fa fa-bell"></i>
+            <span>Solicitudes</span>
+            <th:block th:if="${numeroNotificacionesPendientes != null and numeroNotificacionesPendientes > 0}">
+                <span class="notification-badge notifications-badge" th:text="${numeroNotificacionesPendientes}"></span>
+            </th:block>
+        </a>
 
-            <div class="search-item">
-                <label>Salida</label>
-                <input type="date" name="fechaFin">
-            </div>
+        <!-- Botón de Favoritos -->
+        <a th:if="${usuario != null}" href="/favoritos" class="menu-btn favorites-btn">
+            <i class="fa fa-heart"></i>
+            <span>Favoritos</span>
+        </a>
 
-            <div class="search-item">
-                <label>Huéspedes</label>
-                <input type="number" name="capacidad" placeholder="1" min="1">
-            </div>
-
-            <button class="search-button" type="submit">
-                Buscar
-            </button>
-        </form>
-
-        <button class="btn-ver-catalogo" onclick="window.location.href='/catalogo'">
-             Ver catálogo de alojamientos
-        </button>
+        <!-- Botón de Usuario -->
+        <a th:href="${usuario != null ? '/configuracion?idUsuario=' + usuario.id : '/login'}" class="menu-btn user-menu">
+            <i class="fa fa-user"></i> 
+            <span th:if="${usuario != null}" th:text="${usuario.nombre}">Usuario</span>
+            <span th:if="${usuario == null}">Iniciar sesión</span>
+        </a>
     </div>
+</div>
+
+<div class="hero">
+    <h1>Encuentra tu próximo alojamiento</h1>
+    <p>Explora lugares únicos en todo el mundo con Manteca SL</p>
+
+    <form action="/catalogo" method="get" class="search-box">
+        <div class="search-item">
+            <label>¿Dónde?</label>
+            <input type="text" name="ciudad" placeholder="Destino, ciudad...">
+        </div>
+
+        <div class="search-item">
+            <label>Entrada</label>
+            <input type="date" name="fechaInicio">
+        </div>
+
+        <div class="search-item">
+            <label>Salida</label>
+            <input type="date" name="fechaFin">
+        </div>
+
+        <div class="search-item">
+            <label>Huéspedes</label>
+            <input type="number" name="capacidad" placeholder="1" min="1">
+        </div>
+
+        <button class="search-button" type="submit">Buscar</button>
+    </form>
+
+    <button class="btn-ver-catalogo" onclick="window.location.href='/catalogo'">
+        Ver catálogo de alojamientos
+    </button>
+</div>
+
+<script>
+    // Establecer fecha mínima en los inputs de fecha
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        const fechaInicio = document.querySelector('input[name="fechaInicio"]');
+        const fechaFin = document.querySelector('input[name="fechaFin"]');
+        
+        if (fechaInicio) fechaInicio.min = today;
+        if (fechaFin) fechaFin.min = today;
+        
+        // Actualizar fecha mínima de fin cuando cambia la de inicio
+        if (fechaInicio && fechaFin) {
+            fechaInicio.addEventListener('change', function() {
+                fechaFin.min = this.value;
+                if (fechaFin.value && fechaFin.value < this.value) {
+                    fechaFin.value = this.value;
+                }
+            });
+        }
+    });
+</script>
+
 
     <script>
         // User dropdown menu toggle

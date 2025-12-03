@@ -1,46 +1,47 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import java.time.LocalDate;
-import java.util.List;
-
+import com.mantecasl.accommodationapp.business.entity.*;
+import com.mantecasl.accommodationapp.business.persistance.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.mantecasl.accommodationapp.business.entity.Inmueble;
-import com.mantecasl.accommodationapp.business.entity.Reserva;
-import com.mantecasl.accommodationapp.business.persistance.*;
-
+import java.util.List;
 
 @Service
+@Transactional
 public class GestorReservas {
+
+    @Autowired
+    private SolicitudReservaDAO solicitudReservaDAO;
+
     @Autowired
     private ReservaDAO reservaDAO;
 
-    @Autowired
-    private InmuebleDAO inmuebleDAO;
+    //PENDIENTES
+    public List<SolicitudReserva> obtenerSolicitudesPendientesPropietario(Long propietarioId) {
+        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "PENDIENTE");
+    }
 
-    public void crearReserva(Long inmuebleId, LocalDate inicio, LocalDate fin) throws Exception {
+    //APROBADAS
+    public List<SolicitudReserva> obtenerSolicitudesAprobadasPropietario(Long propietarioId) {
+        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "APROBADA");
+    }
 
-        Inmueble inmueble = inmuebleDAO.findById(inmuebleId).orElse(null);
-        if (inmueble == null) {
-            throw new Exception("El inmueble no existe.");
-        }
+    //RECHAZADAS
+    public List<SolicitudReserva> obtenerSolicitudesRechazadasPropietario(Long propietarioId) {
+        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "RECHAZADA");
+    }
 
-        // Comprobar solapamiento de fechas
-        List<Reserva> reservasSolapadas =
-                reservaDAO.findByInmuebleIdAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqual(
-                        inmuebleId, fin, inicio);
+    //HISTORIAL
+    public List<Reserva> obtenerHistorialReservasPropietario(Long propietarioId) {
+        List<Reserva> todas = reservaDAO.findAll()
+                .stream()
+                .filter(r -> r.getInmueble().getPropietario().getId().equals(propietarioId))
+                .sorted((a, b) -> b.getId().compareTo(a.getId()))
+                .limit(10)
+                .toList();
 
-        if (!reservasSolapadas.isEmpty()) {
-            throw new Exception("El inmueble no está disponible en las fechas seleccionadas.");
-        }
-
-        // Crear reserva
-        Reserva reserva = new Reserva();
-        reserva.setInmueble(inmueble);
-        reserva.setFechaInicio(inicio);
-        reserva.setFechaFin(fin);
-
-        reservaDAO.save(reserva);
+        return todas;
     }
 }

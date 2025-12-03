@@ -2,9 +2,9 @@ package com.mantecasl.accommodationapp.business.controller;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,13 @@ public class GestorDisponibilidad {
     private DisponibilidadDAO disponibilidadDAO;
 
     @Autowired
+    private ReservaDAO reservaDAO;
+
+    @Autowired
     private InmuebleDAO inmuebleDAO;
+
+    @Autowired
+    private SolicitudReservaDAO solicitudReservaDAO;
 
     // Validar fechas
     public Date[] validarFechas(String fechaInicio, String fechaFin) {
@@ -57,18 +63,13 @@ public class GestorDisponibilidad {
             throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
         }
 
-        // Calcular precio total CORRECTAMENTE
-        long dias = ChronoUnit.DAYS.between(inicio.toLocalDate(), fin.toLocalDate());
-        double total = dias * inmueble.getPrecioNoche();
-
         // Crear la disponibilidad (reserva)
         Disponibilidad reserva = new Disponibilidad();
         reserva.setInmueble(inmueble);
         reserva.setFechaInicio(inicio);
         reserva.setFechaFin(fin);
         reserva.setDirecta(esDirecta);
-        reserva.setPrecio(total);
-        reserva.setDisponible(false); // IMPORTANTE: false = reservado
+        reserva.setDisponible(false); 
 
         return disponibilidadDAO.save(reserva);
     }
@@ -79,15 +80,54 @@ public class GestorDisponibilidad {
         
         for (Disponibilidad reserva : reservasExistentes) {
             if (seSolapan(reserva.getFechaInicio(), reserva.getFechaFin(), inicio, fin)) {
-                return false; // Hay solapamiento
+                return false;
             }
         }
-        return true; // No hay solapamientos
+        return true;
     }
 
     // Método auxiliar para verificar solapamiento
     private boolean seSolapan(Date inicio1, Date fin1, Date inicio2, Date fin2) {
         return (inicio1.before(fin2) && inicio2.before(fin1));
+    }
+
+    // Añade este método al GestorDisponibilidad
+    public boolean verificarDisponibilidadParaSolicitud(Long inmuebleId, Date inicio, Date fin) {
+        // Obtener disponibilidades bloqueadas
+        List<Disponibilidad> disponibilidadesBloqueadas = 
+            disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(inmuebleId);
+        
+        // Obtener reservas confirmadas
+        List<Reserva> reservasConfirmadas = 
+            reservaDAO.findByInmuebleIdAndEstado(inmuebleId, "CONFIRMADA");
+        
+        // Obtener solicitudes aprobadas que ya tienen reserva
+        List<SolicitudReserva> solicitudesAprobadas = solicitudReservaDAO
+            .findByInmuebleIdAndEstado(inmuebleId, "APROBADA")
+            .stream()
+            .filter(s -> s.getReserva() != null)
+            .collect(Collectors.toList());
+        
+        // Verificar solapamientos
+        for (Disponibilidad d : disponibilidadesBloqueadas) {
+            if (seSolapan(d.getFechaInicio(), d.getFechaFin(), inicio, fin)) {
+                return false;
+            }
+        }
+        
+        for (Reserva r : reservasConfirmadas) {
+            if (seSolapan(r.getFechaInicio(), r.getFechaFin(), inicio, fin)) {
+                return false;
+            }
+        }
+        
+        for (SolicitudReserva s : solicitudesAprobadas) {
+            if (seSolapan(s.getFechaInicio(), s.getFechaFin(), inicio, fin)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     // Buscar inmuebles disponibles
