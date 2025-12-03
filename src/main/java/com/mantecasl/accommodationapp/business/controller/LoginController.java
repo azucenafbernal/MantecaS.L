@@ -39,6 +39,7 @@ public class LoginController {
             return "login";
         }
 
+        // guardar usuario en sesion
         session.setAttribute("usuario", encontrado);
 
         if (from != null && !from.isEmpty()) {

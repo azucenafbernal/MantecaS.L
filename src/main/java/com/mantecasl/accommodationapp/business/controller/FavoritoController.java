@@ -11,6 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("/favoritos")
 public class FavoritoController {
@@ -21,9 +24,7 @@ public class FavoritoController {
     @Autowired
     private InmuebleDAO inmuebleDAO;
 
-    // ==========================================
-    // MOSTRAR LISTA DE FAVORITOS
-    // ==========================================
+    // MOSTRAR LISTA DE FAVORITOS 
     @GetMapping
     public String mostrarFavoritos(HttpSession session, Model model) {
 
@@ -33,13 +34,32 @@ public class FavoritoController {
             return "redirect:/login?loginRequerido=true";
         }
 
-        model.addAttribute("favoritos", favoritoDAO.findByUsuario(usuario));
+        // Obtener todos los favoritos del usuario
+        List<Favorito> todosFavoritos = favoritoDAO.findByUsuario(usuario);
+        
+        // Filtrar solo los favoritos donde el inmueble todavía existe y tiene propietario
+        List<Favorito> favoritosValidos = todosFavoritos.stream()
+                .filter(fav -> {
+                    try {
+                        Inmueble inmueble = fav.getInmueble();
+                        // Verificar que el inmueble existe, tiene propietario y el propietario tiene usuario
+                        return inmueble != null && 
+                               inmueble.getPropietario() != null && 
+                               inmueble.getPropietario().getUsuario() != null &&
+                               inmuebleDAO.existsById(inmueble.getId());
+                    } catch (Exception e) {
+                        // Si hay cualquier error, excluir este favorito
+                        return false;
+                    }
+                })
+                .collect(Collectors.toList());
+
+        model.addAttribute("favoritos", favoritosValidos);
         return "lista-deseos";
     }
 
-    // ==========================================
+
     // AGREGAR FAVORITO
-    // ==========================================
     @PostMapping("/agregar/{idInmueble}")
     public String agregarFavorito(@PathVariable Long idInmueble, HttpSession session, Model model) {
 
@@ -65,9 +85,7 @@ public class FavoritoController {
         return "redirect:/favoritos";
     }
 
-    // ==========================================
     // ELIMINAR FAVORITO
-    // ==========================================
     @PostMapping("/eliminar/{id}")
     public String eliminarFavorito(@PathVariable Long id, HttpSession session) {
 

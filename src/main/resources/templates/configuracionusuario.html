@@ -117,6 +117,117 @@
             background: #eee;
             margin: 20px 0;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            color: #4a00e0;
+            margin-bottom: 20px;
+        }
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+        .alert {
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .alert-error {
+            background-color: #ffe0e0;
+            border: 1px solid #ff4757;
+            color: #d32f2f;
+        }
+        .alert-success {
+            background-color: #e0ffe0;
+            border: 1px solid #2ed573;
+            color: #00a152;
+        }
+        
+        /* Phone Input Component Styles */
+        .form-group .phone-input-box {
+            display: flex !important;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+
+        .prefix-dropdown-with-flag {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            flex-shrink: 0 !important;
+            width: auto;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .prefix-dropdown-with-flag:focus {
+            border-color: #4a00e0;
+            box-shadow: 0 0 5px rgba(74, 0, 224, 0.3);
+            outline: none;
+        }
+
+        #telefonoCompleto {
+            flex: 1 1 auto !important;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            width: auto;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        #telefonoCompleto:focus {
+            border-color: #4a00e0;
+            box-shadow: 0 0 5px rgba(74, 0, 224, 0.3);
+            outline: none;
+        }
+
+        @media (max-width: 768px) {
+            .form-group .phone-input-box {
+                flex-wrap: wrap;
+            }
+
+            .prefix-dropdown-with-flag,
+            #telefonoCompleto {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -144,12 +255,8 @@
             <input id="email" type="email" th:field="*{email}" required />
         </div>
 
-        <div class="form-group">
-            <label for="contrasena">Contraseña</label>
-            <input id="contrasena" type="password" th:field="*{contrasena}" />
-        </div>
-
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('passwordModal').style.display='flex'">Cambiar contraseña</button>
     </div>
 </form>
 
@@ -160,35 +267,25 @@
         <form th:action="@{/configuracion/actualizarPropietario}" method="post">
             <input type="hidden" name="usuarioId" th:value="${usuario.id}"/>
 
-            <div class="form-group">
-                <label for="telefono">Teléfono de Contacto</label>
-                <input id="telefono" name="telefono" type="tel" th:value="${propietario.telefonoContacto}" placeholder="Ej: +34 612 345 678" />
+            <h3 style="color: #666; margin-bottom: 15px; font-size: 14px;">📞 Contacto</h3>
+            <div th:if="${propietario?.telefonoContacto}" style="margin-bottom: 15px; padding: 10px; background-color: #f0f0f0; border-radius: 6px;">
+                <strong>Teléfono actual:</strong> <span th:text="${propietario.telefonoContacto}"></span>
             </div>
+            <div th:replace="~{components/phone-input :: phone-input}"></div>
+            <input type="hidden" id="telefonoConPrefijo" name="telefono">
 
-            <div class="form-group">
-                <label for="cuenta">Número de Cuenta Bancaria (IBAN)</label>
-                <input id="cuenta" name="cuenta" th:value="${propietario.cuentaBancaria}" placeholder="Ej: ES9121000418450200051332" />
-            </div>
-
-            <hr>
-
-            <div class="form-group">
-                <label for="creditcard">Número de Tarjeta de Crédito</label>
-                <input id="creditcard" name="creditcard" type="text" th:value="${propietario.numeroTarjeta}" placeholder="Ej: 4532 1488 0343 6467" maxlength="19" />
-            </div>
-
-            <div class="form-group">
-                <label for="expiry">Fecha de Vencimiento</label>
-                <input id="expiry" name="expiry" type="text" th:value="${propietario.fechaVencimiento}" placeholder="MM/YY" maxlength="5" />
-            </div>
-
-            <div class="form-group">
-                <label for="cvv">CVV</label>
-                <input id="cvv" name="cvv" type="password" placeholder="Ej: 123" maxlength="4" />
-            </div>
-
-            <button type="submit" class="btn btn-primary">Actualizar información de pago</button>
+            <button type="submit" class="btn btn-primary" style="margin-bottom: 15px;">Actualizar Teléfono</button>
         </form>
+
+        <button type="button" class="btn btn-secondary" style="margin-bottom: 15px; margin-top: 20px;" onclick="document.getElementById('bankAccountModal').style.display='flex'">🏦 Configurar Cuenta Bancaria</button>
+        <div th:if="${propietario?.cuentaBancaria}" style="margin-bottom: 15px; padding: 10px; background-color: #f0f0f0; border-radius: 6px; font-size: 14px;">
+            <strong>Cuenta Bancaria:</strong> <span th:text="'***' + ${propietario.cuentaBancaria.substring(propietario.cuentaBancaria.length() - 3)}"></span>
+        </div>
+        
+        <button type="button" class="btn btn-secondary" style="margin-bottom: 15px;" onclick="document.getElementById('creditCardModal').style.display='flex'">💳 Configurar Tarjeta de Crédito</button>
+        <div th:if="${propietario?.numeroTarjeta}" style="margin-bottom: 15px; padding: 10px; background-color: #f0f0f0; border-radius: 6px; font-size: 14px;">
+            <strong>Tarjeta de Crédito:</strong> <span th:text="'*** *** *** ' + ${propietario.numeroTarjeta.substring(propietario.numeroTarjeta.length() - 3)}"></span>
+        </div>
     </div>
 </div>
 
@@ -200,14 +297,197 @@
             <button type="submit" class="btn btn-secondary">Cerrar sesión</button>
         </form>
 
-        <form th:action="@{/configuracion/eliminarCuenta}" method="post">
-            <input type="hidden" name="idUsuario" th:value="${usuario.id}" />
-            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.');">Eliminar cuenta</button>
+        <button type="button" class="btn btn-danger" onclick="document.getElementById('deleteAccountModal').style.display='flex'">Eliminar cuenta</button>
+    </div>
+</div>
+
+<!-- Modal para configurar tarjeta de crédito -->
+<div id="creditCardModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('creditCardModal').style.display='none'">&times;</span>
+        <div class="modal-header">💳 Configurar Tarjeta de Crédito</div>
+        
+        <div th:if="${errorTarjeta}" class="alert alert-error" th:text="${errorTarjeta}"></div>
+        <div th:if="${successTarjeta}" class="alert alert-success" th:text="${successTarjeta}"></div>
+        
+        <form th:action="@{/configuracion/actualizarTarjeta}" method="post">
+            <input type="hidden" name="usuarioId" th:value="${usuario.id}" />
+            
+            <div class="form-group">
+                <label for="creditcard">Número de Tarjeta</label>
+                <input id="creditcard" type="text" name="creditcard" th:value="${propietario?.numeroTarjeta}" placeholder="Ej: 4532 1488 0343 6467" maxlength="19" />
+            </div>
+            
+            <div class="form-group" style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="expiry">Fecha de Vencimiento</label>
+                    <input id="expiry" type="text" name="expiry" th:value="${propietario?.fechaVencimiento}" placeholder="MM/YY" maxlength="5" />
+                </div>
+                <div style="flex: 0.8;">
+                    <label for="cvv">CVV</label>
+                    <input id="cvv" type="password" name="cvv" placeholder="Ej: 123" maxlength="4" />
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="margin-bottom: 10px;">Guardar tarjeta</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('creditCardModal').style.display='none'">Cancelar</button>
         </form>
     </div>
 </div>
 
+<!-- Modal para cambiar contraseña -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('passwordModal').style.display='none'">&times;</span>
+        <div class="modal-header">Cambiar Contraseña</div>
+        
+        <div th:if="${errorPassword}" class="alert alert-error" th:text="${errorPassword}"></div>
+        <div th:if="${successPassword}" class="alert alert-success" th:text="${successPassword}"></div>
+        
+        <form th:action="@{/configuracion/cambiarContrasena}" method="post">
+            <input type="hidden" name="usuarioId" th:value="${usuario.id}" />
+            
+            <div class="form-group">
+                <label for="passwordActual">Contraseña Actual</label>
+                <input id="passwordActual" type="password" name="passwordActual" required />
+            </div>
+            
+            <div class="form-group">
+                <label for="passwordNueva">Nueva Contraseña</label>
+                <input id="passwordNueva" type="password" name="passwordNueva" required />
+            </div>
+            
+            <div class="form-group">
+                <label for="passwordConfirm">Confirmar Contraseña</label>
+                <input id="passwordConfirm" type="password" name="passwordConfirm" required />
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="margin-bottom: 10px;">Actualizar contraseña</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('passwordModal').style.display='none'">Cancelar</button>
+        </form>
+    </div>
 </div>
+
+<!-- Modal para configurar cuenta bancaria -->
+<div id="bankAccountModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('bankAccountModal').style.display='none'">&times;</span>
+        <div class="modal-header">🏦 Configurar Cuenta Bancaria</div>
+        
+        <div th:if="${errorBanco}" class="alert alert-error" th:text="${errorBanco}"></div>
+        <div th:if="${successBanco}" class="alert alert-success" th:text="${successBanco}"></div>
+        
+        <form th:action="@{/configuracion/actualizarCuentaBancaria}" method="post">
+            <input type="hidden" name="usuarioId" th:value="${usuario.id}" />
+            
+            <div class="form-group">
+                <label for="iban">Número de Cuenta Bancaria (IBAN)</label>
+                <input id="iban" type="text" name="cuenta" th:value="${propietario?.cuentaBancaria}" placeholder="Ej: ES9121000418450200051332" />
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="margin-bottom: 10px;">Guardar cuenta bancaria</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('bankAccountModal').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para eliminar cuenta -->
+<div id="deleteAccountModal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="document.getElementById('deleteAccountModal').style.display='none'">&times;</span>
+        <div class="modal-header" style="color: #ff4757;">⚠️ Eliminar Cuenta</div>
+        
+        <div style="margin-bottom: 20px; padding: 15px; background-color: #ffe0e0; border: 1px solid #ff4757; border-radius: 6px; color: #d32f2f;">
+            <strong>Advertencia:</strong> Esta acción es <strong>irreversible</strong>. Se eliminarán todos tus datos de forma permanente.
+        </div>
+        
+        <form id="deleteForm" th:onsubmit="return handleDeleteSubmit(event, [[${usuario.id}]])">
+            <input type="hidden" name="idUsuario" th:value="${usuario.id}" />
+            <button type="submit" class="btn btn-danger" style="margin-bottom: 10px;">Sí, eliminar mi cuenta</button>
+            <button type="button" class="btn btn-secondary" onclick="document.getElementById('deleteAccountModal').style.display='none'">Cancelar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal para confirmar eliminación exitosa -->
+<div id="deleteSuccessModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="color: #2ed573; text-align: center;">✅ Cuenta Eliminada</div>
+        <p style="text-align: center; margin: 20px 0; color: #333;">Tu cuenta ha sido eliminada correctamente. Serás redirigido al inicio...</p>
+    </div>
+</div>
+
+<script>
+    // Cerrar modales al hacer clic fuera de ellos
+    window.onclick = function(event) {
+        const passwordModal = document.getElementById('passwordModal');
+        const creditCardModal = document.getElementById('creditCardModal');
+        const bankAccountModal = document.getElementById('bankAccountModal');
+        const deleteAccountModal = document.getElementById('deleteAccountModal');
+        
+        if (event.target === passwordModal) {
+            passwordModal.style.display = 'none';
+        }
+        if (event.target === creditCardModal) {
+            creditCardModal.style.display = 'none';
+        }
+        if (event.target === bankAccountModal) {
+            bankAccountModal.style.display = 'none';
+        }
+        if (event.target === deleteAccountModal) {
+            deleteAccountModal.style.display = 'none';
+        }
+    }
+    
+    // Capturar el número de teléfono con prefijo en el formulario de propietario
+    document.querySelector('form[action*="actualizarPropietario"]')?.addEventListener('submit', function(e) {
+        const fullPhone = window.getFullPhoneNumber ? window.getFullPhoneNumber() : '';
+        if (fullPhone) {
+            document.getElementById('telefonoConPrefijo').value = fullPhone;
+        }
+    });
+
+    // Manejar eliminación de cuenta con AJAX
+    function handleDeleteSubmit(event, userId) {
+        event.preventDefault();
+        
+        console.log('Iniciando eliminación de cuenta para usuario:', userId);
+        
+        const params = new URLSearchParams();
+        params.append('idUsuario', userId);
+        
+        fetch('/configuracion/eliminarCuenta', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        })
+        .then(response => {
+            console.log('Response status:', response.status);
+            if (response.ok) {
+                console.log('Eliminación exitosa');
+                // Mostrar modal de éxito
+                document.getElementById('deleteAccountModal').style.display = 'none';
+                document.getElementById('deleteSuccessModal').style.display = 'flex';
+                
+                // Redirigir después de 2 segundos
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            } else {
+                console.log('Error en respuesta:', response.statusText);
+                alert('Error al eliminar la cuenta. Por favor intenta de nuevo.');
+            }
+        })
+        .catch(error => {
+            console.error('Error en fetch:', error);
+            alert('Error al eliminar la cuenta. Por favor intenta de nuevo: ' + error);
+        });
+        
+        return false;
+    }
+</script>
 
 </body>
 </html>

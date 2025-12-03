@@ -43,7 +43,16 @@ public class PropiedadController {
             @RequestParam(required = false) Integer capacidad,
             Model model) {
         
-        List<Inmueble> propiedadesFiltradas = new ArrayList<>();
+        // Obtenemos todos los inmuebles de la base de datos
+        List<Inmueble> todasLasPropiedades = inmuebleDAO.findAll();
+        
+        // FILTRAR: Solo propiedades que tengan propietario (evitar propiedades eliminadas)
+        List<Inmueble> propiedadesValidas = todasLasPropiedades.stream()
+                .filter(inmueble -> inmueble.getPropietario() != null)
+                .toList(); // Manteniendo tu formato .toList()
+        
+        // Filtrar según los parámetros recibidos
+        List<Inmueble> propiedadesFiltradas = new ArrayList<>(propiedadesValidas);
         
         if (fechaInicio != null && !fechaInicio.isEmpty() && 
             fechaFin != null && !fechaFin.isEmpty()) {
@@ -67,24 +76,16 @@ public class PropiedadController {
                     return "lista-propiedades";
                 }
 
-                // Obtener todos los inmuebles
-                List<Inmueble> todosInmuebles = inmuebleDAO.findAll();
-                
                 // Filtrar solo los que estén disponibles en las fechas solicitadas
-                for (Inmueble inmueble : todosInmuebles) {
-                    if (gestorDisponibilidad.verificarDisponibilidad(inmueble.getId(), sqlInicio, sqlFin)) {
-                        propiedadesFiltradas.add(inmueble);
-                    }
-                }
+                propiedadesFiltradas = propiedadesFiltradas.stream()
+                    .filter(inmueble -> gestorDisponibilidad.verificarDisponibilidad(inmueble.getId(), sqlInicio, sqlFin))
+                    .collect(Collectors.toList());
 
             } catch (Exception e) {
                 model.addAttribute("error", "Formato de fecha inválido: " + e.getMessage());
                 model.addAttribute("propiedades", new ArrayList<>());
                 return "lista-propiedades";
             }
-        } else {
-            // Sin fechas, obtener todas las propiedades
-            propiedadesFiltradas = inmuebleDAO.findAll();
         }
 
         if (ciudad != null && !ciudad.isEmpty()) {

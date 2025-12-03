@@ -423,6 +423,7 @@
         </div>
         
         <!-- Filtros activos - diseño minimalista -->
+
         <div th:if="${filtroCiudad != null or filtroCapacidad != null}" class="filtros-activos">
             <div class="filtros-header">
                 <h3>Filtros aplicados</h3>
@@ -447,6 +448,7 @@
         </div>
         
         <!-- Estado sin propiedades -->
+
         <div th:if="${propiedades.empty}" class="no-properties">
             <h2>No se encontraron propiedades</h2>
             <p>Modifica tus criterios de búsqueda o explora todas las propiedades disponibles</p>
@@ -454,6 +456,7 @@
         </div>
         
         <!-- Grid de propiedades -->
+
         <div th:unless="${propiedades.empty}" class="properties-grid">
             <div th:each="inmueble : ${propiedades}" class="property-card">
                 <div class="property-header">
@@ -483,6 +486,22 @@
                         <div class="info-item">
                             <span class="info-label">📧 Contacto</span>
                             <span class="info-value" th:text="${inmueble.propietario.usuario.email}">juan@ejemplo.com</span>
+                            <span class="info-label">👤 Propietario:</span>
+                            <span class="info-value" 
+                                  th:text="${inmueble.propietario != null && inmueble.propietario.usuario != null} ? 
+                                           ${inmueble.propietario.usuario.nombre} : 
+                                           'Propietario no disponible'">
+                                Juan Pérez
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">📧 Contacto:</span>
+                            <span class="info-value" 
+                                  th:text="${inmueble.propietario != null && inmueble.propietario.usuario != null} ? 
+                                           ${inmueble.propietario.usuario.email} : 
+                                           'Contacto no disponible'">
+                                juan@ejemplo.com
+                            </span>
                         </div>
                     </div>
                     
@@ -507,6 +526,7 @@
         </div>
         
         <!-- Footer -->
+
         <div class="footer">
             <div class="footer-buttons">
                 <a th:href="@{/propiedades/registro}" class="btn-footer">
