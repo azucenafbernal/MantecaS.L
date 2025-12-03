@@ -236,22 +236,15 @@
                 <div class="notificacion-mensaje" th:text="${notificacion.mensaje}"></div>
                 
                 <div class="notificacion-acciones">
-                    <a th:if="${not #strings.isEmpty(notificacion.accionUrl)}"
-                    th:href="${notificacion.accionUrl}" 
-                    class="btn-accion">
-                        🔍 Ver detalles
-                    </a>
-
-                    
                     <form th:action="@{/notificaciones/{id}/leer(id=${notificacion.id})}" 
-                          method="post" 
-                          th:if="${not notificacion.leida}">
+                        method="post" 
+                        th:if="${not notificacion.leida}">
                         <button type="submit" class="btn-accion">✓ Marcar como leída</button>
                     </form>
                     
                     <form th:action="@{/notificaciones/{id}/eliminar(id=${notificacion.id})}" 
-                          method="post" 
-                          onsubmit="return confirm('¿Eliminar esta notificación?')">
+                        method="post" 
+                        onsubmit="return confirm('¿Eliminar esta notificación?')">
                         <button type="submit" class="btn-eliminar">🗑️ Eliminar</button>
                     </form>
                 </div>

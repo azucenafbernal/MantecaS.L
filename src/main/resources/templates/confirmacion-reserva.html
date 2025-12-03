@@ -589,24 +589,6 @@
                 🏠 Volver al Inicio
             </a>
             
-            <!-- Botón para ver solicitud (solo para pendientes) -->
-            <a th:if="${not esDirecta and solicitud != null}" 
-               th:href="@{/propietario/reserva/{id}(id=${solicitud.id})}" 
-               class="btn-action btn-info">
-                📋 Ver Mi Solicitud
-            </a>
-            
-            <a th:href="@{/inmueble/{id}(id=${inmueble.id})}" class="btn-action btn-secondary">
-                🏠 Ver el Inmueble
-            </a>
-            
-            <!-- Botón para ver mis reservas (solo para reservas confirmadas) -->
-            <a th:if="${esDirecta and reserva != null}" 
-               th:href="@{/inquilino/mis-reservas}" 
-               class="btn-action btn-success">
-                📅 Ver Mis Reservas
-            </a>
-            
             <a th:href="@{/catalogo}" class="btn-action btn-secondary">
                 🔍 Buscar Más Alojamientos
             </a>

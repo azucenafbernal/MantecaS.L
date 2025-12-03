@@ -393,9 +393,6 @@
 
         <!-- Acciones rápidas -->
         <div class="text-center mt-4">
-            <a th:href="@{/propietario/dashboard}" class="btn-primary">
-                ← Volver al Panel
-            </a>
             <a th:href="@{/}" class="btn-primary ms-2">
                 🏠 Ir al Inicio
             </a>
@@ -433,7 +430,6 @@
                 });
             });
             
-            // Archivar notificación
             document.querySelectorAll('.btn-archive').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -441,7 +437,6 @@
                     notificationItem.style.opacity = '0.5';
                     notificationItem.style.textDecoration = 'line-through';
                     
-                    // Aquí iría la llamada AJAX para archivar en el backend
                     setTimeout(() => {
                         notificationItem.remove();
                     }, 300);

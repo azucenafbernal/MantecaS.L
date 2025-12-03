@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.*;
 public class NotificacionesController { 
     
     @Autowired
-    private GestorNotificaciones gestorNotificaciones; // CAMBIAR
+    private GestorNotificaciones gestorNotificaciones;
+
+    @Autowired
+    private GestorReservas gestorReservas;
+
     
     @GetMapping
     public String listarNotificaciones(HttpSession session, Model model) {
@@ -28,6 +32,33 @@ public class NotificacionesController {
         
         return "notificacionesUsuario";
     }
+
+    @GetMapping("/propietario")
+    public String verNotificacionesPropietario(HttpSession session, Model model) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        Long propietarioId = usuario.getId();
+
+        model.addAttribute("solicitudesPendientes",
+                gestorReservas.obtenerSolicitudesPendientesPropietario(propietarioId));
+
+        model.addAttribute("solicitudesAprobadas",
+                gestorReservas.obtenerSolicitudesAprobadasPropietario(propietarioId));
+
+        model.addAttribute("solicitudesRechazadas",
+                gestorReservas.obtenerSolicitudesRechazadasPropietario(propietarioId));
+
+        model.addAttribute("reservasRecientes",
+                gestorReservas.obtenerHistorialReservasPropietario(propietarioId));
+
+        return "notificaciones";
+    }
+
     
     @PostMapping("/{id}/leer")
     public String marcarComoLeida(@PathVariable Long id, HttpSession session) {
