@@ -28,12 +28,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="form-group">
-                        <label for="telefonoContacto">Teléfono de Contacto *</label>
-                        <input type="tel" id="telefonoContacto" name="telefonoContacto" 
-                            class="input-field" placeholder="+34 123 456 789" required>
-                    </div>
-                    <!-- NUEVOS CAMPOS PARA DATOS DE PROPIETARIO -->
+                    <!-- COMPONENTE TELÉFONO CON PREFIJO -->
                     <div th:replace="~{components/phone-input :: phone-input}"></div>
                     <input type="hidden" id="telefonoConPrefijo" name="telefonoContacto">
 
