@@ -2,7 +2,7 @@
 <!-- Usage: <div th:replace="~{components/phone-input :: phone-input}"></div> -->
 
 <div th:fragment="phone-input" class="form-group">
-    <label for="telefonoCompleto">Teléfono de Contacto</label>
+    <label for="telefonoCompleto">📞 Teléfono de Contacto *</label>
     <div class="phone-input-box">
         <!-- Country Flag & Prefix Dropdown -->
         <select id="countryPrefix" name="countryPrefix" class="prefix-dropdown-with-flag">
@@ -58,9 +58,9 @@
 
     .prefix-dropdown-with-flag {
         padding: 12px 15px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        background-color: white;
+        background: rgba(197, 205, 218, 0.1);
+        border: 1px solid rgba(116, 130, 150, 0.4);
+        border-radius: 8px;
         cursor: pointer;
         font-size: 15px;
         white-space: nowrap;
@@ -69,19 +69,23 @@
         display: flex;
         align-items: center;
         transition: all 0.3s;
+        color: #e2e8f0;
     }
 
     .prefix-dropdown-with-flag:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        border-color: #4299e1;
+        box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
         outline: none;
+        background: rgba(197, 205, 218, 0.15);
     }
 
     #telefonoCompleto {
         flex: 1 1 auto !important;
         padding: 12px 15px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
+        background: rgba(197, 205, 218, 0.1);
+        border: 1px solid rgba(116, 130, 150, 0.4);
+        border-radius: 8px;
+        color: #e2e8f0;
         font-size: 15px;
         width: auto;
         box-sizing: border-box;
@@ -89,9 +93,14 @@
     }
 
     #telefonoCompleto:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        border-color: #4299e1;
+        box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
         outline: none;
+        background: rgba(197, 205, 218, 0.15);
+    }
+
+    #telefonoCompleto::placeholder {
+        color: #8a96a6;
     }
 
     @media (max-width: 768px) {
