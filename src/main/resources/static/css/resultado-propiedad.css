@@ -1,0 +1,174 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: 
+        linear-gradient(135deg, rgba(35, 54, 73, 0.85) 0%, rgba(38, 65, 99, 0.85) 100%),
+        url('/images/fondoazul.jpg') center/cover no-repeat fixed;
+    min-height: 100vh;
+    padding: 20px;
+    color: #9eaabe;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: rgba(52, 84, 110, 0.95);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(116, 130, 150, 0.6);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(116, 130, 150, 0.3);
+}
+
+.title h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #a3b6dd;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.title p {
+    color: #c1c9d6;
+    font-size: 14px;
+}
+
+.details {
+    margin-bottom: 30px;
+    border: 1px solid rgba(116, 130, 150, 0.3);
+    padding: 20px;
+    border-radius: 8px;
+    background: rgba(197, 205, 218, 0.08);
+}
+
+.detail-item {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(116, 130, 150, 0.3);
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.detail-item span {
+    font-weight: 600;
+    color: #c5cdda;
+    font-size: 14px;
+}
+
+.detail-item p {
+    color: #e2e8f0;
+    text-align: right;
+    font-size: 14px;
+}
+
+.description {
+    margin-bottom: 30px;
+    padding: 20px;
+    border-left: 4px solid #4299e1;
+    background: rgba(66, 153, 225, 0.1);
+    border-radius: 8px;
+}
+
+.description h3 {
+    color: #4299e1;
+    margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.description p {
+    color: #e2e8f0;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn {
+    flex: 1;
+    padding: 16px 20px;
+    text-align: center;
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+}
+
+.btn:hover {
+    background: linear-gradient(135deg, #3182ce, #2c5282);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(66, 153, 225, 0.4);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #ed8936, #dd6b20);
+    box-shadow: 0 4px 12px rgba(237, 137, 54, 0.3);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #dd6b20, #c05621);
+    box-shadow: 0 6px 18px rgba(237, 137, 54, 0.4);
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 20px;
+    }
+
+    .title h1 {
+        font-size: 24px;
+    }
+    
+    .buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+
+    .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .detail-item p {
+        text-align: left;
+        margin-top: 5px;
+    }
+}

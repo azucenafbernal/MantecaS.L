@@ -102,14 +102,14 @@ public class MisPropiedadesController {
 
     @PostMapping("/actualizar-propiedad")
     public String actualizarPropiedad(@RequestParam Long id,
-                                     @RequestParam String calle,
-                                     @RequestParam String numero,
-                                     @RequestParam String ciudad,
-                                     @RequestParam String codigoPostal,
-                                     @RequestParam double precioNoche,
-                                     @RequestParam Integer capacidad,
-                                     @RequestParam String descripcion,
-                                     HttpSession session) {
+                                        @RequestParam String calle,
+                                        @RequestParam String numero,
+                                        @RequestParam String ciudad,
+                                        @RequestParam String codigoPostal,
+                                        @RequestParam double precioNoche,
+                                        @RequestParam Integer capacidad,
+                                        @RequestParam String descripcion,
+                                        HttpSession session) {
         
         Usuario usuario = (Usuario) session.getAttribute("usuario");
         
