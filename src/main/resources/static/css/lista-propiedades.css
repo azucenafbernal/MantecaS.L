@@ -1,0 +1,417 @@
+/* lista-propiedades.css */
+/* Estilos específicos para la página de catálogo de propiedades */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: 
+        linear-gradient(135deg, rgba(35, 54, 73, 0.85) 0%, rgba(38, 65, 99, 0.85) 100%),
+        url('/images/fondoazul.jpg') center/cover no-repeat fixed;
+    min-height: 100vh;
+    padding: 20px;
+    color: #9eaabe;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 40px 0;
+}
+
+.header h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: #a3b6dd;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header p {
+    font-size: 18px;
+    color: #c1c9d6;
+    font-weight: 400;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.filtros-activos {
+    background: rgba(52, 84, 110, 0.9);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(116, 130, 150, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.filtros-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.filtros-header h3 {
+    color: #b4bccc;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.limpiar-filtros {
+    background: #9e2424;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.limpiar-filtros:hover {
+    background: #d12525;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(222, 37, 37, 0.4);
+}
+
+.filtros-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filtro-item {
+    background: rgba(176, 186, 197, 0.9);
+    color: #23324b;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(226, 232, 240, 0.3);
+}
+
+.properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 24px;
+    margin-bottom: 50px;
+}
+
+.property-card {
+    background: rgba(52, 84, 110, 0.9);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(116, 130, 150, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.property-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    background: rgba(52, 84, 110, 0.95);
+}
+
+.property-header {
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.9) 0%, rgba(74, 85, 104, 0.9) 100%);
+    color: white;
+    padding: 24px;
+    position: relative;
+    border-bottom: 1px solid rgba(116, 130, 150, 0.3);
+}
+
+.property-id {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.property-address {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.property-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: #68d391;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.property-content {
+    padding: 24px;
+}
+
+.property-info {
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(247, 250, 252, 0.1);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #c5cdda;
+    font-size: 14px;
+}
+
+.info-value {
+    color: #e2e8f0;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.property-description {
+    background: rgba(197, 205, 218, 0.1);
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 16px;
+    border-left: 4px solid #4299e1;
+}
+
+.description-text {
+    color: #e2e8f0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.property-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.btn-details {
+    background: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    text-decoration: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+.btn-details:hover {
+    background: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+}
+
+.btn-favoritos {
+    background: #ed8936;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-shadow: 0 2px 8px rgba(237, 137, 54, 0.3);
+}
+
+.btn-favoritos:hover {
+    background: #dd6b20;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+}
+
+/* Footer elegante */
+.footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid rgba(226, 232, 240, 0.2);
+    margin-top: 40px;
+}
+
+.footer-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.btn-footer {
+    background: rgba(45, 55, 72, 0.9);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.btn-footer:hover {
+    background: rgba(74, 85, 104, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.btn-footer.secondary {
+    background: rgba(113, 128, 150, 0.9);
+}
+
+.btn-footer.secondary:hover {
+    background: rgba(74, 85, 104, 0.9);
+}
+
+/* Estado sin propiedades */
+.no-properties {
+    text-align: center;
+    padding: 80px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    margin: 20px 0;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.no-properties h2 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    font-weight: 600;
+    color: #e2e8f0;
+}
+
+.no-properties p {
+    font-size: 16px;
+    color: #c1c9d6;
+    margin-bottom: 24px;
+}
+
+.no-properties .btn-primary {
+    background: #4299e1;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+.no-properties .btn-primary:hover {
+    background: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .properties-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .property-actions {
+        flex-direction: column;
+    }
+    
+    .filtros-header {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .footer-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-footer {
+        width: 100%;
+        max-width: 280px;
+        justify-content: center;
+    }
+    
+    .header h1 {
+        font-size: 32px;
+    }
+}
+
+/* Mejoras de accesibilidad */
+.btn-details:focus,
+.btn-favoritos:focus,
+.btn-footer:focus {
+    outline: 2px solid #4299e1;
+    outline-offset: 2px;
+}
+
+/* Animaciones sutiles */
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.property-card {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.filtros-activos {
+    animation: fadeIn 0.4s ease-out;
+}
