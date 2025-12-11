@@ -1,22 +1,26 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
 
 @Service
 @Transactional
 public class GestorReservas {
 
-    @Autowired
     private SolicitudReservaDAO solicitudReservaDAO;
-
-    @Autowired
     private ReservaDAO reservaDAO;
+
+    public GestorReservas(SolicitudReservaDAO solicitudReservaDAO, ReservaDAO reservaDAO) {
+        this.solicitudReservaDAO = solicitudReservaDAO;
+        this.reservaDAO = reservaDAO;
+    }
 
     //PENDIENTES
     public List<SolicitudReserva> obtenerSolicitudesPendientesPropietario(Long propietarioId) {
@@ -35,13 +39,11 @@ public class GestorReservas {
 
     //HISTORIAL
     public List<Reserva> obtenerHistorialReservasPropietario(Long propietarioId) {
-        List<Reserva> todas = reservaDAO.findAll()
-                .stream()
-                .filter(r -> r.getInmueble().getPropietario().getId().equals(propietarioId))
-                .sorted((a, b) -> b.getId().compareTo(a.getId()))
-                .limit(10)
-                .toList();
-
-        return todas;
+        return reservaDAO.findAll()
+            .stream()
+            .filter(r -> r.getInmueble().getPropietario().getId().equals(propietarioId))
+            .sorted((a, b) -> b.getId().compareTo(a.getId()))
+            .limit(10)
+            .toList();
     }
 }

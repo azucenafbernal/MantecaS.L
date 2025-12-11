@@ -1,24 +1,28 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.Inmueble;
-import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+
 @Controller
 public class BusquedaController {
 
-    @Autowired
-    private GestorDisponibilidad gestorDisponibilidad;
+    private final GestorDisponibilidad gestorDisponibilidad;
+    private final InmuebleDAO inmuebleDAO;
 
-    @Autowired
-    private InmuebleDAO inmuebleDAO;
+    public BusquedaController(GestorDisponibilidad gestorDisponibilidad, InmuebleDAO inmuebleDAO) {
+        this.gestorDisponibilidad = gestorDisponibilidad;
+        this.inmuebleDAO = inmuebleDAO;
+    }
 
     // ---------------------- BUSCAR DESDE INDEX ----------------------
     @GetMapping("/buscar")

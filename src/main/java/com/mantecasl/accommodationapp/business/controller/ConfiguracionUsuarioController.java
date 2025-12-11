@@ -2,7 +2,8 @@ package com.mantecasl.accommodationapp.business.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,14 +26,26 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/configuracion")
 public class ConfiguracionUsuarioController {
 
-    @Autowired
-    private UsuarioDAO usuarioDAO;
+    private static final String ATTR_ERROR = "error";
+    private static final String ATTR_USUARIO = "usuario";
+    private static final String ATTR_PROPIETARIO = "propietario";
+    private static final String ATTR_ERROR_TARJETA = "errorTarjeta";
+    private static final String ATTR_ERROR_PASSWORD = "errorPassword";
+    private static final String VIEW_CONFIG = "configuracionusuario";
+    private static final String MSG_USUARIO_NO_ENCONTRADO = "Usuario no encontrado";
+    private static final String MSG_NO_PROPIETARIO = "Este usuario no es propietario";
 
-    @Autowired
-    private PropietarioDAO propietarioDAO;
+    private static final Logger log = LoggerFactory.getLogger(ConfiguracionUsuarioController.class);
 
-    @Autowired
-    private FavoritoDAO favoritoDAO;
+    private final UsuarioDAO usuarioDAO;
+    private final PropietarioDAO propietarioDAO;
+    private final FavoritoDAO favoritoDAO;
+
+    public ConfiguracionUsuarioController(UsuarioDAO usuarioDAO, PropietarioDAO propietarioDAO, FavoritoDAO favoritoDAO) {
+        this.usuarioDAO = usuarioDAO;
+        this.propietarioDAO = propietarioDAO;
+        this.favoritoDAO = favoritoDAO;
+    }
 
     /** Muestra la página de configuración */
     @GetMapping
@@ -41,20 +54,20 @@ public class ConfiguracionUsuarioController {
             Usuario usuario = usuarioDAO.findById(idUsuario).orElse(null);
 
             if (usuario == null) {
-                model.addAttribute("error", "Usuario no encontrado");
-                return "error";
+                model.addAttribute(ATTR_ERROR, MSG_USUARIO_NO_ENCONTRADO);
+                return ATTR_ERROR;
             }
 
             // Comprobar si es propietario
             Propietario propietario = propietarioDAO.findByUsuarioId(idUsuario);
 
-            model.addAttribute("usuario", usuario);
-            model.addAttribute("propietario", propietario);
+            model.addAttribute(ATTR_USUARIO, usuario);
+            model.addAttribute(ATTR_PROPIETARIO, propietario);
 
-            return "configuracionusuario"; // Thymeleaf
+            return VIEW_CONFIG; // Thymeleaf
         } catch (Exception e) {
-            model.addAttribute("error", "Error al cargar la configuración: " + e.getMessage());
-            return "error";
+            model.addAttribute(ATTR_ERROR, "Error al cargar la configuración: " + e.getMessage());
+            return ATTR_ERROR;
         }
     }
 
@@ -67,8 +80,8 @@ public class ConfiguracionUsuarioController {
         Usuario usuario = usuarioDAO.findById(usuarioActualizado.getId()).orElse(null);
 
         if (usuario == null) {
-            model.addAttribute("error", "Usuario no encontrado");
-            return "error";
+            model.addAttribute(ATTR_ERROR, MSG_USUARIO_NO_ENCONTRADO);
+            return ATTR_ERROR;
         }
 
         usuario.setNombre(usuarioActualizado.getNombre());
@@ -90,18 +103,18 @@ public class ConfiguracionUsuarioController {
         Propietario p = propietarioDAO.findByUsuarioId(usuarioId);
 
         if (p == null) {
-            model.addAttribute("error", "Este usuario no es propietario");
-            return "error";
+            model.addAttribute(ATTR_ERROR, MSG_NO_PROPIETARIO);
+            return ATTR_ERROR;
         }
 
         p.setTelefonoContacto(telefono);
 
         propietarioDAO.save(p);
 
-        model.addAttribute("usuario", usuarioDAO.findById(usuarioId).orElse(null));
-        model.addAttribute("propietario", p);
+        model.addAttribute(ATTR_USUARIO, usuarioDAO.findById(usuarioId).orElse(null));
+        model.addAttribute(ATTR_PROPIETARIO, p);
         model.addAttribute("successTelefono", "Teléfono actualizado correctamente");
-        return "configuracionusuario";
+        return VIEW_CONFIG;
     }
 
     /** Actualizar cuenta bancaria */
@@ -114,33 +127,33 @@ public class ConfiguracionUsuarioController {
         Propietario p = propietarioDAO.findByUsuarioId(usuarioId);
 
         if (p == null) {
-            model.addAttribute("error", "Este usuario no es propietario");
-            return "error";
+            model.addAttribute(ATTR_ERROR, MSG_NO_PROPIETARIO);
+            return ATTR_ERROR;
         }
 
         // Validar que la cuenta no esté vacía
         if (cuenta == null || cuenta.trim().isEmpty()) {
-            model.addAttribute("usuario", usuarioDAO.findById(usuarioId).orElse(null));
-            model.addAttribute("propietario", p);
+            model.addAttribute(ATTR_USUARIO, usuarioDAO.findById(usuarioId).orElse(null));
+            model.addAttribute(ATTR_PROPIETARIO, p);
             model.addAttribute("errorBanco", "El número de cuenta bancaria no puede estar vacío");
-            return "configuracionusuario";
+            return VIEW_CONFIG;
         }
 
         // Validación básica de IBAN (al menos 15 caracteres)
         if (cuenta.trim().length() < 15) {
-            model.addAttribute("usuario", usuarioDAO.findById(usuarioId).orElse(null));
-            model.addAttribute("propietario", p);
+            model.addAttribute(ATTR_USUARIO, usuarioDAO.findById(usuarioId).orElse(null));
+            model.addAttribute(ATTR_PROPIETARIO, p);
             model.addAttribute("errorBanco", "El IBAN debe tener al menos 15 caracteres");
-            return "configuracionusuario";
+            return VIEW_CONFIG;
         }
 
         p.setCuentaBancaria(cuenta);
         propietarioDAO.save(p);
 
-        model.addAttribute("usuario", usuarioDAO.findById(usuarioId).orElse(null));
-        model.addAttribute("propietario", p);
+        model.addAttribute(ATTR_USUARIO, usuarioDAO.findById(usuarioId).orElse(null));
+        model.addAttribute(ATTR_PROPIETARIO, p);
         model.addAttribute("successBanco", "Cuenta bancaria actualizada correctamente");
-        return "configuracionusuario";
+        return VIEW_CONFIG;
     }
 
     /** Actualizar tarjeta de crédito */
@@ -155,8 +168,8 @@ public class ConfiguracionUsuarioController {
         Propietario p = propietarioDAO.findByUsuarioId(usuarioId);
 
         if (p == null) {
-            model.addAttribute("error", "Este usuario no es propietario");
-            return "error";
+            model.addAttribute(ATTR_ERROR, MSG_NO_PROPIETARIO);
+            return ATTR_ERROR;
         }
 
         // Validar número de tarjeta
@@ -164,10 +177,10 @@ public class ConfiguracionUsuarioController {
             // Remover espacios para validación
             String cardNumberOnly = creditcard.replaceAll("\\s+", "");
             if (cardNumberOnly.length() < 13 || cardNumberOnly.length() > 19) {
-                model.addAttribute("usuario", usuarioDAO.findById(usuarioId).orElse(null));
-                model.addAttribute("propietario", p);
-                model.addAttribute("errorTarjeta", "El número de tarjeta debe tener entre 13 y 19 dígitos");
-                return "configuracionusuario";
+                model.addAttribute(ATTR_USUARIO, usuarioDAO.findById(usuarioId).orElse(null));
+                model.addAttribute(ATTR_PROPIETARIO, p);
+                model.addAttribute(ATTR_ERROR_TARJETA, "El número de tarjeta debe tener entre 13 y 19 dígitos");
+                return VIEW_CONFIG;
             }
             p.setNumeroTarjeta(creditcard);
         }
@@ -175,10 +188,10 @@ public class ConfiguracionUsuarioController {
         // Validar fecha de vencimiento (MM/YY)
         if (expiry != null && !expiry.isEmpty()) {
             if (!expiry.matches("\\d{2}/\\d{2}")) {
-                model.addAttribute("usuario", usuarioDAO.findById(usuarioId).orElse(null));
-                model.addAttribute("propietario", p);
-                model.addAttribute("errorTarjeta", "La fecha de vencimiento debe estar en formato MM/YY");
-                return "configuracionusuario";
+                model.addAttribute(ATTR_USUARIO, usuarioDAO.findById(usuarioId).orElse(null));
+                model.addAttribute(ATTR_PROPIETARIO, p);
+                model.addAttribute(ATTR_ERROR_TARJETA, "La fecha de vencimiento debe estar en formato MM/YY");
+                return VIEW_CONFIG;
             }
             p.setFechaVencimiento(expiry);
         }
@@ -186,20 +199,20 @@ public class ConfiguracionUsuarioController {
         // Validar CVV
         if (cvv != null && !cvv.isEmpty()) {
             if (!cvv.matches("\\d{3,4}")) {
-                model.addAttribute("usuario", usuarioDAO.findById(usuarioId).orElse(null));
-                model.addAttribute("propietario", p);
-                model.addAttribute("errorTarjeta", "El CVV debe tener 3 o 4 dígitos");
-                return "configuracionusuario";
+                model.addAttribute(ATTR_USUARIO, usuarioDAO.findById(usuarioId).orElse(null));
+                model.addAttribute(ATTR_PROPIETARIO, p);
+                model.addAttribute(ATTR_ERROR_TARJETA, "El CVV debe tener 3 o 4 dígitos");
+                return VIEW_CONFIG;
             }
             p.setCvv(cvv);
         }
 
         propietarioDAO.save(p);
 
-        model.addAttribute("usuario", usuarioDAO.findById(usuarioId).orElse(null));
-        model.addAttribute("propietario", p);
+        model.addAttribute(ATTR_USUARIO, usuarioDAO.findById(usuarioId).orElse(null));
+        model.addAttribute(ATTR_PROPIETARIO, p);
         model.addAttribute("successTarjeta", "Tarjeta de crédito actualizada correctamente");
-        return "configuracionusuario";
+        return VIEW_CONFIG;
     }
 
     /** Cambiar contraseña */
@@ -214,32 +227,32 @@ public class ConfiguracionUsuarioController {
         Usuario usuario = usuarioDAO.findById(usuarioId).orElse(null);
 
         if (usuario == null) {
-            model.addAttribute("error", "Usuario no encontrado");
-            return "error";
+            model.addAttribute(ATTR_ERROR, MSG_USUARIO_NO_ENCONTRADO);
+            return ATTR_ERROR;
         }
 
         // Verificar que la contraseña actual es correcta
         if (!usuario.getContrasena().equals(passwordActual)) {
-            model.addAttribute("usuario", usuario);
-            model.addAttribute("propietario", propietarioDAO.findByUsuarioId(usuarioId));
-            model.addAttribute("errorPassword", "La contraseña actual es incorrecta");
-            return "configuracionusuario";
+            model.addAttribute(ATTR_USUARIO, usuario);
+            model.addAttribute(ATTR_PROPIETARIO, propietarioDAO.findByUsuarioId(usuarioId));
+            model.addAttribute(ATTR_ERROR_PASSWORD, "La contraseña actual es incorrecta");
+            return VIEW_CONFIG;
         }
 
         // Verificar que las nuevas contraseñas coinciden
         if (!passwordNueva.equals(passwordConfirm)) {
-            model.addAttribute("usuario", usuario);
-            model.addAttribute("propietario", propietarioDAO.findByUsuarioId(usuarioId));
-            model.addAttribute("errorPassword", "Las nuevas contraseñas no coinciden");
-            return "configuracionusuario";
+            model.addAttribute(ATTR_USUARIO, usuario);
+            model.addAttribute(ATTR_PROPIETARIO, propietarioDAO.findByUsuarioId(usuarioId));
+            model.addAttribute(ATTR_ERROR_PASSWORD, "Las nuevas contraseñas no coinciden");
+            return VIEW_CONFIG;
         }
 
         // Validar que la nueva contraseña no sea vacía
         if (passwordNueva.trim().isEmpty()) {
-            model.addAttribute("usuario", usuario);
-            model.addAttribute("propietario", propietarioDAO.findByUsuarioId(usuarioId));
-            model.addAttribute("errorPassword", "La nueva contraseña no puede estar vacía");
-            return "configuracionusuario";
+            model.addAttribute(ATTR_USUARIO, usuario);
+            model.addAttribute(ATTR_PROPIETARIO, propietarioDAO.findByUsuarioId(usuarioId));
+            model.addAttribute(ATTR_ERROR_PASSWORD, "La nueva contraseña no puede estar vacía");
+            return VIEW_CONFIG;
         }
 
         // Actualizar la contraseña
@@ -247,39 +260,38 @@ public class ConfiguracionUsuarioController {
         usuarioDAO.save(usuario);
 
         model.addAttribute("successPassword", "Contraseña actualizada correctamente");
-        model.addAttribute("usuario", usuario);
-        model.addAttribute("propietario", propietarioDAO.findByUsuarioId(usuarioId));
-        return "configuracionusuario";
+        model.addAttribute(ATTR_USUARIO, usuario);
+        model.addAttribute(ATTR_PROPIETARIO, propietarioDAO.findByUsuarioId(usuarioId));
+        return VIEW_CONFIG;
     }
 
     /** Eliminar cuenta */
     @PostMapping("/eliminarCuenta")
     public ResponseEntity<String> eliminarCuenta(@RequestParam Long idUsuario, HttpSession session) {
         try {
-            System.out.println("Eliminando cuenta para usuario ID: " + idUsuario);
+            log.info("Eliminando cuenta para usuario ID: {}", idUsuario);
             
             // 1. Eliminar favoritos del usuario
             List<Favorito> favoritos = favoritoDAO.findByUsuarioId(idUsuario);
             if (favoritos != null && !favoritos.isEmpty()) {
-                System.out.println("Eliminando " + favoritos.size() + " favoritos del usuario");
+                log.info("Eliminando {} favoritos del usuario", favoritos.size());
                 favoritoDAO.deleteAll(favoritos);
             }
             
             // 2. Eliminar propietario asociado (y sus inmuebles en cascada)
             Propietario propietario = propietarioDAO.findByUsuarioId(idUsuario);
             if (propietario != null) {
-                System.out.println("Eliminando propietario ID: " + propietario.getId());
+                log.info("Eliminando propietario ID: {}", propietario.getId());
                 propietarioDAO.delete(propietario);
             }
             
             // 3. Eliminar usuario
             usuarioDAO.deleteById(idUsuario);
             session.invalidate();
-            System.out.println("Cuenta eliminada correctamente");
+            log.info("Cuenta eliminada correctamente");
             return ResponseEntity.ok("Cuenta eliminada correctamente");
         } catch (Exception e) {
-            System.err.println("Error al eliminar cuenta: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Error al eliminar cuenta: {}", e.getMessage(), e);
             return ResponseEntity.status(500).body("Error al eliminar la cuenta: " + e.getMessage());
         }
     }

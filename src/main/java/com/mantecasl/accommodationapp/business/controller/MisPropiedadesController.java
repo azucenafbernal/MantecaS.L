@@ -1,50 +1,54 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.Inmueble;
-import com.mantecasl.accommodationapp.business.entity.Usuario;
-import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
-import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
-import com.mantecasl.accommodationapp.business.persistance.FavoritoDAO;
-import com.mantecasl.accommodationapp.business.persistance.PagoDAO;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.transaction.annotation.Transactional; 
-import jakarta.servlet.http.HttpSession;
 
-import java.util.List;
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+import com.mantecasl.accommodationapp.business.persistance.FavoritoDAO;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class MisPropiedadesController {
 
-    @Autowired
-    private InmuebleDAO inmuebleDAO;
+    private static final String ATTR_USUARIO = "usuario";
+    private static final String REDIRECT_LOGIN = "redirect:/login";
+    private static final String REDIRECT_MIS_PROPIEDADES = "redirect:/mis-propiedades";
 
-    @Autowired
-    private ReservaDAO reservaDAO;
+    private final InmuebleDAO inmuebleDAO;
+    private final ReservaDAO reservaDAO;
+    private final FavoritoDAO favoritoDAO;
 
-    @Autowired
-    private FavoritoDAO favoritoDAO;
-
-    @Autowired
-    private PagoDAO pagoDAO;
+    public MisPropiedadesController(InmuebleDAO inmuebleDAO,
+                                   ReservaDAO reservaDAO,
+                                   FavoritoDAO favoritoDAO) {
+        this.inmuebleDAO = inmuebleDAO;
+        this.reservaDAO = reservaDAO;
+        this.favoritoDAO = favoritoDAO;
+    }
 
     @GetMapping("/mis-propiedades")
     public String mostrarMisPropiedades(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
         
         if (usuario == null) {
-            return "redirect:/login";
+            return REDIRECT_LOGIN;
         }
 
         List<Inmueble> misPropiedades = inmuebleDAO.findByPropietarioUsuarioId(usuario.getId());
         
         model.addAttribute("propiedades", misPropiedades);
-        model.addAttribute("usuario", usuario);
+        model.addAttribute(ATTR_USUARIO, usuario);
         
         return "modificar-propiedad";
     }
@@ -52,10 +56,10 @@ public class MisPropiedadesController {
     @GetMapping("/eliminar-propiedad/{id}")
     @Transactional
     public String eliminarPropiedad(@PathVariable Long id, HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
         
         if (usuario == null) {
-            return "redirect:/login";
+            return REDIRECT_LOGIN;
         }
 
         Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
@@ -73,29 +77,29 @@ public class MisPropiedadesController {
                     inmueble.setPropietario(null);
                     inmuebleDAO.save(inmueble);
                 } catch (Exception e2) {
-                    // Si falla todo, simplemente redirigir
+                    return REDIRECT_MIS_PROPIEDADES;
                 }
             }
         }
 
-        return "redirect:/mis-propiedades";
+        return REDIRECT_MIS_PROPIEDADES;
     }
 
     @GetMapping("/editar-propiedad/{id}")
     public String mostrarEditarPropiedad(@PathVariable Long id, HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
         
         if (usuario == null) {
-            return "redirect:/login";
+            return REDIRECT_LOGIN;
         }
 
         Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
         if (inmueble == null || !inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
-            return "redirect:/mis-propiedades";
+            return REDIRECT_MIS_PROPIEDADES;
         }
 
         model.addAttribute("inmueble", inmueble);
-        model.addAttribute("usuario", usuario);
+        model.addAttribute(ATTR_USUARIO, usuario);
         
         return "editar-propiedad";
     }
@@ -111,10 +115,10 @@ public class MisPropiedadesController {
                                         @RequestParam String descripcion,
                                         HttpSession session) {
         
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
         
         if (usuario == null) {
-            return "redirect:/login";
+            return REDIRECT_LOGIN;
         }
 
         Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
@@ -130,6 +134,6 @@ public class MisPropiedadesController {
             inmuebleDAO.save(inmueble);
         }
 
-        return "redirect:/mis-propiedades";
+        return REDIRECT_MIS_PROPIEDADES;
     }
 }

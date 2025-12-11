@@ -6,6 +6,10 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "reservas")
 public class Reserva {
+
+    private static final String ESTADO_PENDIENTE = "PENDIENTE";
+    private static final String ESTADO_CONFIRMADA = "CONFIRMADA";
+    private static final String ESTADO_CANCELADA = "CANCELADA";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,7 +41,7 @@ public class Reserva {
 
     // Constructores
     public Reserva() {
-        this.estado = "PENDIENTE";
+        this.estado = ESTADO_PENDIENTE;
     }
 
     // Constructor para reservas directas
@@ -49,7 +53,7 @@ public class Reserva {
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.precioTotal = precioTotal;
-        this.estado = "CONFIRMADA";
+        this.estado = ESTADO_CONFIRMADA;
         this.metodoPagoUsado = inquilino.getMetodoPago();
     }
 
@@ -83,16 +87,16 @@ public class Reserva {
 
     // Métodos de negocio
     public void confirmar() {
-        this.estado = "CONFIRMADA";
+        this.estado = ESTADO_CONFIRMADA;
         this.metodoPagoUsado = this.inquilino.getMetodoPago();
     }
 
-    public void cancelar(String motivo) {
-        this.estado = "CANCELADA";
+    public void cancelar() {
+        this.estado = ESTADO_CANCELADA;
     }
 
     public boolean estaActiva() {
-        return "CONFIRMADA".equals(estado);
+        return ESTADO_CONFIRMADA.equals(estado);
     }
 
     public long getNumeroNoches() {
@@ -111,7 +115,12 @@ public class Reserva {
     
     @Transient
     public String getMetodoPago() {
-        return metodoPagoUsado != null ? metodoPagoUsado : 
-               (inquilino != null ? inquilino.getMetodoPago() : null);
+        if (metodoPagoUsado != null) {
+            return metodoPagoUsado;
+        }
+        if (inquilino != null) {
+            return inquilino.getMetodoPago();
+        }
+        return null;
     }
 }
