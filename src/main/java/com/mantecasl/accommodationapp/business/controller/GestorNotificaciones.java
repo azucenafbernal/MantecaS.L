@@ -200,12 +200,15 @@ public class GestorNotificaciones {
             motivo != null ? motivo : "No especificado"
         ));
         notificacion.setTipo(Notificacion.RESERVA_CANCELADA);
-        notificacion.setInmueble(reserva.getInmueble());
-        notificacion.setReserva(reserva);
+
+        notificacion.setInmueble(null);
+        notificacion.setReserva(null);
+
         notificacion.setAccionUrl("/reservas/canceladas");
         
         return notificacionDAO.save(notificacion);
     }
+
     
     @Transactional
     public Notificacion crearNotificacionMensajePropietario(Reserva reserva, String mensaje) {

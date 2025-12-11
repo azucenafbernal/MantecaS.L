@@ -23,6 +23,9 @@ public interface NotificacionDAO extends JpaRepository<Notificacion, Long> {
     // Contar notificaciones no leídas
     long countByUsuarioAndLeidaFalse(Usuario usuario);
 
+    void deleteByInmuebleId(Long inmuebleId);
+    void deleteByReservaInmuebleId(Long inmuebleId);
+
     @Modifying
     @Transactional
     @Query("UPDATE Notificacion n SET n.leida = true WHERE n.usuario = :usuario AND n.leida = false")
