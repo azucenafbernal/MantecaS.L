@@ -67,7 +67,8 @@ public class LoginController {
             return VIEW_LOGIN;
         }
 
-        // guardar usuario ID en sesion (no el objeto completo)
+        // guardar usuario completo en sesion
+        session.setAttribute(ATTR_USUARIO, encontrado);
         session.setAttribute(SESSION_USUARIO_ID, encontrado.getId());
 
         // Redireccionar solo a URLs en whitelist
@@ -88,11 +89,11 @@ public class LoginController {
 
     @GetMapping("/resultLogin")
     public String mostrarResultLogin(HttpSession session, Model model) {
-        Long usuarioId = (Long) session.getAttribute(SESSION_USUARIO_ID);
-        if (usuarioId == null) {
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
+        if (usuario == null) {
             return REDIRECT_PREFIX + "/login";
         }
-        model.addAttribute(ATTR_USUARIO, usuarioId);
+        model.addAttribute(ATTR_USUARIO, usuario);
         return VIEW_RESULT_LOGIN;
     }
 

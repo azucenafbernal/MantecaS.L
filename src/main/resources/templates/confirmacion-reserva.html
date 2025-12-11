@@ -89,9 +89,9 @@
                     </div>
 
                     <!-- Observaciones -->
-                    <div th:if="${reserva.observaciones}" class="info-card">
+                    <div th:if="${reserva.observacionesInquilino}" class="info-card">
                         <h5>💬 Observaciones</h5>
-                        <p class="info-value" style="text-align: left;" th:text="${reserva.observaciones}"></p>
+                        <p class="info-value" style="text-align: left;" th:text="${reserva.observacionesInquilino}"></p>
                     </div>
 
                     <!-- Información de contacto -->
@@ -191,9 +191,9 @@
                     </div>
 
                     <!-- Observaciones -->
-                    <div th:if="${solicitud.observaciones}" class="info-card">
+                    <div th:if="${solicitud.observacionesInquilino}" class="info-card">
                         <h5>💬 Observaciones</h5>
-                        <p class="info-value" style="text-align: left;" th:text="${solicitud.observaciones}"></p>
+                        <p class="info-value" style="text-align: left;" th:text="${solicitud.observacionesInquilino}"></p>
                     </div>
 
                     <!-- Pasos a seguir -->
