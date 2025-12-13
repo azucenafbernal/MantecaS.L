@@ -27,4 +27,6 @@ public interface DisponibilidadDAO extends JpaRepository<Disponibilidad, Long> {
         @Param("fechaInicio") Date fechaInicio,
         @Param("fechaFin") Date fechaFin
     );
+
+    void deleteByInmuebleId(Long inmuebleId);
 }

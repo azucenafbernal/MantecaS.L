@@ -13,6 +13,8 @@ import com.mantecasl.accommodationapp.business.entity.Reserva;
 
 @Repository
 public interface ReservaDAO extends JpaRepository<Reserva, Long> {
+
+    List<Reserva> findTop10ByInmueblePropietarioUsuarioIdOrderByIdDesc(Long usuarioId);
     
     @Query("SELECT r FROM Reserva r WHERE r.inmueble.id = :inmuebleId " +
            "AND r.estado IN ('PENDIENTE', 'CONFIRMADA') " +

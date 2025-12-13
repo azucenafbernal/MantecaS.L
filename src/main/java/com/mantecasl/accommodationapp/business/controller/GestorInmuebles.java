@@ -5,6 +5,7 @@ import com.mantecasl.accommodationapp.business.persistance.*;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -103,7 +104,13 @@ public class GestorInmuebles {
     @GetMapping("/propiedades")
     public String listarPropiedades(Model model) {
         List<Inmueble> propiedades = inmuebleDAO.findAll();
-        model.addAttribute("propiedades", propiedades);
+        
+        // Filtrar solo propiedades con propietario (no nulas y no eliminadas)
+        List<Inmueble> propiedadesActivas = propiedades.stream()
+            .filter(inmueble -> inmueble.getPropietario() != null)
+            .collect(Collectors.toList());
+        
+        model.addAttribute("propiedades", propiedadesActivas);
         return "lista-propiedades";
     }
 

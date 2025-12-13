@@ -2,6 +2,7 @@ package com.mantecasl.accommodationapp.business.persistance;
 
 import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -42,4 +43,19 @@ public interface SolicitudReservaDAO extends JpaRepository<SolicitudReserva, Lon
     long countByInmueblePropietarioIdAndEstado(Long propietarioId, String estado);
     
     List<SolicitudReserva> findByInquilinoId(Long inquilinoId);
+    
+    void deleteByInmuebleId(Long inmuebleId);
+
+    @Modifying
+    @Query("DELETE FROM SolicitudReserva s WHERE s.reserva.id = :reservaId")
+    void deleteByReservaId(@Param("reservaId") Long reservaId);
+
+    @Modifying
+    @Query(value = "DELETE FROM solicitudes_reserva WHERE reserva_id = :reservaId", nativeQuery = true)
+    void deleteByReservaIdNative(@Param("reservaId") Long reservaId);
+
+
+    List<SolicitudReserva> findByInmueblePropietarioUsuarioIdAndEstado(
+            Long usuarioId, String estado
+    );
 }

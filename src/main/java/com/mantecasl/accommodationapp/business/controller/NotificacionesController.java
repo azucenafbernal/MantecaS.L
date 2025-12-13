@@ -16,7 +16,6 @@ public class NotificacionesController {
 
     @Autowired
     private GestorReservas gestorReservas;
-
     
     @GetMapping
     public String listarNotificaciones(HttpSession session, Model model) {
@@ -33,32 +32,30 @@ public class NotificacionesController {
         return "notificacionesUsuario";
     }
 
-    @GetMapping("/propietario")
-    public String verNotificacionesPropietario(HttpSession session, Model model) {
+    @GetMapping("/propietario/notificaciones")
+    public String verNotificaciones(HttpSession session, Model model) {
 
         Usuario usuario = (Usuario) session.getAttribute("usuario");
-
         if (usuario == null) {
             return "redirect:/login";
         }
 
-        Long propietarioId = usuario.getId();
+        Long usuarioId = usuario.getId();
 
         model.addAttribute("solicitudesPendientes",
-                gestorReservas.obtenerSolicitudesPendientesPropietario(propietarioId));
+                gestorReservas.obtenerSolicitudesPendientesPropietario(usuarioId));
 
         model.addAttribute("solicitudesAprobadas",
-                gestorReservas.obtenerSolicitudesAprobadasPropietario(propietarioId));
+                gestorReservas.obtenerSolicitudesAprobadasPropietario(usuarioId));
 
         model.addAttribute("solicitudesRechazadas",
-                gestorReservas.obtenerSolicitudesRechazadasPropietario(propietarioId));
+                gestorReservas.obtenerSolicitudesRechazadasPropietario(usuarioId));
 
         model.addAttribute("reservasRecientes",
-                gestorReservas.obtenerHistorialReservasPropietario(propietarioId));
+                gestorReservas.obtenerHistorialReservasPropietario(usuarioId));
 
         return "notificaciones";
     }
-
     
     @PostMapping("/{id}/leer")
     public String marcarComoLeida(@PathVariable Long id, HttpSession session) {

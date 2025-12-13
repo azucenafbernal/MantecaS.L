@@ -41,7 +41,6 @@ public class Notificacion {
     @Column(columnDefinition = "CLOB")
     private String mensaje;
     
-    // Cambiar de Enum a String
     @Column(nullable = false, length = 50)
     private String tipo;
     
@@ -79,7 +78,7 @@ public class Notificacion {
         this.tipo = tipo;
     }
     
-    // Getters y Setters (actualizar los tipos)
+    // Getters y Setters 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
