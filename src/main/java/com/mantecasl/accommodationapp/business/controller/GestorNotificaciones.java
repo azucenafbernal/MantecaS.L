@@ -185,7 +185,7 @@ public class GestorNotificaciones {
     }
     
     @Transactional
-    public Notificacion crearNotificacionReservaCanceladaPorPropietario(Reserva reserva, String motivo) {
+    public Notificacion crearNotificacionReservaCanceladaPorPropietario(Reserva reserva, String motivo, String direccionInmueble) {
         Usuario inquilino = reserva.getInquilino().getUsuario();
         
         Notificacion notificacion = new Notificacion();
@@ -193,18 +193,38 @@ public class GestorNotificaciones {
         notificacion.setTitulo("⚠️ Reserva CANCELADA por el propietario");
         notificacion.setMensaje(String.format(
             "Tu reserva en %s del %s al %s ha sido CANCELADA por el propietario. " +
-            "Motivo: %s. Tu pago ha sido reembolsado.",
-            reserva.getInmueble().getDireccion(),
+            "Motivo: %s. Tu pago será reembolsado en un plazo inferior a 48 horas.",
+            direccionInmueble,
             reserva.getFechaInicio(),
             reserva.getFechaFin(),
             motivo != null ? motivo : "No especificado"
         ));
         notificacion.setTipo(Notificacion.RESERVA_CANCELADA);
-
+        notificacion.setAccionUrl("/reservas/canceladas");
+        
+        // No establecer relaciones que ya no existirán
         notificacion.setInmueble(null);
         notificacion.setReserva(null);
-
-        notificacion.setAccionUrl("/reservas/canceladas");
+        
+        return notificacionDAO.save(notificacion);
+    }
+    
+    @Transactional
+    public Notificacion crearNotificacionSolicitudRechazadaPorEliminacion(SolicitudReserva solicitud, String direccionInmueble) {
+        Usuario solicitante = solicitud.getInquilino().getUsuario();
+        
+        Notificacion notificacion = new Notificacion();
+        notificacion.setUsuario(solicitante);
+        notificacion.setTitulo("❌ Solicitud de reserva RECHAZADA");
+        notificacion.setMensaje(String.format(
+            "Tu solicitud de reserva para %s ha sido rechazada porque la propiedad ha sido eliminada por el propietario.",
+            direccionInmueble
+        ));
+        notificacion.setTipo(Notificacion.SOLICITUD_RECHAZADA);
+        notificacion.setAccionUrl("/mis-solicitudes");
+        
+        notificacion.setInmueble(null);
+        notificacion.setReserva(null);
         
         return notificacionDAO.save(notificacion);
     }

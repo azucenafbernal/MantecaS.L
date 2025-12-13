@@ -50,8 +50,12 @@ public interface SolicitudReservaDAO extends JpaRepository<SolicitudReserva, Lon
     @Query("DELETE FROM SolicitudReserva s WHERE s.reserva.id = :reservaId")
     void deleteByReservaId(@Param("reservaId") Long reservaId);
 
-    // O si no funciona con JPQL, usa nativo:
     @Modifying
     @Query(value = "DELETE FROM solicitudes_reserva WHERE reserva_id = :reservaId", nativeQuery = true)
     void deleteByReservaIdNative(@Param("reservaId") Long reservaId);
+
+
+    List<SolicitudReserva> findByInmueblePropietarioUsuarioIdAndEstado(
+            Long usuarioId, String estado
+    );
 }

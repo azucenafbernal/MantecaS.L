@@ -3,6 +3,7 @@ package com.mantecasl.accommodationapp.business.controller;
 import com.mantecasl.accommodationapp.business.entity.Inmueble;
 import com.mantecasl.accommodationapp.business.entity.Inquilino;
 import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
 import com.mantecasl.accommodationapp.business.entity.Usuario;
 import com.mantecasl.accommodationapp.business.persistance.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,6 @@ public class MisPropiedadesController {
         } catch (Exception e) {
             System.err.println("Error en eliminarPropiedad: " + e.getMessage());
             e.printStackTrace();
-            // Intentar ocultar como fallback
             try {
                 Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
                 if (inmueble != null) {
@@ -93,41 +93,40 @@ public class MisPropiedadesController {
         Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
         if (inmueble != null && inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
             
-            System.out.println("1. Eliminando notificaciones...");
+            // Guardar información del inmueble antes de eliminarlo
+            String direccionInmueble = inmueble.getDireccion();
+            
+            // 1. Notificar reservas
+            List<Reserva> reservas = reservaDAO.findByInmuebleId(id);
+            for (Reserva reserva : reservas) {
+                String motivo = "Propiedad eliminada por el propietario";
+                gestorNotificaciones.crearNotificacionReservaCanceladaPorPropietario(
+                    reserva, motivo, direccionInmueble
+                );
+            }
+            
+            // 2. Notificar solicitudes pendientes
+            List<SolicitudReserva> solicitudes = solicitudReservaDAO.findByInmuebleId(id);
+            for (SolicitudReserva solicitud : solicitudes) {
+                gestorNotificaciones.crearNotificacionSolicitudRechazadaPorEliminacion(
+                    solicitud, direccionInmueble
+                );
+            }
+            
+            // 3. Ahora eliminar todo (en el orden correcto)
             notificacionDAO.deleteByInmuebleId(id);
-            
-            System.out.println("2. Eliminando solicitudes de reserva...");
             solicitudReservaDAO.deleteByInmuebleId(id);
-            
-            System.out.println("3. Eliminando disponibilidad...");
             disponibilidadDAO.deleteByInmuebleId(id);
-            
-            System.out.println("4. Eliminando favoritos...");
             favoritoDAO.deleteByInmuebleId(id);
             
-            System.out.println("5. Actualizando inquilinos...");
             List<Inquilino> inquilinos = inquilinoDAO.findByInmuebleId(id);
             for (Inquilino inquilino : inquilinos) {
                 inquilino.setInmueble(null);
                 inquilinoDAO.save(inquilino);
             }
             
-            System.out.println("6. Obteniendo reservas...");
-            List<Reserva> reservas = reservaDAO.findByInmuebleId(id);
-            
-            System.out.println("7. Creando notificaciones para " + reservas.size() + " reservas...");
-            for (Reserva reserva : reservas) {
-                String motivo = "Propiedad eliminada por el propietario";
-                gestorNotificaciones.crearNotificacionReservaCanceladaPorPropietario(reserva, motivo);
-            }
-            
-            System.out.println("8. Eliminando reservas...");
             reservaDAO.deleteByInmuebleId(id);
-            
-            System.out.println("9. Eliminando inmueble...");
             inmuebleDAO.delete(inmueble);
-            
-            System.out.println("¡Eliminación completada!");
         }
     }
 
