@@ -85,7 +85,6 @@ body {
     background-color: rgba(66, 153, 225, 0.3);
     border-color: rgba(66, 153, 225, 0.5);
 }
-
 .messages-btn:hover i {
     color: #4299e1;
 }
@@ -95,7 +94,6 @@ body {
     background-color: rgba(56, 178, 172, 0.3);
     border-color: rgba(56, 178, 172, 0.5);
 }
-
 .notifications-btn:hover i {
     color: #38b2ac;
 }
@@ -105,7 +103,6 @@ body {
     background-color: rgba(255, 107, 157, 0.3);
     border-color: rgba(255, 107, 157, 0.5);
 }
-
 .favorites-btn:hover i {
     color: #ff6b9d;
 }
@@ -115,7 +112,6 @@ body {
     background-color: rgba(108, 92, 231, 0.3);
     border-color: rgba(108, 92, 231, 0.5);
 }
-
 .user-settings-btn:hover i {
     color: #6c5ce7;
 }
@@ -125,7 +121,6 @@ body {
     background-color: rgba(74, 0, 224, 0.3);
     border-color: rgba(74, 0, 224, 0.5);
 }
-
 .login-btn:hover i {
     color: #4a00e0;
 }
@@ -216,7 +211,7 @@ body {
 }
 
 .notifications-badge {
-    background: linear-gradient(135deg, #48bb78, #38a169);
+    background: linear-gradient(135deg, #38a169, #2f855a);
 }
 
 @keyframes pulse {
