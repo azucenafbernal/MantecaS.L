@@ -224,6 +224,10 @@ public class GestorNotificaciones {
         notificacion.setInmueble(null);
         notificacion.setReserva(null);
         
+        // No establecer relaciones que ya no existirán
+        notificacion.setInmueble(null);
+        notificacion.setReserva(null);
+        
         return notificacionDAO.save(notificacion);
     }
     

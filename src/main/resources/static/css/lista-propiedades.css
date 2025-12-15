@@ -8,6 +8,7 @@
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Body y fondo general */
 body {
     background: 
         linear-gradient(135deg, rgba(35, 54, 73, 0.85) 0%, rgba(38, 65, 99, 0.85) 100%),
@@ -17,11 +18,13 @@ body {
     color: #9eaabe;
 }
 
+/* Contenedor principal */
 .container {
     max-width: 1200px;
     margin: 0 auto;
 }
 
+/* Header de la página */
 .header {
     text-align: center;
     margin-bottom: 50px;
@@ -44,6 +47,7 @@ body {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+/* Filtros activos */
 .filtros-activos {
     background: rgba(52, 84, 110, 0.9);
     border-radius: 12px;
@@ -52,6 +56,7 @@ body {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(116, 130, 150, 0.5);
     backdrop-filter: blur(10px);
+    animation: fadeIn 0.4s ease-out;
 }
 
 .filtros-header {
@@ -106,6 +111,7 @@ body {
     border: 1px solid rgba(226, 232, 240, 0.3);
 }
 
+/* Grid de propiedades */
 .properties-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -113,6 +119,7 @@ body {
     margin-bottom: 50px;
 }
 
+/* Tarjeta de propiedad */
 .property-card {
     background: rgba(52, 84, 110, 0.9);
     border-radius: 12px;
@@ -121,6 +128,7 @@ body {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(116, 130, 150, 0.5);
     backdrop-filter: blur(10px);
+    animation: fadeIn 0.6s ease-out;
 }
 
 .property-card:hover {
@@ -129,6 +137,7 @@ body {
     background: rgba(52, 84, 110, 0.95);
 }
 
+/* Header de cada propiedad */
 .property-header {
     background: linear-gradient(135deg, rgba(45, 55, 72, 0.9) 0%, rgba(74, 85, 104, 0.9) 100%);
     color: white;
@@ -158,6 +167,7 @@ body {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
+/* Contenido de la propiedad */
 .property-content {
     padding: 24px;
 }
@@ -193,6 +203,7 @@ body {
     font-weight: 500;
 }
 
+/* Descripción de la propiedad */
 .property-description {
     background: rgba(197, 205, 218, 0.1);
     padding: 16px;
@@ -207,6 +218,7 @@ body {
     line-height: 1.5;
 }
 
+/* Acciones de la propiedad */
 .property-actions {
     display: flex;
     gap: 12px;
@@ -240,13 +252,13 @@ body {
 }
 
 .btn-favoritos {
-    background: #ed8936;
+    background: linear-gradient(135deg, #ff4d4d, #cc0000); /* rojo intenso */
     color: white;
     border: none;
     border-radius: 8px;
     padding: 12px 20px;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     flex: 1;
@@ -254,13 +266,14 @@ body {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    box-shadow: 0 2px 8px rgba(237, 137, 54, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 77, 77, 0.5); /* sombra para destacar */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3); /* hace que el corazón resalte */
 }
 
 .btn-favoritos:hover {
-    background: #dd6b20;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(237, 137, 54, 0.4);
+    background: linear-gradient(135deg, #ff6666, #e60000);
+    transform: translateY(-2px) scale(1.05); /* pequeño zoom al pasar el mouse */
+    box-shadow: 0 6px 16px rgba(255, 77, 77, 0.6);
 }
 
 /* Footer elegante */
@@ -406,12 +419,4 @@ body {
         opacity: 1; 
         transform: translateY(0); 
     }
-}
-
-.property-card {
-    animation: fadeIn 0.6s ease-out;
-}
-
-.filtros-activos {
-    animation: fadeIn 0.4s ease-out;
 }

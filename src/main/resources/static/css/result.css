@@ -1,21 +1,20 @@
-/* ========================================
-   RESULT.CSS - Estilos para página de resultado
-   ======================================== */
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-    background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    background: 
+        linear-gradient(135deg, rgba(35, 54, 73, 0.85) 0%, rgba(38, 65, 99, 0.85) 100%),
+        url('/images/fondoazul.jpg') center/cover no-repeat fixed;
     min-height: 100vh;
+    padding: 20px;
+    color: #e2e8f0;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
 }
 
 .container {
@@ -23,23 +22,28 @@ body {
     max-width: 450px;
 }
 
-/* ========================================
-   CARD - Contenedor principal
-   ======================================== */
-
+/* CARD */
 .card {
-    background-color: white;
+    background: rgba(52, 84, 110, 0.9);
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(116, 130, 150, 0.5);
+    color: #e2e8f0;
 }
 
-/* ========================================
-   HEADER
-   ======================================== */
+/* CARD HOVER */
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    background: rgba(52, 84, 110, 0.95);
+}
 
+/* HEADER */
 .header {
-    background: linear-gradient(135deg, #4299e1, #3182ce);
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.9) 0%, rgba(74, 85, 104, 0.9) 100%);
     color: white;
     padding: 25px 20px;
     text-align: center;
@@ -56,25 +60,22 @@ body {
     opacity: 0.9;
 }
 
+/* ICONO SUCCESS */
 .success-icon {
     font-size: 48px;
     margin-bottom: 15px;
+    color: #68d391; /* Verde tipo aprobado */
+    text-shadow: 0 2px 10px rgba(104, 211, 145, 0.3);
 }
 
-/* ========================================
-   CONTENT
-   ======================================== */
-
+/* CONTENT */
 .content {
     padding: 30px;
 }
 
-/* ========================================
-   USER INFO
-   ======================================== */
-
+/* USER INFO */
 .user-info {
-    background: #f8f9fa;
+    background: rgba(45, 55, 72, 0.5);
     border-radius: 8px;
     padding: 20px;
     margin-bottom: 25px;
@@ -85,7 +86,7 @@ body {
     justify-content: space-between;
     margin-bottom: 12px;
     padding-bottom: 12px;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid rgba(247, 250, 252, 0.1);
 }
 
 .info-item:last-child {
@@ -95,18 +96,19 @@ body {
 }
 
 .info-label {
-    font-weight: 600;
-    color: #495057;
+    font-weight: 500;
+    color: #c5cdda;
+    font-size: 14px;
 }
 
 .info-value {
-    color: #6c757d;
+    color: #e2e8f0;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 500;
 }
 
-/* ========================================
-   BOTONES
-   ======================================== */
-
+/* BOTONES */
 .btn-primary {
     background: linear-gradient(135deg, #4299e1, #3182ce);
     color: white;
@@ -125,15 +127,15 @@ body {
 }
 
 .btn-primary:hover {
-    background: linear-gradient(to right, #3a00c0, #7e1dd2);
+    background: linear-gradient(135deg, #3182ce, #2c5282);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 .btn-secondary {
-    background: transparent;
-    color: #4a00e0;
-    border: 2px solid #4a00e0;
+    background: rgba(113, 128, 150, 0.9);
+    color: white;
+    border: none;
     border-radius: 6px;
     padding: 12px;
     width: 100%;
@@ -147,33 +149,26 @@ body {
 }
 
 .btn-secondary:hover {
-    background: #4a00e0;
-    color: white;
+    background: rgba(74, 85, 104, 0.9);
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
 }
 
-/* ========================================
-   FOOTER
-   ======================================== */
-
+/* FOOTER */
 .footer {
     text-align: center;
     padding: 20px;
     font-size: 14px;
-    color: #666;
-    border-top: 1px solid #eee;
+    color: #c1c9d6;
+    border-top: 1px solid rgba(116, 130, 150, 0.3);
 }
 
 .footer a {
-    color: #4a00e0;
+    color: #4299e1;
     text-decoration: none;
 }
 
-/* ========================================
-   RESPONSIVE
-   ======================================== */
-
+/* RESPONSIVE */
 @media (max-width: 480px) {
     .container {
         max-width: 100%;
