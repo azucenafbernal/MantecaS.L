@@ -1,7 +1,9 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
+import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,30 +20,27 @@ public class GestorReservas {
     @Autowired
     private ReservaDAO reservaDAO;
 
-    //PENDIENTES
-    public List<SolicitudReserva> obtenerSolicitudesPendientesPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "PENDIENTE");
+    //Pendientes
+    public List<SolicitudReserva> obtenerSolicitudesPendientesPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "PENDIENTE");
     }
 
-    //APROBADAS
-    public List<SolicitudReserva> obtenerSolicitudesAprobadasPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "APROBADA");
+    //Aprobadas
+    public List<SolicitudReserva> obtenerSolicitudesAprobadasPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "APROBADA");
     }
 
-    //RECHAZADAS
-    public List<SolicitudReserva> obtenerSolicitudesRechazadasPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "RECHAZADA");
+    //Rechazadas
+    public List<SolicitudReserva> obtenerSolicitudesRechazadasPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "RECHAZADA");
     }
 
-    //HISTORIAL
-    public List<Reserva> obtenerHistorialReservasPropietario(Long propietarioId) {
-        List<Reserva> todas = reservaDAO.findAll()
-                .stream()
-                .filter(r -> r.getInmueble().getPropietario().getId().equals(propietarioId))
-                .sorted((a, b) -> b.getId().compareTo(a.getId()))
-                .limit(10)
-                .toList();
-
-        return todas;
+    //Historial reciente
+    public List<Reserva> obtenerHistorialReservasPropietario(Long usuarioId) {
+        return reservaDAO
+                .findTop10ByInmueblePropietarioUsuarioIdOrderByIdDesc(usuarioId);
     }
 }
