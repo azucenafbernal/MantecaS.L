@@ -46,7 +46,7 @@ public class LoginController {
             return "redirect:" + from;
         }
 
-        return "redirect:/";
+        return "redirect:/resultLogin";
     }
 
 

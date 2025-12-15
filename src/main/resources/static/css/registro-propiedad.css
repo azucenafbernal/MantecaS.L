@@ -11,7 +11,10 @@ body {
         url('/images/fondoazul.jpg') center/cover no-repeat fixed;
     min-height: 100vh;
     padding: 20px;
-    color: #9eaabe;
+    color: #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .container {
@@ -52,12 +55,12 @@ body {
 }
 
 .error {
-    background: rgba(220, 53, 69, 0.2);
-    color: #ff6b6b;
+    background: rgba(245, 101, 101, 0.2);
+    color: #f56565;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-    border: 1px solid rgba(220, 53, 69, 0.5);
+    border: 1px solid rgba(245, 101, 101, 0.5);
     text-align: center;
 }
 
@@ -131,7 +134,7 @@ textarea.input-field {
     margin-bottom: 0;
 }
 
-/* ESTILOS PARA LOS RADIO BUTTONS */
+/* RADIO BUTTONS */
 .radio-options {
     background: rgba(197, 205, 218, 0.08);
     border-radius: 8px;
@@ -142,7 +145,7 @@ textarea.input-field {
 
 .radio-option {
     display: flex;
-    align-items: flex-start; /* Alinea verticalmente al inicio */
+    align-items: flex-start;
     margin-bottom: 15px;
     cursor: pointer;
     transition: all 0.2s;
@@ -155,11 +158,11 @@ textarea.input-field {
 }
 
 .radio-option input[type="radio"] {
-    margin: 3px 12px 0 5px; /* Ajustado para alinear con el texto */
+    margin: 3px 12px 0 5px;
     width: 18px;
     height: 18px;
     cursor: pointer;
-    flex-shrink: 0; /* Evita que se encoja */
+    flex-shrink: 0;
 }
 
 .radio-label {
@@ -201,7 +204,7 @@ textarea.input-field {
     color: white;
 }
 
-/* Información adicional */
+/* INFORMACIÓN ADICIONAL */
 .info-box {
     background: rgba(66, 153, 225, 0.1);
     border-radius: 8px;
@@ -227,6 +230,7 @@ textarea.input-field {
     font-size: 13px;
 }
 
+/* BOTÓN SUBMIT */
 .btn-submit {
     background: linear-gradient(135deg, #4299e1, #3182ce);
     color: white;
@@ -252,13 +256,14 @@ textarea.input-field {
     box-shadow: 0 6px 18px rgba(66, 153, 225, 0.4);
 }
 
+/* FOOTER */
 .footer {
     text-align: center;
     margin-top: 25px;
     padding-top: 20px;
     border-top: 1px solid rgba(116, 130, 150, 0.3);
     font-size: 14px;
-    color: #8a96a6;
+    color: #9eaabe;
 }
 
 .footer a {
@@ -272,6 +277,7 @@ textarea.input-field {
     text-decoration: underline;
 }
 
+/* RESPONSIVE */
 @media (max-width: 768px) {
     .container {
         padding: 20px;
@@ -287,7 +293,7 @@ textarea.input-field {
     }
 }
 
-/* Phone Input Component Styles */
+/* PHONE INPUT */
 .form-group .phone-input-box {
     display: flex !important;
     gap: 8px;
@@ -298,9 +304,9 @@ textarea.input-field {
 
 .prefix-dropdown-with-flag {
     padding: 12px 15px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(116, 130, 150, 0.4);
     border-radius: 6px;
-    background-color: white;
+    background-color: rgba(52, 84, 110, 0.1);
     cursor: pointer;
     font-size: 15px;
     white-space: nowrap;
@@ -312,25 +318,27 @@ textarea.input-field {
 }
 
 .prefix-dropdown-with-flag:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    border-color: #4299e1;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
     outline: none;
 }
 
 #telefonoCompleto {
     flex: 1 1 auto !important;
     padding: 12px 15px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(116, 130, 150, 0.4);
     border-radius: 6px;
     font-size: 15px;
     width: auto;
     box-sizing: border-box;
     transition: all 0.3s;
+    background-color: rgba(52, 84, 110, 0.1);
+    color: #e2e8f0;
 }
 
 #telefonoCompleto:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+    border-color: #4299e1;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
     outline: none;
 }
 

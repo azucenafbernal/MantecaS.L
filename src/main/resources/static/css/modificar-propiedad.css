@@ -24,11 +24,13 @@
 }
 
 body {
-    background: linear-gradient(135deg, rgba(35, 54, 73, 0.95) 0%, rgba(38, 65, 99, 0.95) 100%),
-                url('/images/fondoazul.jpg') center/cover no-repeat fixed;
+    background: 
+        linear-gradient(135deg, rgba(35, 54, 73, 0.85) 0%, rgba(38, 65, 99, 0.85) 100%),
+        url('/images/ciudad.jpg') center/cover no-repeat fixed;
     min-height: 100vh;
     color: var(--text-primary);
     padding: 20px;
+    color: #e2e8f0;
 }
 
 /* Contenedor principal */
@@ -46,13 +48,9 @@ body {
 /* Header */
 .header {
     text-align: center;
-    margin-bottom: 50px;
-    padding: 30px 20px;
-    background: rgba(52, 84, 110, 0.5);
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 15px 35px var(--shadow-color);
+    margin-bottom: 40px;
+    color: #e2e8f0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .header h1 {
@@ -132,35 +130,25 @@ body {
 
 /* Tarjeta de propiedad */
 .property-card {
-    background: var(--bg-card);
-    backdrop-filter: blur(12px);
-    border-radius: 20px;
+    background: rgba(52, 84, 110, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid var(--border-color);
-    box-shadow: 0 15px 35px var(--shadow-color);
-    position: relative;
-    opacity: 0;
-    transform: translateY(30px);
-    animation: cardAppear 0.6s ease-out forwards;
-}
-
-@keyframes cardAppear {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    transition: all 0.3s ease;
+    border: 1px solid rgba(116, 130, 150, 0.5);
+    backdrop-filter: blur(10px);
+    color: #e2e8f0;
 }
 
 .property-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-    border-color: rgba(66, 153, 225, 0.5);
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    background: rgba(52, 84, 110, 0.95);
 }
 
 /* Header de la tarjeta */
 .property-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(135deg, #4299e1, #3182ce);
     color: white;
     padding: 25px;
     position: relative;
@@ -246,17 +234,9 @@ body {
 .info-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-.info-item:hover {
-    background: rgba(255, 255, 255, 0.03);
-    padding-left: 10px;
-    padding-right: 10px;
-    border-radius: 6px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(247, 250, 252, 0.1);
 }
 
 .info-item:last-child {
@@ -265,7 +245,7 @@ body {
 
 .info-label {
     font-weight: 600;
-    color: var(--text-primary);
+    color: #c5cdda;
     font-size: 14px;
     display: flex;
     align-items: center;
@@ -273,7 +253,8 @@ body {
 }
 
 .info-value {
-    color: var(--text-secondary);
+    color: #e2e8f0;
+    text-align: right;
     font-size: 14px;
     font-weight: 500;
     text-align: right;
@@ -283,7 +264,8 @@ body {
 
 /* Descripción */
 .property-description {
-    background: linear-gradient(135deg, rgba(66, 153, 225, 0.1), rgba(52, 84, 110, 0.2));
+    background: rgba(45, 55, 72, 0.5);
+    padding: 18px;
     border-radius: 12px;
     padding: 20px;
     margin-top: 20px;
@@ -291,7 +273,7 @@ body {
 }
 
 .description-text {
-    color: var(--text-secondary);
+    color: #e2e8f0;
     font-size: 14px;
     line-height: 1.6;
     max-height: 100px;
@@ -321,7 +303,7 @@ body {
 }
 
 .btn-modificar {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(135deg, #4299e1, #3182ce);
     color: white;
     border: none;
     border-radius: 10px;
@@ -333,7 +315,7 @@ body {
     flex: 1;
     text-decoration: none;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(66, 153, 225, 0.3);
+    box-shadow: 0 4px 12px rgba(66,153,225,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -354,17 +336,13 @@ body {
 }
 
 .btn-modificar:hover {
-    background: linear-gradient(135deg, var(--primary-dark), #2c5282);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(66, 153, 225, 0.4);
-}
-
-.btn-modificar:hover::before {
-    left: 100%;
+    background: linear-gradient(135deg, #3182ce, #2c5282);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(49,130,206,0.4);
 }
 
 .btn-eliminar {
-    background: linear-gradient(135deg, var(--danger-color), #e53e3e);
+    background: linear-gradient(135deg, #e53e3e, #c53030);
     color: white;
     border: none;
     border-radius: 10px;
@@ -376,7 +354,7 @@ body {
     flex: 1;
     text-decoration: none;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+    box-shadow: 0 4px 12px rgba(229,62,62,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -397,9 +375,9 @@ body {
 }
 
 .btn-eliminar:hover {
-    background: linear-gradient(135deg, #e53e3e, #c53030);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(245, 101, 101, 0.4);
+    background: linear-gradient(135deg, #c53030, #9b2c2c);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(197,47,47,0.4);
 }
 
 .btn-eliminar:hover::before {
@@ -425,7 +403,7 @@ body {
 }
 
 .btn-footer {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    background: linear-gradient(135deg, #4299e1, #3182ce);
     color: white;
     border: none;
     border-radius: 15px;
@@ -435,12 +413,9 @@ body {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    box-shadow: 0 8px 25px rgba(66, 153, 225, 0.3);
-    min-width: 250px;
+    display: inline-block;
+    box-shadow: 0 4px 12px rgba(66,153,225,0.3);
+    min-width: 200px;
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -458,17 +433,23 @@ body {
 }
 
 .btn-footer:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 15px 35px rgba(66, 153, 225, 0.4);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 18px rgba(49,130,206,0.4);
 }
 
 .btn-footer:hover::before {
     left: 100%;
 }
 
-.btn-footer.secondary {
-    background: linear-gradient(135deg, var(--secondary-color), #2d3748);
-    border: 2px solid rgba(255, 255, 255, 0.2);
+.no-properties {
+    text-align: center;
+    color: #e2e8f0;
+    padding: 80px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    margin: 20px 0;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .btn-footer.secondary:hover {
@@ -529,50 +510,4 @@ body {
     .no-properties {
         padding: 60px 20px;
     }
-    
-    .no-properties h2 {
-        font-size: 28px;
-    }
-    
-    .no-properties p {
-        font-size: 16px;
-    }
 }
-
-@media (max-width: 480px) {
-    .header h1 {
-        font-size: 28px;
-    }
-    
-    .header p {
-        font-size: 16px;
-    }
-    
-    .property-header {
-        padding: 20px;
-    }
-    
-    .property-price {
-        font-size: 28px;
-    }
-    
-    .property-content {
-        padding: 20px;
-    }
-    
-    .footer {
-        padding: 30px 15px;
-    }
-}
-
-/* Efectos de animación para tarjetas con retraso */
-.property-card:nth-child(1) { animation-delay: 0.1s; }
-.property-card:nth-child(2) { animation-delay: 0.2s; }
-.property-card:nth-child(3) { animation-delay: 0.3s; }
-.property-card:nth-child(4) { animation-delay: 0.4s; }
-.property-card:nth-child(5) { animation-delay: 0.5s; }
-.property-card:nth-child(6) { animation-delay: 0.6s; }
-.property-card:nth-child(7) { animation-delay: 0.7s; }
-.property-card:nth-child(8) { animation-delay: 0.8s; }
-.property-card:nth-child(9) { animation-delay: 0.9s; }
-.property-card:nth-child(10) { animation-delay: 1s; }
