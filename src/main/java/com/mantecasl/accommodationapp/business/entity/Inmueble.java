@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +31,14 @@ public class Inmueble {
     private String descripcion;
     private Integer capacidad;
 
-    private boolean reservaDirecta = true; 
+    private boolean reservaDirecta = true;
+    
+    @Column(length = 100)
+    private String politicaCancelacion;
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(length = 100)
+    private List<String> comodidades = new ArrayList<>();
     
     //Relación con Propietario (Un propietario puede tener asociados muchos inmuebles)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -102,6 +111,21 @@ public class Inmueble {
     public void setReservaDirecta(boolean reservaDirecta) {
         this.reservaDirecta = reservaDirecta;
     }
+    
+    public String getPoliticaCancelacion() {
+        return politicaCancelacion;
+    }
+    public void setPoliticaCancelacion(String politicaCancelacion) {
+        this.politicaCancelacion = politicaCancelacion;
+    }
+    
+    public List<String> getComodidades() {
+        return comodidades;
+    }
+    public void setComodidades(List<String> comodidades) {
+        this.comodidades = comodidades;
+    }
+    
     public String getDescripcion() { 
         return descripcion; 
     }

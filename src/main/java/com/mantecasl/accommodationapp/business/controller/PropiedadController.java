@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +37,8 @@ public class PropiedadController {
     private static final String ATTR_FILTRO_FECHA_INICIO = "filtroFechaInicio";
     private static final String ATTR_FILTRO_FECHA_FIN = "filtroFechaFin";
     private static final String ATTR_MENSAJE = "mensaje";
+    private static final String ATTR_COMODIDADES_DISPONIBLES = "comodidadesDisponibles";
+    private static final String ATTR_POLITICAS_CANCELACION = "politicasCancelacion";
     private static final String REDIRECT_HOME = "redirect:/propiedades";
 
     private final InmuebleDAO inmuebleDAO;
@@ -59,10 +62,20 @@ public class PropiedadController {
             @RequestParam(required = false) String fechaInicio,
             @RequestParam(required = false) String fechaFin,
             @RequestParam(required = false) Integer capacidad,
+            @RequestParam(required = false) boolean reservaInmediata,
+            @RequestParam(required = false) List<String> comodidades,
+            @RequestParam(required = false) String politicaCancelacion,
+            @RequestParam(required = false) Double precioMinimo,
+            @RequestParam(required = false) Double precioMaximo,
+            @RequestParam(required = false) boolean reservaDirecta,
+            @RequestParam(required = false) boolean reservaConfirmacion,
             Model model) {
         
         try {
-            List<Inmueble> propiedadesFiltradas = obtenerPropiedadesFiltradas(ciudad, fechaInicio, fechaFin, capacidad);
+            List<Inmueble> propiedadesFiltradas = obtenerPropiedadesFiltradas(
+                    ciudad, fechaInicio, fechaFin, capacidad, 
+                    reservaInmediata, comodidades, politicaCancelacion, 
+                    precioMinimo, precioMaximo, reservaDirecta, reservaConfirmacion);
 
             // Pasar los filtros aplicados para mostrarlos en la vista
             model.addAttribute(ATTR_PROPIEDADES, propiedadesFiltradas);
@@ -70,6 +83,10 @@ public class PropiedadController {
             model.addAttribute(ATTR_FILTRO_CAPACIDAD, capacidad);
             model.addAttribute(ATTR_FILTRO_FECHA_INICIO, fechaInicio);
             model.addAttribute(ATTR_FILTRO_FECHA_FIN, fechaFin);
+            
+            // Pasar opciones disponibles para los filtros avanzados
+            model.addAttribute(ATTR_COMODIDADES_DISPONIBLES, obtenerComodidadesDisponibles());
+            model.addAttribute(ATTR_POLITICAS_CANCELACION, obtenerPoliticasCancelacion());
 
             if (propiedadesFiltradas.isEmpty()) {
                 model.addAttribute(ATTR_MENSAJE, "No se encontraron propiedades disponibles con los criterios especificados");
@@ -83,7 +100,10 @@ public class PropiedadController {
     }
 
     private List<Inmueble> obtenerPropiedadesFiltradas(String ciudad, String fechaInicio, String fechaFin, 
-                                                       Integer capacidad) {
+                                                       Integer capacidad, boolean reservaInmediata,
+                                                       List<String> comodidades, String politicaCancelacion,
+                                                       Double precioMinimo, Double precioMaximo,
+                                                       boolean reservaDirecta, boolean reservaConfirmacion) {
         // Obtenemos todos los inmuebles de la base de datos
         List<Inmueble> todasLasPropiedades = inmuebleDAO.findAll();
         
@@ -112,6 +132,12 @@ public class PropiedadController {
                 .filter(inmueble -> inmueble.getCapacidad() >= capacidad)
                 .toList();
         }
+        
+        // Aplicar filtros avanzados
+        propiedadesFiltradas = aplicarFiltrosAvanzados(propiedadesFiltradas, reservaInmediata, 
+                                                       comodidades, politicaCancelacion, 
+                                                       precioMinimo, precioMaximo,
+                                                       reservaDirecta, reservaConfirmacion);
 
         return propiedadesFiltradas;
     }
@@ -178,5 +204,127 @@ public class PropiedadController {
             redirectAttributes.addFlashAttribute(ATTR_ERROR, "Error al eliminar propiedad: " + e.getMessage());
             return VIEW_ERROR_ELIMINAR;
         }
+    }
+    
+    /**
+     * Aplica los filtros avanzados a una lista de inmuebles
+     */
+    private List<Inmueble> aplicarFiltrosAvanzados(List<Inmueble> propiedades, 
+                                                   boolean reservaInmediata,
+                                                   List<String> comodidades, 
+                                                   String politicaCancelacion,
+                                                   Double precioMinimo, 
+                                                   Double precioMaximo,
+                                                   boolean reservaDirecta,
+                                                   boolean reservaConfirmacion) {
+        List<Inmueble> resultado = new ArrayList<>(propiedades);
+        
+        // Filtro 1: Reserva inmediata
+        if (reservaInmediata) {
+            resultado = resultado.stream()
+                .filter(Inmueble::isReservaDirecta)
+                .toList();
+        }
+        
+        // Filtro 2: Precio mínimo
+        if (precioMinimo != null && precioMinimo > 0) {
+            resultado = resultado.stream()
+                .filter(inmueble -> inmueble.getPrecioNoche() >= precioMinimo)
+                .toList();
+        }
+        
+        // Filtro 3: Precio máximo
+        if (precioMaximo != null && precioMaximo > 0) {
+            resultado = resultado.stream()
+                .filter(inmueble -> inmueble.getPrecioNoche() <= precioMaximo)
+                .toList();
+        }
+        
+        // Filtro 4: Comodidades
+        if (comodidades != null && !comodidades.isEmpty()) {
+            resultado = resultado.stream()
+                .filter(inmueble -> {
+                    List<String> comodidadesInmueble = inmueble.getComodidades();
+                    if (comodidadesInmueble == null || comodidadesInmueble.isEmpty()) {
+                        return false;
+                    }
+                    // Verificar que contiene al menos una de las buscadas
+                    return comodidades.stream()
+                        .anyMatch(c -> comodidadesInmueble.stream()
+                            .anyMatch(cl -> cl.trim().equalsIgnoreCase(c.trim())));
+                })
+                .collect(Collectors.toList());
+        }
+        
+        // Filtro 5: Política de cancelación
+        if (politicaCancelacion != null && !politicaCancelacion.isEmpty()) {
+            resultado = resultado.stream()
+                .filter(inmueble -> {
+                    String policyInmueble = inmueble.getPoliticaCancelacion();
+                    if (policyInmueble == null || policyInmueble.isEmpty()) {
+                        return false;
+                    }
+                    // Comparar exactamente el valor guardado
+                    return policyInmueble.equalsIgnoreCase(politicaCancelacion);
+                })
+                .toList();
+        }
+        
+        // Filtro 6: Tipo de Reserva
+        if (reservaDirecta || reservaConfirmacion) {
+            resultado = resultado.stream()
+                .filter(inmueble -> {
+                    boolean esReservaDirecta = inmueble.isReservaDirecta();
+                    // Si ambas están seleccionadas, mostrar todas
+                    if (reservaDirecta && reservaConfirmacion) {
+                        return true;
+                    }
+                    // Si solo reserva directa está seleccionada
+                    if (reservaDirecta) {
+                        return esReservaDirecta;
+                    }
+                    // Si solo requiere confirmación está seleccionada
+                    if (reservaConfirmacion) {
+                        return !esReservaDirecta;
+                    }
+                    return false;
+                })
+                .toList();
+        }
+        
+        return resultado;
+    }
+    
+    /**
+     * Obtiene las comodidades disponibles para los filtros avanzados
+     */
+    private List<String> obtenerComodidadesDisponibles() {
+        return List.of(
+            "WiFi",
+            "Aire acondicionado",
+            "Calefacción",
+            "Piscina",
+            "Jardín",
+            "Parking",
+            "Cocina equipada",
+            "Lavadora",
+            "Televisión",
+            "Mascotas permitidas",
+            "Acceso para personas con movilidad reducida",
+            "Gimnasio"
+        );
+    }
+    
+    /**
+     * Obtiene las políticas de cancelación disponibles
+     */
+    private List<String> obtenerPoliticasCancelacion() {
+        return List.of(
+            "Flexible - Cancelación gratuita hasta 7 días antes del check-in",
+            "Moderada - Cancelación gratuita hasta 30 días antes del check-in",
+            "Estricta - Cancelación gratuita hasta 60 días antes del check-in",
+            "No reembolsable - Sin devoluciones",
+            "Flexible moderada - Cancelación gratuita hasta 48 horas antes del check-in"
+        );
     }
 }

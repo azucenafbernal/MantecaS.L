@@ -1,7 +1,6 @@
 package com.mantecasl.accommodationapp.business.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -68,8 +67,10 @@ public class GestorInmuebles {
         @RequestParam boolean reservaDirecta,
         @RequestParam Integer capacidad,
         @RequestParam String emailPropietario,
-        @RequestParam String telefonoContacto, 
+        @RequestParam String telefonoContacto,
         @RequestParam String cuentaBancaria,
+        @RequestParam String politicaCancelacion,
+        @RequestParam(required = false, defaultValue = "") String[] comodidades,
         Model model) {    
 
         try {
@@ -103,6 +104,13 @@ public class GestorInmuebles {
             inmueble.setDescripcion(descripcion);
             inmueble.setCapacidad(capacidad);
             inmueble.setReservaDirecta(reservaDirecta);
+            inmueble.setPoliticaCancelacion(politicaCancelacion);
+            
+            // Agregar comodidades seleccionadas
+            if (comodidades != null && comodidades.length > 0) {
+                inmueble.setComodidades(java.util.Arrays.asList(comodidades));
+            }
+            
             inmueble.setPropietario(propietario);
 
             Inmueble nuevoInmueble = inmuebleDAO.save(inmueble);
