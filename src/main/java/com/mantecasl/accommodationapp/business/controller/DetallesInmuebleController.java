@@ -12,8 +12,11 @@ import com.mantecasl.accommodationapp.business.entity.Inmueble;
 @Controller
 public class DetallesInmuebleController {
 
-    @Autowired
     private InmuebleDAO inmuebleDAO;
+
+    public DetallesInmuebleController(@Autowired InmuebleDAO inmuebleDAO) {
+        this.inmuebleDAO = inmuebleDAO;
+    }
 
     @GetMapping("/gestor/propiedad/{id}")
     public String verDetalles(@PathVariable Long id, Model model) {

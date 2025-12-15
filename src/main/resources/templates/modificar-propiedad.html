@@ -53,11 +53,10 @@
                     <!-- Información básica -->
                     <div class="property-info">
                         <div class="info-item">
-                            <span class="info-label">
-                                <i data-lucide="map-pin" class="w-4 h-4"></i>
-                                Dirección:
+                            <span class="info-label">📍 Dirección:</span>
+                            <span class="info-value" th:text="|${inmueble.calle} ${inmueble.numero}, ${inmueble.ciudad}|">
+                                Calle Ejemplo 123, Ciudad
                             </span>
-                            <span class="info-value" th:text="${inmueble.direccion}"></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">

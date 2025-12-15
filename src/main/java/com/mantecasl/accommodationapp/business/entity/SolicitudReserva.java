@@ -96,18 +96,12 @@ public class SolicitudReserva {
 
     public String getObservacionesInquilino() { return observacionesInquilino; }
     public void setObservacionesInquilino(String observacionesInquilino) { this.observacionesInquilino = observacionesInquilino; }
-    
-    public String getObservaciones() { return observacionesInquilino; }
-    public void setObservaciones(String observaciones) { this.observacionesInquilino = observaciones; }
 
     public String getMensajePropietario() { return mensajePropietario; }
     public void setMensajePropietario(String mensajePropietario) { this.mensajePropietario = mensajePropietario; }
 
     public String getMotivoRechazo() { return motivoRechazo; }
     public void setMotivoRechazo(String motivoRechazo) { this.motivoRechazo = motivoRechazo; }
-    
-    public String getMotivoCancelacion() { return motivoRechazo; }
-    public void setMotivoCancelacion(String motivoCancelacion) { this.motivoRechazo = motivoCancelacion; }
 
     public LocalDateTime getFechaDecision() { return fechaDecision; }
     public void setFechaDecision(LocalDateTime fechaDecision) { this.fechaDecision = fechaDecision; }

@@ -3,7 +3,6 @@ package com.mantecasl.accommodationapp.business.controller;
 import com.mantecasl.accommodationapp.business.entity.Usuario;
 import com.mantecasl.accommodationapp.business.persistance.UsuarioDAO;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class GestorUsuarios {
 
-    @Autowired
     private UsuarioDAO usuarioDAO;
+
+    public GestorUsuarios(UsuarioDAO usuarioDAO) {
+        this.usuarioDAO = usuarioDAO;
+    }
 
     @GetMapping("/usuarios")
     public String mostrarFormulario(Model model) {

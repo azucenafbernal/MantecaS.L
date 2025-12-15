@@ -1,103 +1,107 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.Inmueble;
-import com.mantecasl.accommodationapp.business.entity.Inquilino;
-import com.mantecasl.accommodationapp.business.entity.Reserva;
-import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
-import com.mantecasl.accommodationapp.business.entity.Usuario;
-import com.mantecasl.accommodationapp.business.persistance.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.transaction.annotation.Transactional; 
-import jakarta.servlet.http.HttpSession;
 
-import java.util.List;
+import com.mantecasl.accommodationapp.business.config.PropertiesDAOConfig;
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.entity.Inquilino;
+import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class MisPropiedadesController {
-
-    @Autowired
-    private InmuebleDAO inmuebleDAO;
-
-    @Autowired
-    private ReservaDAO reservaDAO;
-
-    @Autowired
-    private FavoritoDAO favoritoDAO;
-
-    @Autowired
+    
+    private static final Logger logger = LoggerFactory.getLogger(MisPropiedadesController.class);
+    
+    // Constantes para atributos del modelo
+    private static final String ATTR_USUARIO = "usuario";
+    private static final String ATTR_PROPIEDADES = "propiedades";
+    
+    // Constantes para vistas
+    private static final String VIEW_MODIFICAR_PROPIEDAD = "modificar-propiedad";
+    
+    // Constantes para redirects
+    private static final String REDIRECT_LOGIN = "redirect:/login";
+    private static final String REDIRECT_MIS_PROPIEDADES = "redirect:/mis-propiedades";
+    
+    private PropertiesDAOConfig daoConfig;
     private GestorNotificaciones gestorNotificaciones;
+    private ObjectProvider<MisPropiedadesController> selfProvider;
 
-    @Autowired
-    private InquilinoDAO inquilinoDAO;
-
-    @Autowired
-    private DisponibilidadDAO disponibilidadDAO;
-
-    @Autowired
-    private SolicitudReservaDAO solicitudReservaDAO;
-
-    @Autowired
-    private NotificacionDAO notificacionDAO;
+    public MisPropiedadesController(PropertiesDAOConfig daoConfig,
+                                    GestorNotificaciones gestorNotificaciones,
+                                    ObjectProvider<MisPropiedadesController> selfProvider) {
+        this.daoConfig = daoConfig;
+        this.gestorNotificaciones = gestorNotificaciones;
+        this.selfProvider = selfProvider;
+    }
 
     @GetMapping("/mis-propiedades")
     public String mostrarMisPropiedades(HttpSession session, Model model) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
         
         if (usuario == null) {
-            return "redirect:/login";
+            return REDIRECT_LOGIN;
         }
 
-        List<Inmueble> misPropiedades = inmuebleDAO.findByPropietarioUsuarioId(usuario.getId());
+        List<Inmueble> misPropiedades = daoConfig.getInmuebleDAO().findByPropietarioUsuarioId(usuario.getId());
         
-        model.addAttribute("propiedades", misPropiedades);
-        model.addAttribute("usuario", usuario);
+        model.addAttribute(ATTR_PROPIEDADES, misPropiedades);
+        model.addAttribute(ATTR_USUARIO, usuario);
         
-        return "modificar-propiedad";
+        return VIEW_MODIFICAR_PROPIEDAD;
     }
 
     @GetMapping("/eliminar-propiedad/{id}")
     public String eliminarPropiedad(@PathVariable Long id, HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
         
         if (usuario == null) {
-            return "redirect:/login";
+            return REDIRECT_LOGIN;
         }
 
         try {
-            eliminarPropiedadTransactional(id, usuario);
+            selfProvider.getObject().eliminarPropiedadTransactional(id, usuario);
         } catch (Exception e) {
-            System.err.println("Error en eliminarPropiedad: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error en eliminarPropiedad: {}", e.getMessage(), e);
             try {
-                Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
+                Inmueble inmueble = daoConfig.getInmuebleDAO().findById(id).orElse(null);
                 if (inmueble != null) {
                     inmueble.setPropietario(null);
-                    inmuebleDAO.save(inmueble);
+                    daoConfig.getInmuebleDAO().save(inmueble);
                 }
             } catch (Exception e2) {
-                System.err.println("Error en fallback: " + e2.getMessage());
+                logger.error("Error en fallback: {}", e2.getMessage(), e2);
             }
         }
 
-        return "redirect:/mis-propiedades";
+        return REDIRECT_MIS_PROPIEDADES;
     }
 
     @Transactional
     public void eliminarPropiedadTransactional(Long id, Usuario usuario) {
-        Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
+        Inmueble inmueble = daoConfig.getInmuebleDAO().findById(id).orElse(null);
         if (inmueble != null && inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
             
             // Guardar información del inmueble antes de eliminarlo
             String direccionInmueble = inmueble.getDireccion();
             
             // 1. Notificar reservas
-            List<Reserva> reservas = reservaDAO.findByInmuebleId(id);
+            List<Reserva> reservas = daoConfig.getReservaDAO().findByInmuebleId(id);
             for (Reserva reserva : reservas) {
                 String motivo = "Propiedad eliminada por el propietario";
                 gestorNotificaciones.crearNotificacionReservaCanceladaPorPropietario(
@@ -106,27 +110,25 @@ public class MisPropiedadesController {
             }
             
             // 2. Notificar solicitudes pendientes
-            List<SolicitudReserva> solicitudes = solicitudReservaDAO.findByInmuebleId(id);
+            List<SolicitudReserva> solicitudes = daoConfig.getSolicitudReservaDAO().findByInmuebleId(id);
             for (SolicitudReserva solicitud : solicitudes) {
                 gestorNotificaciones.crearNotificacionSolicitudRechazadaPorEliminacion(
                     solicitud, direccionInmueble
                 );
             }
+            daoConfig.getNotificacionDAO().deleteByInmuebleId(id);
+            daoConfig.getSolicitudReservaDAO().deleteByInmuebleId(id);
+            daoConfig.getDisponibilidadDAO().deleteByInmuebleId(id);
+            daoConfig.getFavoritoDAO().deleteByInmuebleId(id);
             
-            // 3. Ahora eliminar todo (en el orden correcto)
-            notificacionDAO.deleteByInmuebleId(id);
-            solicitudReservaDAO.deleteByInmuebleId(id);
-            disponibilidadDAO.deleteByInmuebleId(id);
-            favoritoDAO.deleteByInmuebleId(id);
-            
-            List<Inquilino> inquilinos = inquilinoDAO.findByInmuebleId(id);
+            List<Inquilino> inquilinos = daoConfig.getInquilinoDAO().findByInmuebleId(id);
             for (Inquilino inquilino : inquilinos) {
                 inquilino.setInmueble(null);
-                inquilinoDAO.save(inquilino);
+                daoConfig.getInquilinoDAO().save(inquilino);
             }
             
-            reservaDAO.deleteByInmuebleId(id);
-            inmuebleDAO.delete(inmueble);
+            daoConfig.getReservaDAO().deleteByInmuebleId(id);
+            daoConfig.getInmuebleDAO().delete(inmueble);
         }
     }
 
@@ -141,13 +143,13 @@ public class MisPropiedadesController {
                                         @RequestParam String descripcion,
                                         HttpSession session) {
         
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
         
         if (usuario == null) {
-            return "redirect:/login";
+            return REDIRECT_LOGIN;
         }
 
-        Inmueble inmueble = inmuebleDAO.findById(id).orElse(null);
+        Inmueble inmueble = daoConfig.getInmuebleDAO().findById(id).orElse(null);
         if (inmueble != null && inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
             inmueble.setCalle(calle);
             inmueble.setNumero(numero);
@@ -157,9 +159,9 @@ public class MisPropiedadesController {
             inmueble.setCapacidad(capacidad);
             inmueble.setDescripcion(descripcion);
             
-            inmuebleDAO.save(inmueble);
+            daoConfig.getInmuebleDAO().save(inmueble);
         }
 
-        return "redirect:/mis-propiedades";
+        return REDIRECT_MIS_PROPIEDADES;
     }
 }

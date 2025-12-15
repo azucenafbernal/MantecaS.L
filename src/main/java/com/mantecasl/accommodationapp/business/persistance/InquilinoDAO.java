@@ -1,13 +1,13 @@
 package com.mantecasl.accommodationapp.business.persistance;
 
-import com.mantecasl.accommodationapp.business.entity.Inquilino;
-import com.mantecasl.accommodationapp.business.entity.Usuario;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.mantecasl.accommodationapp.business.entity.Inquilino;
+import com.mantecasl.accommodationapp.business.entity.Usuario;
 
 @Repository
 public interface InquilinoDAO extends JpaRepository<Inquilino, Long> {

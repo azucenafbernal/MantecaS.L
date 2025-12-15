@@ -1,29 +1,34 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.Usuario;
-import com.mantecasl.accommodationapp.business.persistance.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.PropietarioDAO;
+import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
+
 import jakarta.servlet.http.HttpSession;
-import java.util.stream.Collectors;
 
 @Controller
 public class IndexController {
 
-    @Autowired
     private SolicitudReservaDAO solicitudReservaDAO;
-    
-    @Autowired
     private PropietarioDAO propietarioDAO;
-    
-    @Autowired
     private InmuebleDAO inmuebleDAO;
-    
-    @Autowired
     private GestorNotificaciones gestorNotificaciones; // CAMBIAR
+
+    public IndexController(SolicitudReservaDAO solicitudReservaDAO,
+                           PropietarioDAO propietarioDAO,
+                           InmuebleDAO inmuebleDAO,
+                           GestorNotificaciones gestorNotificaciones) {
+        this.solicitudReservaDAO = solicitudReservaDAO;
+        this.propietarioDAO = propietarioDAO;
+        this.inmuebleDAO = inmuebleDAO;
+        this.gestorNotificaciones = gestorNotificaciones;
+    }
 
     @GetMapping({ "/", "/index" })
     public String mostrarIndex(Model model, HttpSession session) {
@@ -36,11 +41,11 @@ public class IndexController {
             var propietario = propietarioDAO.findByUsuarioId(usuario.getId());
             if (propietario != null) {
                 var inmuebleIds = inmuebleDAO.findAll().stream()
-                    .filter(inmueble -> 
-                        inmueble.getPropietario() != null && 
+                    .filter(inmueble ->
+                        inmueble.getPropietario() != null &&
                         inmueble.getPropietario().getId().equals(propietario.getId()))
-                    .map(inmueble -> inmueble.getId())
-                    .collect(Collectors.toList());
+                    .map(Inmueble::getId)
+                    .toList();
                 
                 long numeroPendientes = solicitudReservaDAO.findAll().stream()
                     .filter(solicitud -> 

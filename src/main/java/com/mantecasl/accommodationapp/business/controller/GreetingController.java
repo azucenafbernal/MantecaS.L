@@ -10,15 +10,20 @@ import com.mantecasl.accommodationapp.business.entity.Greeting;
 
 @Controller
 public class GreetingController {
+
+    private static final String ATTR_GREETING = "greeting";
+    private static final String VIEW_GREETING = "greeting";
+    private static final String VIEW_RESULT = "result";
+
     @GetMapping("/greeting")
     public String greetingForm(Model model) {
-        model.addAttribute("greeting", new Greeting());
-        return "greeting";
+        model.addAttribute(ATTR_GREETING, new Greeting());
+        return VIEW_GREETING;
     }
 
     @PostMapping("/greeting")
     public String greetingSubmit(@ModelAttribute Greeting greeting, Model model) {
-        model.addAttribute("greeting", greeting);
-        return "result";
+        model.addAttribute(ATTR_GREETING, greeting);
+        return VIEW_RESULT;
     }
 }
