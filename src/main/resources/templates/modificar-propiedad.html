@@ -32,7 +32,9 @@
                     <div class="property-info">
                         <div class="info-item">
                             <span class="info-label">📍 Dirección:</span>
-                            <span class="info-value" th:text="${inmueble.direccion}">Calle Ejemplo 123</span>
+                            <span class="info-value" th:text="|${inmueble.calle} ${inmueble.numero}, ${inmueble.ciudad}|">
+                                Calle Ejemplo 123, Ciudad
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">💰 Precio/noche:</span>
