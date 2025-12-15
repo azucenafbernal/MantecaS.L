@@ -13,37 +13,36 @@ import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
 @Service
 @Transactional
 public class GestorReservas {
-
     private SolicitudReservaDAO solicitudReservaDAO;
     private ReservaDAO reservaDAO;
 
-    public GestorReservas(SolicitudReservaDAO solicitudReservaDAO, ReservaDAO reservaDAO) {
+    public GestorReservas(SolicitudReservaDAO solicitudReservaDAO,
+                          ReservaDAO reservaDAO) {
         this.solicitudReservaDAO = solicitudReservaDAO;
         this.reservaDAO = reservaDAO;
     }
 
-    //PENDIENTES
-    public List<SolicitudReserva> obtenerSolicitudesPendientesPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "PENDIENTE");
+    //Pendientes
+    public List<SolicitudReserva> obtenerSolicitudesPendientesPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "PENDIENTE");
     }
 
-    //APROBADAS
-    public List<SolicitudReserva> obtenerSolicitudesAprobadasPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "APROBADA");
+    //Aprobadas
+    public List<SolicitudReserva> obtenerSolicitudesAprobadasPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "APROBADA");
     }
 
-    //RECHAZADAS
-    public List<SolicitudReserva> obtenerSolicitudesRechazadasPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "RECHAZADA");
+    //Rechazadas
+    public List<SolicitudReserva> obtenerSolicitudesRechazadasPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "RECHAZADA");
     }
 
-    //HISTORIAL
-    public List<Reserva> obtenerHistorialReservasPropietario(Long propietarioId) {
-        return reservaDAO.findAll()
-            .stream()
-            .filter(r -> r.getInmueble().getPropietario().getId().equals(propietarioId))
-            .sorted((a, b) -> b.getId().compareTo(a.getId()))
-            .limit(10)
-            .toList();
+    //Historial reciente
+    public List<Reserva> obtenerHistorialReservasPropietario(Long usuarioId) {
+        return reservaDAO
+                .findTop10ByInmueblePropietarioUsuarioIdOrderByIdDesc(usuarioId);
     }
 }

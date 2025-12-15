@@ -3,9 +3,7 @@ package com.mantecasl.accommodationapp.business.controller;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,44 +17,21 @@ import com.mantecasl.accommodationapp.business.persistance.NotificacionDAO;
 @Service
 public class GestorNotificaciones {
     
-    private final NotificacionDAO notificacionDAO;
-    private GestorNotificaciones self;
+    // Constantes para URLs
+    private static final String URL_RESERVAS = "/reservas/";
+    private static final String URL_RESERVAS_CANCELADAS = "/reservas/canceladas";
+    private static final String URL_PROPIETARIO_RESERVAS = "/propietario/reservas/";
+    private static final String URL_PROPIETARIO_SOLICITUDES = "/propietario/solicitudes/";
+    
+    // Constantes para formatos de mensaje
+    private static final String MSG_MENSAJE_PROPIETARIO = "Mensaje sobre tu reserva en %s:%n\n%s";
+    
+    private NotificacionDAO notificacionDAO;
+    private ObjectProvider<GestorNotificaciones> selfProvider;
 
-    @Value("${notificaciones.reservas-path:/reservas/}")
-    private String reservasActionPath;
-    
-    @Value("${notificaciones.canceladas-path:/reservas/canceladas/}")
-    private String canceladasActionPath;
-    
-    @Value("${notificaciones.propietario-solicitudes-path:/propietario/solicitudes/}")
-    private String propietarioSolicitudesPath;
-    
-    @Value("${notificaciones.propietario-reservas-path:/propietario/reservas/}")
-    private String propietarioReservasPath;
-
-    public GestorNotificaciones(NotificacionDAO notificacionDAO) {
+    public GestorNotificaciones(NotificacionDAO notificacionDAO, ObjectProvider<GestorNotificaciones> selfProvider) {
         this.notificacionDAO = notificacionDAO;
-    }
-
-    @Autowired
-    public void setSelf(@Lazy GestorNotificaciones self) {
-        this.self = self;
-    }
-
-    public void setReservasActionPath(String path) {
-        this.reservasActionPath = path;
-    }
-
-    public void setCanceladasActionPath(String path) {
-        this.canceladasActionPath = path;
-    }
-
-    public void setPropietarioSolicitudesPath(String path) {
-        this.propietarioSolicitudesPath = path;
-    }
-
-    public void setPropietarioReservasPath(String path) {
-        this.propietarioReservasPath = path;
+        this.selfProvider = selfProvider;
     }
 
     @Transactional
@@ -76,7 +51,7 @@ public class GestorNotificaciones {
         notificacion.setTipo(Notificacion.SOLICITUD_NUEVA);
         notificacion.setInmueble(solicitud.getInmueble());
         notificacion.setSolicitud(solicitud);
-        notificacion.setAccionUrl(propietarioSolicitudesPath + solicitud.getId());
+        notificacion.setAccionUrl(URL_PROPIETARIO_SOLICITUDES + solicitud.getId());
         
         return notificacionDAO.save(notificacion);
     }
@@ -99,7 +74,7 @@ public class GestorNotificaciones {
         notificacion.setInmueble(solicitud.getInmueble());
         notificacion.setSolicitud(solicitud);
         notificacion.setReserva(solicitud.getReserva());
-        notificacion.setAccionUrl(reservasActionPath + solicitud.getReserva().getId());
+        notificacion.setAccionUrl(URL_RESERVAS + solicitud.getReserva().getId());
         
         return notificacionDAO.save(notificacion);
     }
@@ -158,7 +133,7 @@ public class GestorNotificaciones {
             notificacion.setTipo(Notificacion.RESERVA_CANCELADA);
             notificacion.setInmueble(inmueble);
             notificacion.setReserva(reserva);
-            notificacion.setAccionUrl(canceladasActionPath + reserva.getId());
+            notificacion.setAccionUrl(URL_RESERVAS_CANCELADAS);
             
             notificacionDAO.save(notificacion);
         }
@@ -204,7 +179,7 @@ public class GestorNotificaciones {
         notifInquilino.setTipo(Notificacion.RESERVA_CONFIRMADA);
         notifInquilino.setInmueble(reserva.getInmueble());
         notifInquilino.setReserva(reserva);
-        notifInquilino.setAccionUrl(reservasActionPath + reserva.getId());
+        notifInquilino.setAccionUrl(URL_RESERVAS + reserva.getId());
         notificacionDAO.save(notifInquilino);
         
         // Notificación para el propietario
@@ -223,12 +198,12 @@ public class GestorNotificaciones {
         notifPropietario.setTipo(Notificacion.RESERVA_CONFIRMADA); 
         notifPropietario.setInmueble(reserva.getInmueble());
         notifPropietario.setReserva(reserva);
-        notifPropietario.setAccionUrl(propietarioReservasPath + reserva.getId());
+        notifPropietario.setAccionUrl(URL_PROPIETARIO_RESERVAS + reserva.getId());
         notificacionDAO.save(notifPropietario);
     }
     
     @Transactional
-    public Notificacion crearNotificacionReservaCanceladaPorPropietario(Reserva reserva, String motivo) {
+    public Notificacion crearNotificacionReservaCanceladaPorPropietario(Reserva reserva, String motivo, String direccionInmueble) {
         Usuario inquilino = reserva.getInquilino().getUsuario();
         
         Notificacion notificacion = new Notificacion();
@@ -236,19 +211,42 @@ public class GestorNotificaciones {
         notificacion.setTitulo("⚠️ Reserva CANCELADA por el propietario");
         notificacion.setMensaje(String.format(
             "Tu reserva en %s del %s al %s ha sido CANCELADA por el propietario. " +
-            "Motivo: %s. Tu pago ha sido reembolsado.",
-            reserva.getInmueble().getDireccion(),
+            "Motivo: %s. Tu pago será reembolsado en un plazo inferior a 48 horas.",
+            direccionInmueble,
             reserva.getFechaInicio(),
             reserva.getFechaFin(),
             motivo != null ? motivo : "No especificado"
         ));
         notificacion.setTipo(Notificacion.RESERVA_CANCELADA);
-        notificacion.setInmueble(reserva.getInmueble());
-        notificacion.setReserva(reserva);
-        notificacion.setAccionUrl(canceladasActionPath + reserva.getId());
+        notificacion.setAccionUrl(URL_RESERVAS_CANCELADAS);
+        
+        // No establecer relaciones que ya no existirán
+        notificacion.setInmueble(null);
+        notificacion.setReserva(null);
         
         return notificacionDAO.save(notificacion);
     }
+    
+    @Transactional
+    public Notificacion crearNotificacionSolicitudRechazadaPorEliminacion(SolicitudReserva solicitud, String direccionInmueble) {
+        Usuario solicitante = solicitud.getInquilino().getUsuario();
+        
+        Notificacion notificacion = new Notificacion();
+        notificacion.setUsuario(solicitante);
+        notificacion.setTitulo("❌ Solicitud de reserva RECHAZADA");
+        notificacion.setMensaje(String.format(
+            "Tu solicitud de reserva para %s ha sido rechazada porque la propiedad ha sido eliminada por el propietario.",
+            direccionInmueble
+        ));
+        notificacion.setTipo(Notificacion.SOLICITUD_RECHAZADA);
+        notificacion.setAccionUrl("/mis-solicitudes");
+        
+        notificacion.setInmueble(null);
+        notificacion.setReserva(null);
+        
+        return notificacionDAO.save(notificacion);
+    }
+
     
     @Transactional
     public Notificacion crearNotificacionMensajePropietario(Reserva reserva, String mensaje) {
@@ -258,14 +256,14 @@ public class GestorNotificaciones {
         notificacion.setUsuario(inquilino);
         notificacion.setTitulo("💬 Mensaje del propietario");
         notificacion.setMensaje(String.format(
-            "Mensaje sobre tu reserva en %s:%n%n%s",
+            MSG_MENSAJE_PROPIETARIO,
             reserva.getInmueble().getDireccion(),
             mensaje
         ));
         notificacion.setTipo(Notificacion.MENSAJE_PROPIETARIO);
         notificacion.setInmueble(reserva.getInmueble());
         notificacion.setReserva(reserva);
-        notificacion.setAccionUrl(reservasActionPath + reserva.getId());
+        notificacion.setAccionUrl(URL_RESERVAS + reserva.getId());
         
         return notificacionDAO.save(notificacion);
     }
@@ -301,7 +299,7 @@ public class GestorNotificaciones {
     
     @Transactional
     public void marcarTodasComoLeidas(Usuario usuario) {
-        List<Notificacion> noLeidas = obtenerNotificacionesNoLeidas(usuario);
+        List<Notificacion> noLeidas = selfProvider.getObject().obtenerNotificacionesNoLeidas(usuario);
         for (Notificacion notificacion : noLeidas) {
             notificacion.setLeida(true);
         }
@@ -315,7 +313,7 @@ public class GestorNotificaciones {
     
     @Transactional
     public void eliminarTodasLasNotificaciones(Usuario usuario) {
-        List<Notificacion> notificaciones = obtenerNotificacionesUsuario(usuario);
+        List<Notificacion> notificaciones = selfProvider.getObject().obtenerNotificacionesUsuario(usuario);
         notificacionDAO.deleteAll(notificaciones);
     }
     
@@ -333,16 +331,16 @@ public class GestorNotificaciones {
     
     @Transactional
     public Notificacion notificarNuevaSolicitudPropietario(SolicitudReserva solicitud) {
-        return self.crearNotificacionSolicitudNueva(solicitud);
+        return selfProvider.getObject().crearNotificacionSolicitudNueva(solicitud);
     }
     
     @Transactional
     public Notificacion notificarAprobacionInquilino(SolicitudReserva solicitud) {
-        return self.crearNotificacionSolicitudAprobada(solicitud);
+        return selfProvider.getObject().crearNotificacionSolicitudAprobada(solicitud);
     }
     
     @Transactional
     public Notificacion notificarRechazoInquilino(SolicitudReserva solicitud, String motivo) {
-        return self.crearNotificacionSolicitudRechazada(solicitud, motivo);
+        return selfProvider.getObject().crearNotificacionSolicitudRechazada(solicitud, motivo);
     }
 }
