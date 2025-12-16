@@ -30,9 +30,12 @@ public class MisPropiedadesController {
     // Constantes para atributos del modelo
     private static final String ATTR_USUARIO = "usuario";
     private static final String ATTR_PROPIEDADES = "propiedades";
+    private static final String ATTR_INMUEBLE = "inmueble";
+    private static final String ATTR_ERR = "error";
     
     // Constantes para vistas
     private static final String VIEW_MODIFICAR_PROPIEDAD = "modificar-propiedad";
+    private static final String VIEW_EDITAR_PROPIEDAD = "editar-propiedad";
     
     // Constantes para redirects
     private static final String REDIRECT_LOGIN = "redirect:/login";
@@ -79,8 +82,8 @@ public class MisPropiedadesController {
             return REDIRECT_MIS_PROPIEDADES;
         }
 
-        model.addAttribute("inmueble", inmueble);
-        return "editar-propiedad";
+        model.addAttribute(ATTR_INMUEBLE, inmueble);
+        return VIEW_EDITAR_PROPIEDAD;
     }
 
     @GetMapping("/eliminar-propiedad/{id}")
@@ -176,16 +179,16 @@ public class MisPropiedadesController {
             
             if (inmueble == null) {
                 logger.error("Propiedad no encontrada: {}", id);
-                model.addAttribute("error", "Propiedad no encontrada");
-                model.addAttribute("inmueble", new Inmueble());
-                return "editar-propiedad";
+                model.addAttribute(ATTR_ERR, "Propiedad no encontrada");
+                model.addAttribute(ATTR_INMUEBLE, new Inmueble());
+                return VIEW_EDITAR_PROPIEDAD;
             }
             
             if (!inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
                 logger.warn("Usuario {} intenta actualizar propiedad que no le pertenece", usuario.getId());
-                model.addAttribute("error", "No tienes permiso para actualizar esta propiedad");
-                model.addAttribute("inmueble", inmueble);
-                return "editar-propiedad";
+                model.addAttribute(ATTR_ERR, "No tienes permiso para actualizar esta propiedad");
+                model.addAttribute(ATTR_INMUEBLE, inmueble);
+                return VIEW_EDITAR_PROPIEDAD;
             }
             
             inmueble.setCalle(calle);
@@ -218,10 +221,10 @@ public class MisPropiedadesController {
             
         } catch (Exception e) {
             logger.error("Error actualizando propiedad {}: {}", id, e.getMessage(), e);
-            model.addAttribute("error", "Error al actualizar la propiedad: " + e.getMessage());
+            model.addAttribute(ATTR_ERR, "Error al actualizar la propiedad: " + e.getMessage());
             Inmueble inmueble = daoConfig.getInmuebleDAO().findById(id).orElse(new Inmueble());
-            model.addAttribute("inmueble", inmueble);
-            return "editar-propiedad";
+            model.addAttribute(ATTR_INMUEBLE, inmueble);
+            return VIEW_EDITAR_PROPIEDAD;
         }
     }
 }
