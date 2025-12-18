@@ -30,9 +30,12 @@ public class MisPropiedadesController {
     // Constantes para atributos del modelo
     private static final String ATTR_USUARIO = "usuario";
     private static final String ATTR_PROPIEDADES = "propiedades";
+    private static final String ATTR_INMUEBLE = "inmueble";
+    private static final String ATTR_ERR = "error";
     
     // Constantes para vistas
     private static final String VIEW_MODIFICAR_PROPIEDAD = "modificar-propiedad";
+    private static final String VIEW_EDITAR_PROPIEDAD = "editar-propiedad";
     
     // Constantes para redirects
     private static final String REDIRECT_LOGIN = "redirect:/login";
@@ -64,6 +67,23 @@ public class MisPropiedadesController {
         model.addAttribute(ATTR_USUARIO, usuario);
         
         return VIEW_MODIFICAR_PROPIEDAD;
+    }
+
+    @GetMapping("/editar-propiedad/{id}")
+    public String editarPropiedad(@PathVariable Long id, HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
+        
+        if (usuario == null) {
+            return REDIRECT_LOGIN;
+        }
+
+        Inmueble inmueble = daoConfig.getInmuebleDAO().findById(id).orElse(null);
+        if (inmueble == null || !inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
+            return REDIRECT_MIS_PROPIEDADES;
+        }
+
+        model.addAttribute(ATTR_INMUEBLE, inmueble);
+        return VIEW_EDITAR_PROPIEDAD;
     }
 
     @GetMapping("/eliminar-propiedad/{id}")
@@ -133,6 +153,7 @@ public class MisPropiedadesController {
     }
 
     @PostMapping("/actualizar-propiedad")
+    @Transactional
     public String actualizarPropiedad(@RequestParam Long id,
                                         @RequestParam String calle,
                                         @RequestParam String numero,
@@ -140,17 +161,36 @@ public class MisPropiedadesController {
                                         @RequestParam String codigoPostal,
                                         @RequestParam double precioNoche,
                                         @RequestParam Integer capacidad,
-                                        @RequestParam String descripcion,
-                                        HttpSession session) {
+                                        @RequestParam(required = false, defaultValue = "") String descripcion,
+                                        @RequestParam String politicaCancelacion,
+                                        @RequestParam(required = false) String[] comodidades,
+                                        HttpSession session,
+                                        Model model) {
         
         Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
         
         if (usuario == null) {
+            logger.warn("Intento de actualizar propiedad sin usuario autenticado");
             return REDIRECT_LOGIN;
         }
 
-        Inmueble inmueble = daoConfig.getInmuebleDAO().findById(id).orElse(null);
-        if (inmueble != null && inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
+        try {
+            Inmueble inmueble = daoConfig.getInmuebleDAO().findById(id).orElse(null);
+            
+            if (inmueble == null) {
+                logger.error("Propiedad no encontrada: {}", id);
+                model.addAttribute(ATTR_ERR, "Propiedad no encontrada");
+                model.addAttribute(ATTR_INMUEBLE, new Inmueble());
+                return VIEW_EDITAR_PROPIEDAD;
+            }
+            
+            if (!inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
+                logger.warn("Usuario {} intenta actualizar propiedad que no le pertenece", usuario.getId());
+                model.addAttribute(ATTR_ERR, "No tienes permiso para actualizar esta propiedad");
+                model.addAttribute(ATTR_INMUEBLE, inmueble);
+                return VIEW_EDITAR_PROPIEDAD;
+            }
+            
             inmueble.setCalle(calle);
             inmueble.setNumero(numero);
             inmueble.setCiudad(ciudad);
@@ -158,10 +198,33 @@ public class MisPropiedadesController {
             inmueble.setPrecioNoche(precioNoche);
             inmueble.setCapacidad(capacidad);
             inmueble.setDescripcion(descripcion);
+            inmueble.setPoliticaCancelacion(politicaCancelacion);
+            
+            // Actualizar comodidades (limpiar valores vacíos y nulos)
+            if (comodidades != null) {
+                java.util.List<String> comodidadesLimpias = new java.util.ArrayList<>();
+                for (String c : comodidades) {
+                    if (c != null && !c.trim().isEmpty()) {
+                        comodidadesLimpias.add(c.trim());
+                    }
+                }
+                inmueble.setComodidades(comodidadesLimpias);
+            } else {
+                inmueble.setComodidades(new java.util.ArrayList<>());
+            }
             
             daoConfig.getInmuebleDAO().save(inmueble);
+            logger.info("Propiedad {} actualizada exitosamente por usuario {}", id, usuario.getId());
+            
+            // Redirigir con mensaje de éxito
+            return "redirect:/mis-propiedades?success=true";
+            
+        } catch (Exception e) {
+            logger.error("Error actualizando propiedad {}: {}", id, e.getMessage(), e);
+            model.addAttribute(ATTR_ERR, "Error al actualizar la propiedad: " + e.getMessage());
+            Inmueble inmueble = daoConfig.getInmuebleDAO().findById(id).orElse(new Inmueble());
+            model.addAttribute(ATTR_INMUEBLE, inmueble);
+            return VIEW_EDITAR_PROPIEDAD;
         }
-
-        return REDIRECT_MIS_PROPIEDADES;
     }
 }

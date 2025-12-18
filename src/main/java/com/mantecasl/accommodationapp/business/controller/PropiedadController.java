@@ -36,6 +36,8 @@ public class PropiedadController {
     private static final String ATTR_FILTRO_FECHA_INICIO = "filtroFechaInicio";
     private static final String ATTR_FILTRO_FECHA_FIN = "filtroFechaFin";
     private static final String ATTR_MENSAJE = "mensaje";
+    private static final String ATTR_COMODIDADES_DISPONIBLES = "comodidadesDisponibles";
+    private static final String ATTR_POLITICAS_CANCELACION = "politicasCancelacion";
     private static final String REDIRECT_HOME = "redirect:/propiedades";
 
     private final InmuebleDAO inmuebleDAO;
@@ -44,14 +46,24 @@ public class PropiedadController {
     private final GestorNotificaciones notificacion;
 
     public PropiedadController(InmuebleDAO inmuebleDAO,
-                              GestorDisponibilidad gestorDisponibilidad,
-                              ReservaDAO reservaDAO,
-                              GestorNotificaciones notificacion) {
+                               GestorDisponibilidad gestorDisponibilidad,
+                               ReservaDAO reservaDAO,
+                               GestorNotificaciones notificacion) {
         this.inmuebleDAO = inmuebleDAO;
         this.gestorDisponibilidad = gestorDisponibilidad;
         this.reservaDAO = reservaDAO;
         this.notificacion = notificacion;
     }
+
+    private static class FiltrosAvanzados {
+        List<String> comodidades;
+        String politicaCancelacion;
+        Double precioMinimo;
+        Double precioMaximo;
+        Boolean reservaDirecta;
+        Boolean reservaConfirmacion;
+    }
+
 
     @GetMapping("/catalogo")
     public String verCatalogo(
@@ -59,124 +71,276 @@ public class PropiedadController {
             @RequestParam(required = false) String fechaInicio,
             @RequestParam(required = false) String fechaFin,
             @RequestParam(required = false) Integer capacidad,
+            @RequestParam(required = false) List<String> comodidades,
+            @RequestParam(required = false) String politicaCancelacion,
+            @RequestParam(required = false) Double precioMinimo,
+            @RequestParam(required = false) Double precioMaximo,
+            @RequestParam(required = false) Boolean reservaDirecta,
+            @RequestParam(required = false) Boolean reservaConfirmacion,
             Model model) {
-        
-        try {
-            List<Inmueble> propiedadesFiltradas = obtenerPropiedadesFiltradas(ciudad, fechaInicio, fechaFin, capacidad);
 
-            // Pasar los filtros aplicados para mostrarlos en la vista
+        try {
+            FiltrosAvanzados filtros = new FiltrosAvanzados();
+            filtros.comodidades = comodidades;
+            filtros.politicaCancelacion = politicaCancelacion;
+            filtros.precioMinimo = precioMinimo;
+            filtros.precioMaximo = precioMaximo;
+            filtros.reservaDirecta = reservaDirecta;
+            filtros.reservaConfirmacion = reservaConfirmacion;
+
+            List<Inmueble> propiedadesFiltradas =
+                    obtenerPropiedadesFiltradas(
+                            ciudad, fechaInicio, fechaFin, capacidad, filtros);
+
             model.addAttribute(ATTR_PROPIEDADES, propiedadesFiltradas);
             model.addAttribute(ATTR_FILTRO_CIUDAD, ciudad);
             model.addAttribute(ATTR_FILTRO_CAPACIDAD, capacidad);
             model.addAttribute(ATTR_FILTRO_FECHA_INICIO, fechaInicio);
             model.addAttribute(ATTR_FILTRO_FECHA_FIN, fechaFin);
 
+            model.addAttribute(ATTR_COMODIDADES_DISPONIBLES, obtenerComodidadesDisponibles());
+            model.addAttribute(ATTR_POLITICAS_CANCELACION, obtenerPoliticasCancelacion());
+
             if (propiedadesFiltradas.isEmpty()) {
-                model.addAttribute(ATTR_MENSAJE, "No se encontraron propiedades disponibles con los criterios especificados");
+                model.addAttribute(ATTR_MENSAJE,
+                        "No se encontraron propiedades disponibles con los criterios especificados");
             }
 
             return VIEW_LISTA_PROPIEDADES;
+
         } catch (IllegalArgumentException e) {
             model.addAttribute(ATTR_ERROR, e.getMessage());
             return VIEW_ERROR_CATALOGO;
         }
     }
 
-    private List<Inmueble> obtenerPropiedadesFiltradas(String ciudad, String fechaInicio, String fechaFin, 
-                                                       Integer capacidad) {
-        // Obtenemos todos los inmuebles de la base de datos
-        List<Inmueble> todasLasPropiedades = inmuebleDAO.findAll();
-        
-        // FILTRAR: Solo propiedades que tengan propietario (evitar propiedades eliminadas)
-        List<Inmueble> propiedadesValidas = todasLasPropiedades.stream()
-                .filter(inmueble -> inmueble.getPropietario() != null)
+
+    private List<Inmueble> obtenerPropiedadesFiltradas(
+        String ciudad,
+        String fechaInicio,
+        String fechaFin,
+        Integer capacidad,
+        FiltrosAvanzados filtrosAvanzados) {
+
+        List<Inmueble> propiedades = inmuebleDAO.findAll().stream()
+                .filter(i -> i.getPropietario() != null)
                 .toList();
-        
-        // Filtrar según los parámetros recibidos
-        List<Inmueble> propiedadesFiltradas = new ArrayList<>(propiedadesValidas);
-        
-        if (fechaInicio != null && !fechaInicio.isEmpty() && 
-            fechaFin != null && !fechaFin.isEmpty()) {
-            propiedadesFiltradas = filtrarPorFechas(propiedadesFiltradas, fechaInicio, fechaFin);
+
+        List<Inmueble> resultado = new ArrayList<>(propiedades);
+
+        if (fechaInicio != null && fechaFin != null
+                && !fechaInicio.isEmpty() && !fechaFin.isEmpty()) {
+            resultado = filtrarPorFechas(resultado, fechaInicio, fechaFin);
         }
 
         if (ciudad != null && !ciudad.isEmpty()) {
-            propiedadesFiltradas = propiedadesFiltradas.stream()
-                .filter(inmueble -> inmueble.getCiudad() != null && 
-                        inmueble.getCiudad().toLowerCase().contains(ciudad.toLowerCase()))
-                .toList();
+            resultado = resultado.stream()
+                    .filter(i -> i.getCiudad() != null
+                            && i.getCiudad().toLowerCase().contains(ciudad.toLowerCase()))
+                    .toList();
         }
 
         if (capacidad != null && capacidad > 0) {
-            propiedadesFiltradas = propiedadesFiltradas.stream()
-                .filter(inmueble -> inmueble.getCapacidad() >= capacidad)
-                .toList();
+            resultado = resultado.stream()
+                    .filter(i -> i.getCapacidad() >= capacidad)
+                    .toList();
         }
 
-        return propiedadesFiltradas;
+        return aplicarFiltrosAvanzados(
+                resultado,
+                filtrosAvanzados.comodidades,
+                filtrosAvanzados.politicaCancelacion,
+                filtrosAvanzados.precioMinimo,
+                filtrosAvanzados.precioMaximo,
+                filtrosAvanzados.reservaDirecta,
+                filtrosAvanzados.reservaConfirmacion);
     }
 
-    private List<Inmueble> filtrarPorFechas(List<Inmueble> propiedades, String fechaInicio, String fechaFin) {
-        try {
-            LocalDate inicio = LocalDate.parse(fechaInicio);
-            LocalDate fin = LocalDate.parse(fechaFin);
-            Date sqlInicio = Date.valueOf(inicio);
-            Date sqlFin = Date.valueOf(fin);
 
-            // Validar fechas
-            if (inicio.isBefore(LocalDate.now())) {
-                throw new IllegalArgumentException("La fecha de inicio no puede ser en el pasado");
-            }
+    private List<Inmueble> filtrarPorFechas(List<Inmueble> propiedades,
+                                           String fechaInicio,
+                                           String fechaFin) {
 
-            if (fin.isBefore(inicio) || fin.isEqual(inicio)) {
-                throw new IllegalArgumentException("La fecha de salida debe ser posterior a la de entrada");
-            }
+        LocalDate inicio = LocalDate.parse(fechaInicio);
+        LocalDate fin = LocalDate.parse(fechaFin);
 
-            // Filtrar solo los que estén disponibles en las fechas solicitadas
-            return propiedades.stream()
-                .filter(inmueble -> gestorDisponibilidad.verificarDisponibilidad(inmueble.getId(), sqlInicio, sqlFin))
-                .toList();
-
-        } catch (java.time.format.DateTimeParseException e) {
-            throw new IllegalArgumentException("Formato de fecha inválido: " + e.getMessage());
+        if (inicio.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("La fecha de inicio no puede ser en el pasado");
         }
+
+        if (!fin.isAfter(inicio)) {
+            throw new IllegalArgumentException(
+                    "La fecha de salida debe ser posterior a la de entrada");
+        }
+
+        Date sqlInicio = Date.valueOf(inicio);
+        Date sqlFin = Date.valueOf(fin);
+
+        return propiedades.stream()
+                .filter(i -> gestorDisponibilidad.verificarDisponibilidad(
+                        i.getId(), sqlInicio, sqlFin))
+                .toList();
     }
+
+    /* =======================
+       FILTROS AVANZADOS
+       ======================= */
+
+    private List<Inmueble> aplicarFiltrosAvanzados(
+            List<Inmueble> propiedades,
+            List<String> comodidades,
+            String politicaCancelacion,
+            Double precioMinimo,
+            Double precioMaximo,
+            Boolean reservaDirecta,
+            Boolean reservaConfirmacion) {
+
+        List<Inmueble> resultado = new ArrayList<>(propiedades);
+
+        resultado = filtrarPorPrecioMinimo(resultado, precioMinimo);
+        resultado = filtrarPorPrecioMaximo(resultado, precioMaximo);
+        resultado = filtrarPorComodidades(resultado, comodidades);
+        resultado = filtrarPorPoliticaCancelacion(resultado, politicaCancelacion);
+        resultado = filtrarPorTipoReserva(resultado, reservaDirecta, reservaConfirmacion);
+
+        return resultado;
+    }
+
+    private List<Inmueble> filtrarPorPrecioMinimo(List<Inmueble> propiedades, Double precioMinimo) {
+        if (precioMinimo == null || precioMinimo <= 0) {
+            return propiedades;
+        }
+        return propiedades.stream()
+                .filter(i -> i.getPrecioNoche() >= precioMinimo)
+                .toList();
+    }
+
+    private List<Inmueble> filtrarPorPrecioMaximo(List<Inmueble> propiedades, Double precioMaximo) {
+        if (precioMaximo == null || precioMaximo <= 0) {
+            return propiedades;
+        }
+        return propiedades.stream()
+                .filter(i -> i.getPrecioNoche() <= precioMaximo)
+                .toList();
+    }
+
+    private List<Inmueble> filtrarPorComodidades(List<Inmueble> propiedades, List<String> comodidades) {
+        if (comodidades == null || comodidades.isEmpty()) {
+            return propiedades;
+        }
+        return propiedades.stream()
+                .filter(i -> contieneAlgunaComodidad(i, comodidades))
+                .toList();
+    }
+
+    private boolean contieneAlgunaComodidad(Inmueble inmueble, List<String> comodidades) {
+        List<String> comodidadesInmueble = inmueble.getComodidades();
+        if (comodidadesInmueble == null || comodidadesInmueble.isEmpty()) {
+            return false;
+        }
+        return comodidades.stream()
+                .anyMatch(c -> comodidadesInmueble.stream()
+                        .anyMatch(ci -> ci.trim().equalsIgnoreCase(c.trim())));
+    }
+
+    private List<Inmueble> filtrarPorPoliticaCancelacion(
+            List<Inmueble> propiedades,
+            String politicaCancelacion) {
+
+        if (politicaCancelacion == null || politicaCancelacion.isEmpty()) {
+            return propiedades;
+        }
+        return propiedades.stream()
+                .filter(i -> politicaCancelacion.equalsIgnoreCase(
+                        i.getPoliticaCancelacion()))
+                .toList();
+    }
+
+   private List<Inmueble> filtrarPorTipoReserva(
+        List<Inmueble> propiedades,
+        Boolean reservaDirecta,
+        Boolean reservaConfirmacion) {
+
+        boolean filtrarDirecta = Boolean.TRUE.equals(reservaDirecta);
+        boolean filtrarConfirmacion = Boolean.TRUE.equals(reservaConfirmacion);
+
+        // Si no hay filtros o están ambos activos, no se filtra
+        if (filtrarDirecta == filtrarConfirmacion) {
+            return propiedades;
+        }
+
+        return propiedades.stream()
+                .filter(i -> i.isReservaDirecta() == filtrarDirecta)
+                .toList();
+    }
+
+    /* =======================
+       ELIMINAR PROPIEDAD
+       ======================= */
 
     @PostMapping("/propiedades/{id}/eliminar")
     @Transactional
-    public String eliminarPropiedad(@PathVariable Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String eliminarPropiedad(
+            @PathVariable Long id,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
         Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
-        
+
         try {
             Inmueble inmueble = inmuebleDAO.findById(id)
                     .orElseThrow(() -> new RuntimeException("Propiedad no encontrada"));
-            
-            // Verificar que el usuario es el propietario
+
             if (!inmueble.getPropietario().getUsuario().getId().equals(usuario.getId())) {
-                redirectAttributes.addFlashAttribute(ATTR_ERROR, "No tienes permiso para eliminar esta propiedad");
+                redirectAttributes.addFlashAttribute(
+                        ATTR_ERROR, "No tienes permiso para eliminar esta propiedad");
                 return VIEW_ERROR_ELIMINAR;
             }
-            
-            // Obtener reservas futuras
-            List<Reserva> reservasFuturas = reservaDAO.findReservasFuturasByInmueble(id);
-            
-            // NOTIFICAR ELIMINACIÓN
+
+            List<Reserva> reservasFuturas =
+                    reservaDAO.findReservasFuturasByInmueble(id);
+
             notificacion.notificarEliminacionPropiedad(inmueble, reservasFuturas);
-            
-            // Reembolsar pagos
+
             for (Reserva reserva : reservasFuturas) {
-                notificacion.crearNotificacionPagoDevuelto(reserva, reserva.getPrecioTotal());
+                notificacion.crearNotificacionPagoDevuelto(
+                        reserva, reserva.getPrecioTotal());
             }
-            
-            // Eliminar el inmueble
+
             inmuebleDAO.delete(inmueble);
-            
-            redirectAttributes.addFlashAttribute(ATTR_MENSAJE, "Propiedad eliminada correctamente. Se han notificado a los inquilinos afectados.");
+
+            redirectAttributes.addFlashAttribute(
+                    ATTR_MENSAJE,
+                    "Propiedad eliminada correctamente. Se han notificado a los inquilinos afectados.");
+
             return REDIRECT_HOME;
-            
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(ATTR_ERROR, "Error al eliminar propiedad: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(
+                    ATTR_ERROR, "Error al eliminar propiedad: " + e.getMessage());
             return VIEW_ERROR_ELIMINAR;
         }
     }
+
+    /* =======================
+       DATOS DE FILTROS
+       ======================= */
+
+    private List<String> obtenerComodidadesDisponibles() {
+        return List.of(
+                "WiFi", "Aire acondicionado", "Calefacción", "Piscina",
+                "Jardín", "Parking", "Cocina equipada", "Lavadora",
+                "Televisión", "Mascotas permitidas",
+                "Acceso para personas con movilidad reducida", "Gimnasio");
+    }
+
+    private List<String> obtenerPoliticasCancelacion() {
+        return List.of(
+                "Flexible - Cancelación gratuita hasta 7 días antes del check-in",
+                "Moderada - Cancelación gratuita hasta 30 días antes del check-in",
+                "Estricta - Cancelación gratuita hasta 60 días antes del check-in",
+                "No reembolsable - Sin devoluciones",
+                "Flexible moderada - Cancelación gratuita hasta 48 horas antes del check-in");
+    }
 }
+
