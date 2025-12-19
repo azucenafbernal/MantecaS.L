@@ -60,7 +60,7 @@ public class ReservasController {
         }
 
         Inmueble inmueble = inmuebleOpt.get();
-        
+
         // Añadir al modelo si el inmueble tiene reserva directa o por confirmación
         model.addAttribute("esReservaDirecta", inmueble.isReservaDirecta());
         model.addAttribute("usuario", usuario);
@@ -102,14 +102,14 @@ public class ReservasController {
             // Obtener el inmueble con su configuración de reserva
             Inmueble inmueble = inmuebleDAO.findById(inmuebleId)
                     .orElseThrow(() -> new RuntimeException("Inmueble no encontrado"));
-            
+
             // OBTENER EL TIPO DE RESERVA DEL INMUEBLE, NO DEL FORMULARIO
             boolean esReservaDirecta = inmueble.isReservaDirecta();
 
             // Buscar o crear inquilino
             Inquilino inquilino = inquilinoDAO.findByUsuario(usuario).orElseGet(() -> {
                 Inquilino nuevo = new Inquilino(usuario, telefono, documentoIdentidad, metodoPago);
-                nuevo.setInmueble(inmueble); 
+                nuevo.setInmueble(inmueble);
                 return inquilinoDAO.save(nuevo);
             });
 
@@ -155,13 +155,14 @@ public class ReservasController {
             } else {
                 // RESERVA POR CONFIRMACIÓN
                 List<SolicitudReserva> solicitudesExistentes = solicitudReservaDAO.findAll().stream()
-                    .filter(s -> s.getInmueble().getId().equals(inmuebleId) &&
+                        .filter(s -> s.getInmueble().getId().equals(inmuebleId) &&
                                 s.getEstado().equals("PENDIENTE") &&
                                 seSolapan(s.getFechaInicio(), s.getFechaFin(), inicio, fin))
-                    .collect(Collectors.toList());
-                
+                        .collect(Collectors.toList());
+
                 if (!solicitudesExistentes.isEmpty()) {
-                    throw new RuntimeException("Ya existe una solicitud pendiente para estas fechas. Espera la respuesta del propietario.");
+                    throw new RuntimeException(
+                            "Ya existe una solicitud pendiente para estas fechas. Espera la respuesta del propietario.");
                 }
 
                 // Verificar disponibilidad para solicitud
@@ -175,7 +176,8 @@ public class ReservasController {
                 solicitudReservaDAO.save(solicitud);
 
                 model.addAttribute("solicitud", solicitud);
-                model.addAttribute("mensaje", "¡Solicitud de reserva enviada! El propietario la revisará pronto. Solo pagarás cuando sea aprobada.");
+                model.addAttribute("mensaje",
+                        "¡Solicitud de reserva enviada! El propietario la revisará pronto. Solo pagarás cuando sea aprobada.");
                 model.addAttribute("esDirecta", false);
             }
 

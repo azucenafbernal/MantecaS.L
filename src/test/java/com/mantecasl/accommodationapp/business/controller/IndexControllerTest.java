@@ -117,4 +117,44 @@ class IndexControllerTest {
                 .andExpect(model().attribute("numeroNotificacionesPendientes", 1L))
                 .andExpect(model().attribute("notificacionesNoLeidas", 2L));
     }
+
+    @Test
+    void mostrarIndex_propietario_con_ramas_falsas() throws Exception {
+        Usuario usuario = new Usuario();
+        usuario.setId(5L);
+
+        Propietario propietario = new Propietario();
+        propietario.setId(50L);
+
+        // Inmueble SIN propietario (rama false)
+        Inmueble inmuebleSinPropietario = new Inmueble();
+        inmuebleSinPropietario.setId(1L);
+
+        // Inmueble de OTRO propietario (equals false)
+        Propietario otroPropietario = new Propietario();
+        otroPropietario.setId(99L);
+
+        Inmueble inmuebleOtroPropietario = new Inmueble();
+        inmuebleOtroPropietario.setId(2L);
+        inmuebleOtroPropietario.setPropietario(otroPropietario);
+
+        // Solicitud NO pendiente (rama false)
+        SolicitudReserva solicitudNoPendiente = new SolicitudReserva();
+        solicitudNoPendiente.setEstado("APROBADA");
+        solicitudNoPendiente.setInmueble(inmuebleOtroPropietario);
+
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("usuario", usuario);
+
+        when(propietarioDAO.findByUsuarioId(5L)).thenReturn(propietario);
+        when(inmuebleDAO.findAll()).thenReturn(List.of(
+                inmuebleSinPropietario,
+                inmuebleOtroPropietario));
+        when(solicitudReservaDAO.findAll()).thenReturn(List.of(solicitudNoPendiente));
+        when(gestorNotificaciones.contarNotificacionesNoLeidas(usuario)).thenReturn(0L);
+
+        mockMvc.perform(get("/index").session(session))
+                .andExpect(status().isOk());
+    }
+
 }

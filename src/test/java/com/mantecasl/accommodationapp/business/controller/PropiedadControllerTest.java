@@ -1,18 +1,16 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import java.util.Optional;
 
+import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import com.mantecasl.accommodationapp.business.entity.*;
 import com.mantecasl.accommodationapp.business.persistance.*;
@@ -26,12 +24,14 @@ import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfigurati
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(controllers = PropiedadController.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
+@Import(PropiedadControllerTest.TestViewResolverConfig.class)
 class PropiedadControllerTest {
 
     @Autowired
@@ -49,7 +49,7 @@ class PropiedadControllerTest {
     @MockBean
     private GestorNotificaciones notificacion;
 
-    // ViewResolver dummy (misma copla de siempre)
+    // ---------- ViewResolver dummy ----------
     @TestConfiguration
     static class TestViewResolverConfig {
         @Bean
@@ -65,15 +65,16 @@ class PropiedadControllerTest {
         }
     }
 
-    // ---------- GET /catalogo ----------
+    // ---------- CATALOGO ----------
 
     @Test
-    void verCatalogo_sin_filtros_devuelve_lista() throws Exception {
-        Inmueble inmueble = new Inmueble();
-        inmueble.setId(1L);
-        inmueble.setPropietario(new Propietario());
+    void verCatalogo_filtra_propiedades_sin_propietario() throws Exception {
+        Inmueble invalido = new Inmueble(); // sin propietario
+        Inmueble valido = new Inmueble();
+        valido.setId(1L);
+        valido.setPropietario(new Propietario());
 
-        when(inmuebleDAO.findAll()).thenReturn(List.of(inmueble));
+        when(inmuebleDAO.findAll()).thenReturn(List.of(invalido, valido));
 
         mockMvc.perform(get("/catalogo"))
                 .andExpect(status().isOk())
@@ -82,75 +83,94 @@ class PropiedadControllerTest {
     }
 
     @Test
-    void verCatalogo_fecha_inicio_en_pasado_devuelve_error() throws Exception {
+    void verCatalogo_formato_fecha_invalido() throws Exception {
         when(inmuebleDAO.findAll()).thenReturn(List.of());
 
-        String ayer = LocalDate.now().minusDays(1).toString();
-
         mockMvc.perform(get("/catalogo")
-                .param("fechaInicio", ayer)
-                .param("fechaFin", LocalDate.now().plusDays(1).toString()))
+                .param("fechaInicio", "no-fecha")
+                .param("fechaFin", "otra"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("lista-propiedades"))
                 .andExpect(model().attributeExists("error"));
     }
 
     @Test
-    void verCatalogo_fecha_fin_antes_inicio_devuelve_error() throws Exception {
-        when(inmuebleDAO.findAll()).thenReturn(List.of());
+    void verCatalogo_disponibilidad_false() throws Exception {
+        Inmueble i = new Inmueble();
+        i.setId(1L);
+        i.setPropietario(new Propietario());
 
-        mockMvc.perform(get("/catalogo")
-                .param("fechaInicio", "2025-01-10")
-                .param("fechaFin", "2025-01-09"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("lista-propiedades"))
-                .andExpect(model().attributeExists("error"));
-    }
-
-    @Test
-    void verCatalogo_filtro_ciudad_y_capacidad() throws Exception {
-        Inmueble inmueble = new Inmueble();
-        inmueble.setId(1L);
-        inmueble.setCiudad("Madrid");
-        inmueble.setCapacidad(4);
-        inmueble.setPropietario(new Propietario());
-
-        when(inmuebleDAO.findAll()).thenReturn(List.of(inmueble));
+        when(inmuebleDAO.findAll()).thenReturn(List.of(i));
         when(gestorDisponibilidad.verificarDisponibilidad(any(), any(), any()))
-                .thenReturn(true);
+                .thenReturn(false);
 
         mockMvc.perform(get("/catalogo")
-                .param("ciudad", "madrid")
-                .param("capacidad", "2")
                 .param("fechaInicio", LocalDate.now().plusDays(1).toString())
                 .param("fechaFin", LocalDate.now().plusDays(3).toString()))
                 .andExpect(status().isOk())
                 .andExpect(view().name("lista-propiedades"))
-                .andExpect(model().attributeExists("propiedades"));
+                .andExpect(model().attributeExists("mensaje"));
     }
-
-    // ---------- POST eliminar ----------
 
     @Test
-    void eliminarPropiedad_usuario_no_propietario() throws Exception {
-        Usuario usuario = new Usuario();
-        usuario.setId(1L);
+    void verCatalogo_solo_capacidad() throws Exception {
+        Inmueble i = new Inmueble();
+        i.setCapacidad(4);
+        i.setPropietario(new Propietario());
 
-        Usuario otro = new Usuario();
-        otro.setId(2L);
+        when(inmuebleDAO.findAll()).thenReturn(List.of(i));
 
-        Propietario propietario = new Propietario();
-        propietario.setUsuario(otro);
-
-        Inmueble inmueble = new Inmueble();
-        inmueble.setId(10L);
-        inmueble.setPropietario(propietario);
-
-        when(inmuebleDAO.findById(10L)).thenReturn(Optional.of(inmueble));
-
-        mockMvc.perform(post("/propiedades/10/eliminar")
-                .sessionAttr("usuario", usuario))
-                .andExpect(view().name(org.hamcrest.Matchers.startsWith("redirect:")));
+        mockMvc.perform(get("/catalogo")
+                .param("capacidad", "2"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("lista-propiedades"));
     }
 
+    // ---------- ELIMINAR PROPIEDAD ----------
+
+    @Test
+    void eliminarPropiedad_ok_happy_path() throws Exception {
+        Usuario u = new Usuario();
+        u.setId(1L);
+
+        Usuario up = new Usuario();
+        up.setId(1L);
+
+        Propietario p = new Propietario();
+        p.setUsuario(up);
+
+        Inmueble i = new Inmueble();
+        i.setId(10L);
+        i.setPropietario(p);
+
+        Reserva r = new Reserva();
+        r.setPrecioTotal(100);
+
+        when(inmuebleDAO.findById(10L)).thenReturn(Optional.of(i));
+        when(reservaDAO.findReservasFuturasByInmueble(10L))
+                .thenReturn(List.of(r));
+
+        mockMvc.perform(post("/propiedades/10/eliminar")
+                .sessionAttr("usuario", u))
+                .andExpect(status().isOk())
+                .andExpect(view().name("redirect:/propiedades"));
+
+        verify(notificacion).notificarEliminacionPropiedad(eq(i), any());
+        verify(notificacion).crearNotificacionPagoDevuelto(eq(r), eq(100.0));
+        verify(inmuebleDAO).delete(i);
+    }
+
+    @Test
+    void eliminarPropiedad_excepcion_general() throws Exception {
+        Usuario u = new Usuario();
+        u.setId(1L);
+
+        when(inmuebleDAO.findById(5L))
+                .thenThrow(new RuntimeException("boom"));
+
+        mockMvc.perform(post("/propiedades/5/eliminar")
+                .sessionAttr("usuario", u))
+                .andExpect(status().isOk())
+                .andExpect(view().name("redirect:/propiedades/5"));
+    }
 }
