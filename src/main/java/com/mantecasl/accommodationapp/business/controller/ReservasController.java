@@ -97,7 +97,7 @@ public class ReservasController {
         }
 
         Inmueble inmueble = inmuebleOpt.get();
-        
+
         // Añadir al modelo si el inmueble tiene reserva directa o por confirmación
         model.addAttribute(ATTR_ES_RESERVA_DIRECTA, inmueble.isReservaDirecta());
         model.addAttribute(ATTR_USUARIO, usuario);
@@ -137,16 +137,16 @@ public class ReservasController {
             Date fin = fechas[1];
 
             // Obtener el inmueble con su configuración de reserva
-                        Inmueble inmueble = inmuebleDAO.findById(inmuebleId)
-                            .orElseThrow(() -> new ReservaException("Inmueble no encontrado"));
-            
+            Inmueble inmueble = inmuebleDAO.findById(inmuebleId)
+                    .orElseThrow(() -> new RuntimeException("Inmueble no encontrado"));
+
             // OBTENER EL TIPO DE RESERVA DEL INMUEBLE, NO DEL FORMULARIO
             boolean esReservaDirecta = inmueble.isReservaDirecta();
 
             // Buscar o crear inquilino
             Inquilino inquilino = inquilinoDAO.findByUsuario(usuario).orElseGet(() -> {
                 Inquilino nuevo = new Inquilino(usuario, telefono, documentoIdentidad, metodoPago);
-                nuevo.setInmueble(inmueble); 
+                nuevo.setInmueble(inmueble);
                 return inquilinoDAO.save(nuevo);
             });
 
