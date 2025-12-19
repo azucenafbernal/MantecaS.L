@@ -4,34 +4,41 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
+import com.mantecasl.accommodationapp.business.entity.Disponibilidad;
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
+import com.mantecasl.accommodationapp.business.persistance.DisponibilidadDAO;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
 
 @Service
 public class GestorDisponibilidad {
 
-    @Autowired
     private DisponibilidadDAO disponibilidadDAO;
-
-    @Autowired
     private ReservaDAO reservaDAO;
-
-    @Autowired
     private InmuebleDAO inmuebleDAO;
-
-    @Autowired
     private SolicitudReservaDAO solicitudReservaDAO;
+
+    public GestorDisponibilidad(DisponibilidadDAO disponibilidadDAO, 
+                                ReservaDAO reservaDAO,
+                                InmuebleDAO inmuebleDAO,
+                                SolicitudReservaDAO solicitudReservaDAO) {
+        this.disponibilidadDAO = disponibilidadDAO;
+        this.reservaDAO = reservaDAO;
+        this.inmuebleDAO = inmuebleDAO;
+        this.solicitudReservaDAO = solicitudReservaDAO;
+    }
 
     // Validar fechas
     public Date[] validarFechas(String fechaInicio, String fechaFin) {
         if (fechaInicio == null || fechaFin == null ||
                 fechaInicio.isEmpty() || fechaFin.isEmpty()) {
-            throw new RuntimeException("Debes seleccionar las fechas de entrada y salida.");
+            throw new IllegalArgumentException("Debes seleccionar las fechas de entrada y salida.");
         }
 
         try {
@@ -39,7 +46,7 @@ public class GestorDisponibilidad {
             LocalDate fin = LocalDate.parse(fechaFin);
 
             if (fin.isBefore(inicio) || fin.equals(inicio)) {
-                throw new RuntimeException("La fecha de salida debe ser posterior a la de entrada.");
+                throw new IllegalArgumentException("La fecha de salida debe ser posterior a la de entrada.");
             }
 
             return new Date[]{
@@ -48,7 +55,7 @@ public class GestorDisponibilidad {
             };
 
         } catch (Exception e) {
-            throw new RuntimeException("Formato de fecha inválido: " + e.getMessage());
+            throw new IllegalArgumentException("Formato de fecha inválido: " + e.getMessage(), e);
         }
     }
 
@@ -56,11 +63,11 @@ public class GestorDisponibilidad {
     public Disponibilidad crearReserva(Long inmuebleId, Date inicio, Date fin, boolean esDirecta) {
         // Verificar que el inmueble existe
         Inmueble inmueble = inmuebleDAO.findById(inmuebleId)
-                .orElseThrow(() -> new RuntimeException("Inmueble no encontrado."));
+                .orElseThrow(() -> new IllegalArgumentException("Inmueble no encontrado."));
 
         // Verificar que no hay solapamientos con reservas existentes
         if (!verificarDisponibilidad(inmuebleId, inicio, fin)) {
-            throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
+            throw new IllegalStateException("El inmueble no está disponible en las fechas seleccionadas.");
         }
 
         // Crear la disponibilidad (reserva)
@@ -106,7 +113,7 @@ public class GestorDisponibilidad {
             .findByInmuebleIdAndEstado(inmuebleId, "APROBADA")
             .stream()
             .filter(s -> s.getReserva() != null)
-            .collect(Collectors.toList());
+            .toList();
         
         // Verificar solapamientos
         for (Disponibilidad d : disponibilidadesBloqueadas) {

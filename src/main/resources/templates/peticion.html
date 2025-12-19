@@ -126,9 +126,9 @@
                 </div>
 
                 <!-- Observaciones -->
-                <div th:if="${reserva.observaciones}" class="message-box">
+                <div th:if="${reserva.observacionesInquilino}" class="message-box">
                     <h5>📝 Observaciones del Inquilino</h5>
-                    <div class="message-content" th:text="${reserva.observaciones}"></div>
+                    <div class="message-content" th:text="${reserva.observacionesInquilino}"></div>
                 </div>
 
                 <!-- Sección de acciones (solo para pendientes) -->

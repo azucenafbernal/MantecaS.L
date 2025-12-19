@@ -27,7 +27,7 @@ public class Disponibilidad {
         this.disponible = true;
     }
 
-    public Disponibilidad(Inmueble inmueble, Date fechaInicio, Date fechaFin, double precio, boolean directa){
+    public Disponibilidad(Date fechaInicio, Date fechaFin, double precio, boolean directa){
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.precio = precio;

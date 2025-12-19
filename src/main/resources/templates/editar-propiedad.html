@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Propiedad - Manteca SL</title>
+    <!-- Lucide Icons para iconos -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link rel="stylesheet" href="/css/editar-propiedad.css">
 </head>
 <body>
     <div class="container">
         <div class="card">
             <div class="header">
-                <h1>Editar Propiedad</h1>
+                <h1>✏️ Editar Propiedad</h1>
                 <p>Modifica los datos de tu alojamiento</p>
             </div>
             
@@ -18,67 +20,274 @@
                 <!-- Mensaje de error -->
                 <div th:if="${error}" class="error" th:text="${error}"></div>
                 
-                <form th:action="@{/actualizar-propiedad}" method="post">
-                    <input type="hidden" name="id" th:value="${inmueble.id}">
+                <form th:action="@{/actualizar-propiedad}" method="post" id="editPropertyForm" onsubmit="return validarFormulario()">
+                    <input type="hidden" id="id" name="id" th:value="${inmueble.id}">
                     
-                    <div class="form-group" style="display: flex; gap: 10px;">
-                        <div style="flex: 2;">
-                            <label for="calle">Calle *</label>
-                            <input type="text" id="calle" name="calle" th:value="${inmueble.calle}"
-                                class="input-field" placeholder="Ej: Avenida del Sol" required>
+                    <!-- Dirección -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="calle">Calle</label>
+                            <div class="input-with-icon">
+                                <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                <input type="text" id="calle" name="calle" th:value="${inmueble.calle}"
+                                    class="input-field" placeholder="Ej: Avenida del Sol" required>
+                            </div>
+                            <div class="field-helper">Nombre de la vía principal</div>
                         </div>
 
-                        <div style="flex: 1;">
-                            <label for="numero">Número *</label>
+                        <div class="form-group">
+                            <label for="numero">Número</label>
                             <input type="text" id="numero" name="numero" th:value="${inmueble.numero}"
                                 class="input-field" placeholder="12B" required>
+                            <div class="field-helper">Número y bloque si aplica</div>
                         </div>
                     </div>
 
-                    <div class="form-group" style="display: flex; gap: 10px;">
-                        <div style="flex: 2;">
-                            <label for="ciudad">Ciudad *</label>
-                            <input type="text" id="ciudad" name="ciudad" th:value="${inmueble.ciudad}"
-                                class="input-field" placeholder="Madrid" required>
+                    <!-- Ciudad y Código Postal -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="ciudad">Ciudad</label>
+                            <div class="input-with-icon">
+                                <i data-lucide="building" class="w-4 h-4"></i>
+                                <input type="text" id="ciudad" name="ciudad" th:value="${inmueble.ciudad}"
+                                    class="input-field" placeholder="Madrid" required>
+                            </div>
                         </div>
 
-                        <div style="flex: 1;">
-                            <label for="codigoPostal">Código Postal *</label>
+                        <div class="form-group">
+                            <label for="codigoPostal">Código Postal</label>
                             <input type="text" id="codigoPostal" name="codigoPostal" th:value="${inmueble.codigoPostal}"
                                 class="input-field" placeholder="28080" required>
+                            <div class="field-helper">5 dígitos</div>
                         </div>
                     </div>
 
+                    <!-- Precio -->
                     <div class="form-group">
-                        <label for="precioNoche">Precio por Noche (€) *</label>
-                        <input type="number" id="precioNoche" name="precioNoche" th:value="${inmueble.precioNoche}"
-                               class="input-field" placeholder="50.00" step="0.01" min="0" required>
+                        <label for="precioNoche">Precio por Noche (€)</label>
+                        <div class="input-with-icon">
+                            <i data-lucide="euro" class="w-4 h-4"></i>
+                            <input type="number" id="precioNoche" name="precioNoche" th:value="${inmueble.precioNoche}"
+                                   class="input-field" placeholder="50.00" step="0.01" min="0" required>
+                        </div>
+                        <div class="field-helper">Precio por noche de estancia</div>
                     </div>
 
+                    <!-- Capacidad -->
                     <div class="form-group">
-                        <label for="capacidad">Capacidad (personas) *</label>
-                        <input type="number" id="capacidad" name="capacidad" th:value="${inmueble.capacidad}"
-                               class="input-field" placeholder="4" min="1" required>
+                        <label for="capacidad">Capacidad (personas)</label>
+                        <div class="input-with-icon">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <input type="number" id="capacidad" name="capacidad" th:value="${inmueble.capacidad}"
+                                   class="input-field" placeholder="4" min="1" required>
+                        </div>
+                        <div class="field-helper">Máximo número de huéspedes</div>
                     </div>
 
+                    <!-- Descripción -->
                     <div class="form-group">
-                        <label for="descripcion">Descripción de la Propiedad</label>
-                        <textarea id="descripcion" name="descripcion" 
-                                  class="input-field" 
-                                  placeholder="Describe tu propiedad, características, ambiente..."
-                                  th:text="${inmueble.descripcion}"></textarea>
+                        <label for="descripcion" class="optional">Descripción de la Propiedad</label>
+                        <div class="input-with-icon">
+                            <i data-lucide="file-text" class="w-4 h-4" style="align-self: flex-start; margin-top: 14px;"></i>
+                            <textarea id="descripcion" name="descripcion" 
+                                      class="input-field" 
+                                      placeholder="Describe tu propiedad, características, ambiente cercano, servicios incluidos..."
+                                      rows="4" th:text="${inmueble.descripcion}"></textarea>
+                        </div>
+                        <div class="field-helper">Opcional - Describe lo que hace especial tu propiedad</div>
                     </div>
 
-                    <button type="submit" class="btn-submit">Actualizar Propiedad</button>
-                    <a th:href="@{/mis-propiedades}" class="btn-cancel">Cancelar</a>
+                    <!-- Política de Cancelación -->
+                    <div class="form-group">
+                        <label for="politicaCancelacion">Política de Cancelación *</label>
+                        <select id="politicaCancelacion" name="politicaCancelacion" class="input-field" required style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">
+                            <option value="" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">-- Selecciona una política --</option>
+                            <option value="Flexible - Cancelación gratuita hasta 7 días antes del check-in" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);" th:selected="${inmueble.politicaCancelacion == 'Flexible - Cancelación gratuita hasta 7 días antes del check-in'}">Flexible - 7 días antes</option>
+                            <option value="Moderada - Cancelación gratuita hasta 30 días antes del check-in" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);" th:selected="${inmueble.politicaCancelacion == 'Moderada - Cancelación gratuita hasta 30 días antes del check-in'}">Moderada - 30 días antes</option>
+                            <option value="Estricta - Cancelación gratuita hasta 60 días antes del check-in" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);" th:selected="${inmueble.politicaCancelacion == 'Estricta - Cancelación gratuita hasta 60 días antes del check-in'}">Estricta - 60 días antes</option>
+                            <option value="No reembolsable - Sin devoluciones" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);" th:selected="${inmueble.politicaCancelacion == 'No reembolsable - Sin devoluciones'}">No reembolsable</option>
+                            <option value="Flexible moderada - Cancelación gratuita hasta 48 horas antes del check-in" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);" th:selected="${inmueble.politicaCancelacion == 'Flexible moderada - Cancelación gratuita hasta 48 horas antes del check-in'}">Flexible moderada - 48 horas</option>
+                        </select>
+                    </div>
+
+                    <!-- Comodidades -->
+                    <div class="form-group">
+                        <label>🏠 Comodidades</label>
+                        <p style="color: #8a96a6; margin-bottom: 15px; font-size: 14px;">Selecciona las comodidades disponibles en tu propiedad</p>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start;">
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="wifi" name="comodidades" value="WiFi" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('WiFi')}">
+                                <label for="wifi" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">📶 WiFi</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="cocina" name="comodidades" value="Cocina completa" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Cocina completa')}">
+                                <label for="cocina" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🍳 Cocina</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="lavadora" name="comodidades" value="Lavadora" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Lavadora')}">
+                                <label for="lavadora" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🧺 Lavadora</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="aire" name="comodidades" value="Aire acondicionado" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Aire acondicionado')}">
+                                <label for="aire" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">❄️ Aire acond.</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="calefaccion" name="comodidades" value="Calefacción" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Calefacción')}">
+                                <label for="calefaccion" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🔥 Calefacción</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="aparcamiento" name="comodidades" value="Parking" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Parking')}">
+                                <label for="aparcamiento" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🅿️ Parking</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="piscina" name="comodidades" value="Piscina" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Piscina')}">
+                                <label for="piscina" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🏊 Piscina</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="terraza" name="comodidades" value="Terraza" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Terraza')}">
+                                <label for="terraza" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🌳 Terraza</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="television" name="comodidades" value="Televisión" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Televisión')}">
+                                <label for="television" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">📺 TV</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="mascotas" name="comodidades" value="Mascotas permitidas" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Mascotas permitidas')}">
+                                <label for="mascotas" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🐾 Mascotas</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="jardin" name="comodidades" value="Jardín" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Jardín')}">
+                                <label for="jardin" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🌿 Jardín</label>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                                <input type="checkbox" id="acceso" name="comodidades" value="Acceso para personas con movilidad reducida" style="width: 18px; height: 18px; cursor: pointer;" th:checked="${inmueble.comodidades != null && inmueble.comodidades.contains('Acceso para personas con movilidad reducida')}">
+                                <label for="acceso" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">♿ Accesible</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="form-group">
+                        <button type="submit" class="btn-submit">
+                            <i data-lucide="save" class="w-5 h-5"></i>
+                            Actualizar Propiedad
+                        </button>
+                        <a th:href="@{/mis-propiedades}" class="btn-cancel">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                            Cancelar
+                        </a>
+                    </div>
                 </form>
             </div>
             
+            <!-- Footer con enlaces -->
             <div class="footer">
-                <a th:href="@{/mis-propiedades}">Volver a Mis Propiedades</a> | 
-                <a th:href="@{/}">Volver al inicio</a>
+                <a th:href="@{/mis-propiedades}">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    Volver a Mis Propiedades
+                </a>
+                <span>|</span>
+                <a th:href="@{/}">
+                    <i data-lucide="home" class="w-4 h-4"></i>
+                    Volver al inicio
+                </a>
             </div>
         </div>
     </div>
+
+    <script>
+        // Validar formulario antes de enviar
+        function validarFormulario() {
+            const id = document.getElementById('id').value;
+            const calle = document.getElementById('calle').value;
+            const numero = document.getElementById('numero').value;
+            const ciudad = document.getElementById('ciudad').value;
+            const codigoPostal = document.getElementById('codigoPostal').value;
+            const precioNoche = document.getElementById('precioNoche').value;
+            const capacidad = document.getElementById('capacidad').value;
+            const politicaCancelacion = document.getElementById('politicaCancelacion').value;
+            
+            if (!id) {
+                alert('Error: No se encontró el ID de la propiedad');
+                return false;
+            }
+            
+            if (!calle || !numero || !ciudad || !codigoPostal || !precioNoche || !capacidad || !politicaCancelacion) {
+                alert('Por favor, rellena todos los campos requeridos');
+                return false;
+            }
+            
+            console.log('Formulario válido. ID:', id, 'Calle:', calle);
+            return true;
+        }
+        
+        // Inicializar iconos de Lucide
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            
+            // Validación del formulario
+            const form = document.getElementById('editPropertyForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const submitBtn = this.querySelector('.btn-submit');
+                    if (submitBtn) {
+                        submitBtn.classList.add('loading');
+                        submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Actualizando...';
+                        lucide.createIcons();
+                    }
+                });
+            }
+            
+            // Formatear código postal
+            const cpInput = document.getElementById('codigoPostal');
+            if (cpInput) {
+                cpInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/\D/g, '').substring(0, 5);
+                });
+            }
+            
+            // Formatear precio
+            const priceInput = document.getElementById('precioNoche');
+            if (priceInput) {
+                priceInput.addEventListener('blur', function() {
+                    if (this.value) {
+                        this.value = parseFloat(this.value).toFixed(2);
+                    }
+                });
+            }
+            
+            // Contador de caracteres para descripción
+            const descTextarea = document.getElementById('descripcion');
+            if (descTextarea) {
+                const charCount = document.createElement('div');
+                charCount.className = 'field-helper text-right';
+                charCount.style.marginTop = '5px';
+                descTextarea.parentNode.appendChild(charCount);
+                
+                function updateCharCount() {
+                    const length = descTextarea.value.length;
+                    charCount.textContent = `${length}/500 caracteres`;
+                    if (length > 450) {
+                        charCount.style.color = 'var(--warning-color)';
+                    } else if (length > 400) {
+                        charCount.style.color = 'var(--text-secondary)';
+                    } else {
+                        charCount.style.color = 'var(--text-secondary)';
+                    }
+                }
+                
+                descTextarea.addEventListener('input', updateCharCount);
+                updateCharCount(); // Inicial
+                
+                // Limitar a 500 caracteres
+                descTextarea.addEventListener('input', function() {
+                    if (this.value.length > 500) {
+                        this.value = this.value.substring(0, 500);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

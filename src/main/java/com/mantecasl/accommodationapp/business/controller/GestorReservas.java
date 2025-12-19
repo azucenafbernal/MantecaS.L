@@ -1,47 +1,48 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
 
 @Service
 @Transactional
 public class GestorReservas {
-
-    @Autowired
     private SolicitudReservaDAO solicitudReservaDAO;
-
-    @Autowired
     private ReservaDAO reservaDAO;
 
-    //PENDIENTES
-    public List<SolicitudReserva> obtenerSolicitudesPendientesPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "PENDIENTE");
+    public GestorReservas(SolicitudReservaDAO solicitudReservaDAO,
+                          ReservaDAO reservaDAO) {
+        this.solicitudReservaDAO = solicitudReservaDAO;
+        this.reservaDAO = reservaDAO;
     }
 
-    //APROBADAS
-    public List<SolicitudReserva> obtenerSolicitudesAprobadasPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "APROBADA");
+    //Pendientes
+    public List<SolicitudReserva> obtenerSolicitudesPendientesPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "PENDIENTE");
     }
 
-    //RECHAZADAS
-    public List<SolicitudReserva> obtenerSolicitudesRechazadasPropietario(Long propietarioId) {
-        return solicitudReservaDAO.findByInmueblePropietarioIdAndEstado(propietarioId, "RECHAZADA");
+    //Aprobadas
+    public List<SolicitudReserva> obtenerSolicitudesAprobadasPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "APROBADA");
     }
 
-    //HISTORIAL
-    public List<Reserva> obtenerHistorialReservasPropietario(Long propietarioId) {
-        List<Reserva> todas = reservaDAO.findAll()
-                .stream()
-                .filter(r -> r.getInmueble().getPropietario().getId().equals(propietarioId))
-                .sorted((a, b) -> b.getId().compareTo(a.getId()))
-                .limit(10)
-                .toList();
+    //Rechazadas
+    public List<SolicitudReserva> obtenerSolicitudesRechazadasPropietario(Long usuarioId) {
+        return solicitudReservaDAO
+                .findByInmueblePropietarioUsuarioIdAndEstado(usuarioId, "RECHAZADA");
+    }
 
-        return todas;
+    //Historial reciente
+    public List<Reserva> obtenerHistorialReservasPropietario(Long usuarioId) {
+        return reservaDAO
+                .findTop10ByInmueblePropietarioUsuarioIdOrderByIdDesc(usuarioId);
     }
 }

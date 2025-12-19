@@ -1,44 +1,81 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
-
-import jakarta.servlet.http.HttpSession;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import com.mantecasl.accommodationapp.business.entity.Disponibilidad;
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.entity.Inquilino;
+import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+import com.mantecasl.accommodationapp.business.exception.ReservaException;
+import com.mantecasl.accommodationapp.business.persistance.DisponibilidadDAO;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.InquilinoDAO;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/reservas")
 public class ReservasController {
 
-    @Autowired
-    private GestorDisponibilidad gestorDisponibilidad;
+    private static final String ATTR_USUARIO = "usuario";
+    private static final String ATTR_INMUEBLE = "inmueble";
+    private static final String ATTR_FECHA_INICIO = "fechaInicio";
+    private static final String ATTR_FECHA_FIN = "fechaFin";
+    private static final String ATTR_ES_RESERVA_DIRECTA = "esReservaDirecta";
+    private static final String ATTR_RESERVA = "reserva";
+    private static final String ATTR_DISPONIBILIDAD = "disponibilidad";
+    private static final String ATTR_MENSAJE = "mensaje";
+    private static final String ATTR_ES_DIRECTA = "esDirecta";
+    private static final String ATTR_SOLICITUD = "solicitud";
+    private static final String ATTR_ERROR = "error";
 
-    @Autowired
-    private InmuebleDAO inmuebleDAO;
+    private static final String VIEW_RESERVA_INMUEBLE = "reserva-inmueble";
+    private static final String VIEW_CONFIRMACION_RESERVA = "confirmacion-reserva";
 
-    @Autowired
-    private ReservaDAO reservaDAO;
+    private static final String REDIRECT_LOGIN_FROM_RESERVA = "redirect:/login?from=/reservas/nueva/";
+    private static final String REDIRECT_HOME = "redirect:/";
 
-    @Autowired
-    private InquilinoDAO inquilinoDAO;
+    private static final String ESTADO_PENDIENTE = "PENDIENTE";
+    private static final String MSG_NO_DISPONIBLE = "El inmueble no está disponible en las fechas seleccionadas.";
+    private static final String MSG_SOLICITUD_EXISTENTE = "Ya existe una solicitud pendiente para estas fechas. Espera la respuesta del propietario.";
 
-    @Autowired
-    private SolicitudReservaDAO solicitudReservaDAO;
+    private final GestorDisponibilidad gestorDisponibilidad;
+    private final InmuebleDAO inmuebleDAO;
+    private final ReservaDAO reservaDAO;
+    private final InquilinoDAO inquilinoDAO;
+    private final SolicitudReservaDAO solicitudReservaDAO;
+    private final DisponibilidadDAO disponibilidadDAO;
+    private final GestorNotificaciones notificacion;
 
-    @Autowired
-    private DisponibilidadDAO disponibilidadDAO;
-
-    @Autowired
-    private GestorNotificaciones notificacion;
+    public ReservasController(GestorDisponibilidad gestorDisponibilidad,
+                              InmuebleDAO inmuebleDAO,
+                              ReservaDAO reservaDAO,
+                              InquilinoDAO inquilinoDAO,
+                              SolicitudReservaDAO solicitudReservaDAO,
+                              DisponibilidadDAO disponibilidadDAO,
+                              GestorNotificaciones notificacion) {
+        this.gestorDisponibilidad = gestorDisponibilidad;
+        this.inmuebleDAO = inmuebleDAO;
+        this.reservaDAO = reservaDAO;
+        this.inquilinoDAO = inquilinoDAO;
+        this.solicitudReservaDAO = solicitudReservaDAO;
+        this.disponibilidadDAO = disponibilidadDAO;
+        this.notificacion = notificacion;
+    }
 
     @GetMapping("/nueva/{inmuebleId}")
     public String mostrarFormularioReserva(
@@ -48,27 +85,27 @@ public class ReservasController {
             HttpSession session,
             Model model) {
 
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
 
         if (usuario == null) {
-            return "redirect:/login?from=/reservas/nueva/" + inmuebleId;
+            return REDIRECT_LOGIN_FROM_RESERVA + inmuebleId;
         }
 
         Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
         if (inmuebleOpt.isEmpty()) {
-            return "redirect:/";
+            return REDIRECT_HOME;
         }
 
         Inmueble inmueble = inmuebleOpt.get();
 
         // Añadir al modelo si el inmueble tiene reserva directa o por confirmación
-        model.addAttribute("esReservaDirecta", inmueble.isReservaDirecta());
-        model.addAttribute("usuario", usuario);
-        model.addAttribute("inmueble", inmueble);
-        model.addAttribute("fechaInicio", fechaInicio);
-        model.addAttribute("fechaFin", fechaFin);
+        model.addAttribute(ATTR_ES_RESERVA_DIRECTA, inmueble.isReservaDirecta());
+        model.addAttribute(ATTR_USUARIO, usuario);
+        model.addAttribute(ATTR_INMUEBLE, inmueble);
+        model.addAttribute(ATTR_FECHA_INICIO, fechaInicio);
+        model.addAttribute(ATTR_FECHA_FIN, fechaFin);
 
-        return "reserva-inmueble";
+        return VIEW_RESERVA_INMUEBLE;
     }
 
     @PostMapping("/confirmar")
@@ -87,10 +124,10 @@ public class ReservasController {
             HttpSession session,
             Model model) {
 
-        Usuario usuario = (Usuario) session.getAttribute("usuario");
+        Usuario usuario = (Usuario) session.getAttribute(ATTR_USUARIO);
 
         if (usuario == null) {
-            return "redirect:/login?from=/reservas/nueva/" + inmuebleId;
+            return REDIRECT_LOGIN_FROM_RESERVA + inmuebleId;
         }
 
         try {
@@ -127,7 +164,7 @@ public class ReservasController {
             // USAR esReservaDirecta (del inmueble) en lugar de directa (del formulario)
             if (esReservaDirecta) {
                 if (!gestorDisponibilidad.verificarDisponibilidad(inmuebleId, inicio, fin)) {
-                    throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
+                        throw new ReservaException(MSG_NO_DISPONIBLE);
                 }
 
                 // Crear disponibilidad bloqueada
@@ -145,29 +182,28 @@ public class ReservasController {
                 reserva.confirmar();
                 reservaDAO.save(reserva);
 
-                model.addAttribute("reserva", reserva);
-                model.addAttribute("disponibilidad", disponibilidad);
-                model.addAttribute("mensaje", "¡Reserva confirmada y pagada exitosamente!");
-                model.addAttribute("esDirecta", true);
+                model.addAttribute(ATTR_RESERVA, reserva);
+                model.addAttribute(ATTR_DISPONIBILIDAD, disponibilidad);
+                model.addAttribute(ATTR_MENSAJE, "¡Reserva confirmada y pagada exitosamente!");
+                model.addAttribute(ATTR_ES_DIRECTA, true);
 
                 notificacion.crearNotificacionReservaDirecta(reserva);
 
             } else {
                 // RESERVA POR CONFIRMACIÓN
                 List<SolicitudReserva> solicitudesExistentes = solicitudReservaDAO.findAll().stream()
-                        .filter(s -> s.getInmueble().getId().equals(inmuebleId) &&
-                                s.getEstado().equals("PENDIENTE") &&
+                    .filter(s -> s.getInmueble().getId().equals(inmuebleId) &&
+                                s.getEstado().equals(ESTADO_PENDIENTE) &&
                                 seSolapan(s.getFechaInicio(), s.getFechaFin(), inicio, fin))
-                        .collect(Collectors.toList());
-
+                    .toList();
+                
                 if (!solicitudesExistentes.isEmpty()) {
-                    throw new RuntimeException(
-                            "Ya existe una solicitud pendiente para estas fechas. Espera la respuesta del propietario.");
+                    throw new ReservaException(MSG_SOLICITUD_EXISTENTE);
                 }
 
                 // Verificar disponibilidad para solicitud
                 if (!gestorDisponibilidad.verificarDisponibilidadParaSolicitud(inmuebleId, inicio, fin)) {
-                    throw new RuntimeException("El inmueble no está disponible en las fechas seleccionadas.");
+                    throw new ReservaException(MSG_NO_DISPONIBLE);
                 }
 
                 // Crear solicitud pendiente de aprobación
@@ -175,29 +211,28 @@ public class ReservasController {
                 solicitud.setObservacionesInquilino(observaciones);
                 solicitudReservaDAO.save(solicitud);
 
-                model.addAttribute("solicitud", solicitud);
-                model.addAttribute("mensaje",
-                        "¡Solicitud de reserva enviada! El propietario la revisará pronto. Solo pagarás cuando sea aprobada.");
-                model.addAttribute("esDirecta", false);
+                model.addAttribute(ATTR_SOLICITUD, solicitud);
+                model.addAttribute(ATTR_MENSAJE, "¡Solicitud de reserva enviada! El propietario la revisará pronto. Solo pagarás cuando sea aprobada.");
+                model.addAttribute(ATTR_ES_DIRECTA, false);
             }
 
-            model.addAttribute("inmueble", inmueble);
+            model.addAttribute(ATTR_INMUEBLE, inmueble);
 
-            return "confirmacion-reserva";
+            return VIEW_CONFIRMACION_RESERVA;
 
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
+            model.addAttribute(ATTR_ERROR, e.getMessage());
             Optional<Inmueble> inmuebleOpt = inmuebleDAO.findById(inmuebleId);
             if (inmuebleOpt.isPresent()) {
                 Inmueble inmueble = inmuebleOpt.get();
-                model.addAttribute("inmueble", inmueble);
-                model.addAttribute("esReservaDirecta", inmueble.isReservaDirecta());
+                model.addAttribute(ATTR_INMUEBLE, inmueble);
+                model.addAttribute(ATTR_ES_RESERVA_DIRECTA, inmueble.isReservaDirecta());
             }
-            model.addAttribute("usuario", usuario);
-            model.addAttribute("fechaInicio", fechaInicio);
-            model.addAttribute("fechaFin", fechaFin);
+            model.addAttribute(ATTR_USUARIO, usuario);
+            model.addAttribute(ATTR_FECHA_INICIO, fechaInicio);
+            model.addAttribute(ATTR_FECHA_FIN, fechaFin);
 
-            return "reserva-inmueble";
+            return VIEW_RESERVA_INMUEBLE;
         }
     }
 

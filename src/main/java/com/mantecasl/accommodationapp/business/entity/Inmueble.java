@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,7 +31,14 @@ public class Inmueble {
     private String descripcion;
     private Integer capacidad;
 
-    private boolean reservaDirecta = true; 
+    private boolean reservaDirecta = true;
+    
+    @Column(length = 100)
+    private String politicaCancelacion;
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(length = 100)
+    private List<String> comodidades = new ArrayList<>();
     
     //Relación con Propietario (Un propietario puede tener asociados muchos inmuebles)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -47,29 +56,16 @@ public class Inmueble {
     
     //Constructores
     public Inmueble() {}
-    
-    public Inmueble(String calle, String numero, String ciudad, String codigoPostal, double precioNoche, String descripcion, Integer capacidad, boolean reservaDirecta, Propietario propietario) {
-        this.calle = calle;
-        this.numero = numero;
-        this.ciudad = ciudad;
-        this.codigoPostal = codigoPostal;
-        this.precioNoche = precioNoche;
-        this.descripcion = descripcion;
-        this.capacidad = capacidad;
-        this.propietario = propietario;
-    }
-    
-    //Constructor alternativo para compatibilidad
-    public Inmueble(String calle, String numero, String ciudad, String codigoPostal, double precioNoche, String descripcion, Integer capacidad, Usuario usuario) {
-        this.calle = calle;
-        this.numero = numero;
-        this.ciudad = ciudad;
-        this.codigoPostal = codigoPostal;
-        this.precioNoche = precioNoche;
-        this.descripcion = descripcion;
-        this.capacidad = capacidad;
-        //Nota: En este constructor no establecemos propietario
-        //Se establecerá cuando se cree el Propietario
+
+    private Inmueble(Builder builder) {
+        this.calle = builder.calle;
+        this.numero = builder.numero;
+        this.ciudad = builder.ciudad;
+        this.codigoPostal = builder.codigoPostal;
+        this.precioNoche = builder.precioNoche;
+        this.descripcion = builder.descripcion;
+        this.capacidad = builder.capacidad;
+        this.propietario = builder.propietario;
     }
 
     //Getters y Setters
@@ -115,6 +111,21 @@ public class Inmueble {
     public void setReservaDirecta(boolean reservaDirecta) {
         this.reservaDirecta = reservaDirecta;
     }
+    
+    public String getPoliticaCancelacion() {
+        return politicaCancelacion;
+    }
+    public void setPoliticaCancelacion(String politicaCancelacion) {
+        this.politicaCancelacion = politicaCancelacion;
+    }
+    
+    public List<String> getComodidades() {
+        return comodidades;
+    }
+    public void setComodidades(List<String> comodidades) {
+        this.comodidades = comodidades;
+    }
+    
     public String getDescripcion() { 
         return descripcion; 
     }
@@ -162,6 +173,68 @@ public class Inmueble {
     
     public String getDireccion() {
         return calle + " " + numero + ", " + ciudad + " " + codigoPostal;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static final class Builder {
+        private String calle;
+        private String numero;
+        private String ciudad;
+        private String codigoPostal;
+        private double precioNoche;
+        private String descripcion;
+        private Integer capacidad;
+        private Propietario propietario;
+
+        private Builder() {
+        }
+
+        public Builder calle(String calle) {
+            this.calle = calle;
+            return this;
+        }
+
+        public Builder numero(String numero) {
+            this.numero = numero;
+            return this;
+        }
+
+        public Builder ciudad(String ciudad) {
+            this.ciudad = ciudad;
+            return this;
+        }
+
+        public Builder codigoPostal(String codigoPostal) {
+            this.codigoPostal = codigoPostal;
+            return this;
+        }
+
+        public Builder precioNoche(double precioNoche) {
+            this.precioNoche = precioNoche;
+            return this;
+        }
+
+        public Builder descripcion(String descripcion) {
+            this.descripcion = descripcion;
+            return this;
+        }
+
+        public Builder capacidad(Integer capacidad) {
+            this.capacidad = capacidad;
+            return this;
+        }
+
+        public Builder propietario(Propietario propietario) {
+            this.propietario = propietario;
+            return this;
+        }
+
+        public Inmueble build() {
+            return new Inmueble(this);
+        }
     }
 }
 
