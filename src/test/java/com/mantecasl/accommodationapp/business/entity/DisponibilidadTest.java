@@ -5,49 +5,21 @@ import java.sql.Date;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class DisponibilidadTest {
 
-    @Test
-    void esValida_devuelveTrue_siFechaDentroDelRango() {
-        // given
+    @ParameterizedTest
+    @ValueSource(strings = {"2025-01-10", "2025-01-15", "2025-01-20"})
+    void esValida_devuelveTrue_paraFechasDentroOEnElBorde(String fechaStr) {
         Disponibilidad disp = new Disponibilidad();
         disp.setFechaInicio(Date.valueOf("2025-01-10"));
         disp.setFechaFin(Date.valueOf("2025-01-20"));
 
-        Date fecha = Date.valueOf("2025-01-15");
+        Date fecha = Date.valueOf(fechaStr);
 
-        // when
-        boolean resultado = disp.esValida(fecha);
-
-        // then
-        assertTrue(resultado);
-    }
-
-    @Test
-    void esValida_devuelveTrue_siFechaIgualAlInicio() {
-        Disponibilidad disp = new Disponibilidad();
-        disp.setFechaInicio(Date.valueOf("2025-01-10"));
-        disp.setFechaFin(Date.valueOf("2025-01-20"));
-
-        Date fecha = Date.valueOf("2025-01-10");
-
-        boolean resultado = disp.esValida(fecha);
-
-        assertTrue(resultado);
-    }
-
-    @Test
-    void esValida_devuelveTrue_siFechaIgualAlFin() {
-        Disponibilidad disp = new Disponibilidad();
-        disp.setFechaInicio(Date.valueOf("2025-01-10"));
-        disp.setFechaFin(Date.valueOf("2025-01-20"));
-
-        Date fecha = Date.valueOf("2025-01-20");
-
-        boolean resultado = disp.esValida(fecha);
-
-        assertTrue(resultado);
+        assertTrue(disp.esValida(fecha));
     }
 
     @Test
