@@ -1,12 +1,12 @@
 package com.mantecasl.accommodationapp.business.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.sql.Date;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
-public class DisponibilidadTest {
+class DisponibilidadTest {
 
     @Test
     void esValida_devuelveTrue_siFechaDentroDelRango() {

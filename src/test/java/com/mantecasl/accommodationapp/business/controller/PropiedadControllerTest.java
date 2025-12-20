@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -61,6 +60,8 @@ class PropiedadControllerTest {
                                                 Map<String, Object> model,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
+                                        // This method is intentionally left empty because
+                                        // the test context does not require actual view rendering.
                                 }
                         };
                 }
@@ -189,7 +190,7 @@ class PropiedadControllerTest {
                                 .andExpect(view().name("redirect:/propiedades"));
 
                 verify(notificacion).notificarEliminacionPropiedad(eq(i), any());
-                verify(notificacion).crearNotificacionPagoDevuelto(eq(r), eq(100.0));
+                verify(notificacion).crearNotificacionPagoDevuelto(r, 100.0);
                 verify(inmuebleDAO).delete(i);
         }
 

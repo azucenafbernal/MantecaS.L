@@ -54,6 +54,8 @@ class GestorInmueblesTest {
                         Map<String, Object> model,
                         HttpServletRequest request,
                         HttpServletResponse response) {
+                    // This method is intentionally left empty because
+                    // the test context does not require actual view rendering.
                 }
             };
         }

@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -67,6 +66,8 @@ class ReservasControllerTest {
                                                 Map<String, Object> model,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
+                                        // This method is intentionally left empty because
+                                        // the test context does not require actual view rendering.
                                 }
                         };
                 }

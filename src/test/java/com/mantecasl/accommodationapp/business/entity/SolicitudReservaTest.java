@@ -1,14 +1,16 @@
 package com.mantecasl.accommodationapp.business.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.sql.Date;
 import java.time.LocalDateTime;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SolicitudReservaTest {
+class SolicitudReservaTest {
 
     private Inquilino inquilino;
     private Inmueble inmueble;
@@ -85,7 +87,7 @@ public class SolicitudReservaTest {
         SolicitudReserva s = new SolicitudReserva();
         s.setEstado("PENDIENTE");
 
-        assertThrows(IllegalStateException.class, () -> s.crearReserva());
+        assertThrows(IllegalStateException.class, s::crearReserva);
     }
 
     @Test
