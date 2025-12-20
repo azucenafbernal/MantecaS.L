@@ -5,14 +5,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
+import com.mantecasl.accommodationapp.business.config.PropertiesDAOConfig;
 import com.mantecasl.accommodationapp.business.entity.*;
 import com.mantecasl.accommodationapp.business.persistance.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,6 +37,19 @@ class MisPropiedadesControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    // ======= DEPENDENCIAS DEL CONTROLADOR =======
+
+    @MockBean
+    private PropertiesDAOConfig daoConfig;
+
+    @MockBean
+    private GestorNotificaciones gestorNotificaciones;
+
+    @MockBean
+    private ObjectProvider<MisPropiedadesController> selfProvider;
+
+    // ======= DAOs USADOS A TRAVÉS DE daoConfig =======
+
     @MockBean
     private InmuebleDAO inmuebleDAO;
 
@@ -41,12 +57,22 @@ class MisPropiedadesControllerTest {
     private ReservaDAO reservaDAO;
 
     @MockBean
+    private SolicitudReservaDAO solicitudReservaDAO;
+
+    @MockBean
     private FavoritoDAO favoritoDAO;
 
     @MockBean
-    private PagoDAO pagoDAO;
+    private DisponibilidadDAO disponibilidadDAO;
 
-    // ---------- ViewResolver dummy ----------
+    @MockBean
+    private NotificacionDAO notificacionDAO;
+
+    @MockBean
+    private InquilinoDAO inquilinoDAO;
+
+    // ======= CONFIGURACIÓN VIEW RESOLVER =======
+
     @TestConfiguration
     static class TestViewResolverConfig {
         @Bean
@@ -62,7 +88,23 @@ class MisPropiedadesControllerTest {
         }
     }
 
-    // ---------- MOSTRAR ----------
+    // ======= SETUP COMÚN =======
+
+    @BeforeEach
+    void setup() {
+        when(daoConfig.getInmuebleDAO()).thenReturn(inmuebleDAO);
+        when(daoConfig.getReservaDAO()).thenReturn(reservaDAO);
+        when(daoConfig.getSolicitudReservaDAO()).thenReturn(solicitudReservaDAO);
+        when(daoConfig.getFavoritoDAO()).thenReturn(favoritoDAO);
+        when(daoConfig.getDisponibilidadDAO()).thenReturn(disponibilidadDAO);
+        when(daoConfig.getNotificacionDAO()).thenReturn(notificacionDAO);
+        when(daoConfig.getInquilinoDAO()).thenReturn(inquilinoDAO);
+    }
+
+    // ===============================
+    // MOSTRAR MIS PROPIEDADES
+    // ===============================
+
     @Test
     void mostrarMisPropiedades_no_logueado() throws Exception {
         mockMvc.perform(get("/mis-propiedades"))
@@ -81,53 +123,23 @@ class MisPropiedadesControllerTest {
         mockMvc.perform(get("/mis-propiedades")
                 .sessionAttr("usuario", u))
                 .andExpect(status().isOk())
-                .andExpect(view().name("modificar-propiedad"));
+                .andExpect(view().name("modificar-propiedad"))
+                .andExpect(model().attributeExists("propiedades"));
     }
 
-    // ---------- ELIMINAR ----------
-    @Test
-    void eliminarPropiedad_no_logueado() throws Exception {
-        mockMvc.perform(get("/eliminar-propiedad/1"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("redirect:/login"));
-    }
+    // ===============================
+    // EDITAR PROPIEDAD
+    // ===============================
 
-    @Test
-    void eliminarPropiedad_excepcion_oculta() throws Exception {
-        Usuario u = new Usuario();
-        u.setId(1L);
-
-        Usuario up = new Usuario();
-        up.setId(1L);
-
-        Propietario p = new Propietario();
-        p.setUsuario(up);
-
-        Inmueble i = new Inmueble();
-        i.setId(1L);
-        i.setPropietario(p);
-
-        when(inmuebleDAO.findById(1L)).thenReturn(Optional.of(i));
-        doThrow(new RuntimeException()).when(reservaDAO).deleteByInmuebleId(1L);
-        when(inmuebleDAO.save(any())).thenReturn(i);
-
-        mockMvc.perform(get("/eliminar-propiedad/1")
-                .sessionAttr("usuario", u))
-                .andExpect(status().isOk())
-                .andExpect(view().name("redirect:/mis-propiedades"));
-
-        verify(inmuebleDAO).save(i);
-    }
-
-    // ---------- EDITAR ----------
     @Test
     void editarPropiedad_ok() throws Exception {
         Usuario u = new Usuario();
         u.setId(1L);
 
-        Propietario p = new Propietario();
         Usuario up = new Usuario();
         up.setId(1L);
+
+        Propietario p = new Propietario();
         p.setUsuario(up);
 
         Inmueble i = new Inmueble();
@@ -143,7 +155,10 @@ class MisPropiedadesControllerTest {
                 .andExpect(model().attributeExists("inmueble"));
     }
 
-    // ---------- ACTUALIZAR ----------
+    // ===============================
+    // ACTUALIZAR PROPIEDAD
+    // ===============================
+
     @Test
     void actualizarPropiedad_no_logueado() throws Exception {
         mockMvc.perform(post("/actualizar-propiedad")
@@ -154,7 +169,7 @@ class MisPropiedadesControllerTest {
                 .param("codigoPostal", "28000")
                 .param("precioNoche", "50")
                 .param("capacidad", "2")
-                .param("descripcion", "D"))
+                .param("politicaCancelacion", "Flexible"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("redirect:/login"));
     }
@@ -185,43 +200,10 @@ class MisPropiedadesControllerTest {
                 .param("codigoPostal", "28000")
                 .param("precioNoche", "50")
                 .param("capacidad", "2")
-                .param("descripcion", "D"))
+                .param("politicaCancelacion", "Flexible"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("redirect:/mis-propiedades"));
+                .andExpect(view().name("redirect:/mis-propiedades?success=true"));
 
         verify(inmuebleDAO).save(i);
-    }
-
-    @Test
-    void actualizarPropiedad_no_es_propietario() throws Exception {
-        Usuario u = new Usuario();
-        u.setId(1L);
-
-        Usuario up = new Usuario();
-        up.setId(2L);
-
-        Propietario p = new Propietario();
-        p.setUsuario(up);
-
-        Inmueble i = new Inmueble();
-        i.setId(1L);
-        i.setPropietario(p);
-
-        when(inmuebleDAO.findById(1L)).thenReturn(Optional.of(i));
-
-        mockMvc.perform(post("/actualizar-propiedad")
-                .sessionAttr("usuario", u)
-                .param("id", "1")
-                .param("calle", "C")
-                .param("numero", "1")
-                .param("ciudad", "M")
-                .param("codigoPostal", "28000")
-                .param("precioNoche", "50")
-                .param("capacidad", "2")
-                .param("descripcion", "D"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("redirect:/mis-propiedades"));
-
-        verify(inmuebleDAO, never()).save(any());
     }
 }

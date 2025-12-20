@@ -112,8 +112,8 @@ public class SolicitudReservaTest {
     void settersYGettersFuncionan() {
         SolicitudReserva s = new SolicitudReserva();
 
-        s.setObservaciones("Observación X");
-        assertEquals("Observación X", s.getObservaciones());
+        s.setObservacionesInquilino("Observación X");
+        assertEquals("Observación X", s.getObservacionesInquilino());
 
         s.setMensajePropietario("Mensaje X");
         assertEquals("Mensaje X", s.getMensajePropietario());
@@ -121,4 +121,5 @@ public class SolicitudReservaTest {
         s.setMotivoRechazo("Motivo X");
         assertEquals("Motivo X", s.getMotivoRechazo());
     }
+
 }

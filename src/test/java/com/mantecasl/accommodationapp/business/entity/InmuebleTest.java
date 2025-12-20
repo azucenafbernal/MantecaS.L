@@ -13,10 +13,21 @@ public class InmuebleTest {
     }
 
     @Test
-    void constructorCompleto_asignaValoresCorrectamente() {
+    void builder_creaInmuebleCorrectamente() {
+        Usuario u = new Usuario("Luis", "luis@mail.com", "1234");
         Propietario p = new Propietario();
-        Inmueble i = new Inmueble("Calle Falsa", "123", "Madrid", "28001",
-                50.0, "Bonito piso", 3, true, p);
+        p.setUsuario(u);
+
+        Inmueble i = Inmueble.builder()
+                .calle("Calle Falsa")
+                .numero("123")
+                .ciudad("Madrid")
+                .codigoPostal("28001")
+                .precioNoche(50.0)
+                .descripcion("Bonito piso")
+                .capacidad(3)
+                .propietario(p)
+                .build();
 
         assertEquals("Calle Falsa", i.getCalle());
         assertEquals("123", i.getNumero());
@@ -26,6 +37,7 @@ public class InmuebleTest {
         assertEquals("Bonito piso", i.getDescripcion());
         assertEquals(3, i.getCapacidad());
         assertEquals(p, i.getPropietario());
+        assertEquals(u, i.getUsuario());
     }
 
     @Test

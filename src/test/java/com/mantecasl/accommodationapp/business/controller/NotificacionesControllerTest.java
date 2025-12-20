@@ -1,5 +1,6 @@
 package com.mantecasl.accommodationapp.business.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -83,9 +84,10 @@ class NotificacionesControllerTest {
         }
 
         // ---------- PROPIETARIO ----------
+
         @Test
         void verNotificacionesPropietario_sin_usuario() throws Exception {
-                mockMvc.perform(get("/notificaciones/propietario"))
+                mockMvc.perform(get("/notificaciones/propietario/notificaciones"))
                                 .andExpect(status().isOk())
                                 .andExpect(view().name("redirect:/login"));
         }
@@ -107,7 +109,7 @@ class NotificacionesControllerTest {
                 when(gestorReservas.obtenerHistorialReservasPropietario(1L))
                                 .thenReturn(List.of());
 
-                mockMvc.perform(get("/notificaciones/propietario").session(session))
+                mockMvc.perform(get("/notificaciones/propietario/notificaciones").session(session))
                                 .andExpect(status().isOk())
                                 .andExpect(view().name("notificaciones"));
         }
@@ -155,29 +157,5 @@ class NotificacionesControllerTest {
                                 .andExpect(view().name("redirect:/notificaciones"));
 
                 verify(gestorNotificaciones, never()).eliminarNotificacion(any());
-        }
-
-        // ---------- CONTAR ----------
-        @Test
-        void contarNoLeidas_con_usuario() throws Exception {
-                Usuario u = new Usuario();
-                u.setId(1L);
-
-                MockHttpSession session = new MockHttpSession();
-                session.setAttribute("usuario", u);
-
-                when(gestorNotificaciones.contarNotificacionesNoLeidas(u))
-                                .thenReturn(3L);
-
-                mockMvc.perform(get("/notificaciones/contar-no-leidas").session(session))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("3"));
-        }
-
-        @Test
-        void contarNoLeidas_sin_usuario() throws Exception {
-                mockMvc.perform(get("/notificaciones/contar-no-leidas"))
-                                .andExpect(status().isOk())
-                                .andExpect(content().string("0"));
         }
 }

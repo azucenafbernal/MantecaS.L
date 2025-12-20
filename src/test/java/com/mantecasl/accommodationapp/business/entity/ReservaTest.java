@@ -55,7 +55,8 @@ public class ReservaTest {
     @Test
     void cancelar_cambiaEstadoACancelada() {
         Reserva r = new Reserva();
-        r.cancelar("no importa motivo");
+
+        r.cancelar();
 
         assertEquals("CANCELADA", r.getEstado());
     }

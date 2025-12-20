@@ -28,9 +28,10 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+//Cargar solo el controlador, no la aplicación completa
 @WebMvcTest(controllers = ReservasController.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
 class ReservasControllerTest {
-
+        // Simular peticiones HTTP y dependencias
         @Autowired
         private MockMvc mockMvc;
 
@@ -55,7 +56,7 @@ class ReservasControllerTest {
         @MockBean
         private GestorNotificaciones notificacion;
 
-        // ---------- ViewResolver dummy ----------
+        // Simular la resolución de vistas
         @TestConfiguration
         static class TestViewResolverConfig {
                 @Bean

@@ -61,10 +61,8 @@ class LoginControllerTest {
 
     @Test
     void mostrarLogin_usuario_logueado_redirige() throws Exception {
-        Usuario usuario = new Usuario();
-
         mockMvc.perform(get("/login")
-                .sessionAttr("usuario", usuario))
+                .sessionAttr("usuarioId", 1L))
                 .andExpect(status().isOk())
                 .andExpect(view().name("redirect:/resultLogin"));
     }
@@ -104,6 +102,7 @@ class LoginControllerTest {
         Usuario existente = new Usuario();
         existente.setEmail("test@test.com");
         existente.setContrasena("1234");
+        existente.setId(1L);
 
         when(usuarioDAO.findByEmail("test@test.com")).thenReturn(existente);
 
@@ -115,19 +114,20 @@ class LoginControllerTest {
     }
 
     @Test
-    void procesarLogin_correcto_con_from() throws Exception {
+    void procesarLogin_correcto_con_from_permitido() throws Exception {
         Usuario existente = new Usuario();
         existente.setEmail("test@test.com");
         existente.setContrasena("1234");
+        existente.setId(1L);
 
         when(usuarioDAO.findByEmail("test@test.com")).thenReturn(existente);
 
         mockMvc.perform(post("/login")
                 .param("email", "test@test.com")
                 .param("contrasena", "1234")
-                .param("from", "/reservas/nueva/1"))
+                .param("from", "/reservas"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("redirect:/reservas/nueva/1"));
+                .andExpect(view().name("redirect:/reservas"));
     }
 
     // ---------- GET /resultLogin ----------

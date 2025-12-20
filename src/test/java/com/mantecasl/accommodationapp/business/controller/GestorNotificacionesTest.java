@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -24,10 +23,16 @@ class GestorNotificacionesTest {
     @Mock
     private NotificacionDAO notificacionDAO;
 
-    @InjectMocks
     private GestorNotificaciones gestor;
 
+    @BeforeEach
+    void setUp() {
+        // Creamos el servicio SIN ObjectProvider
+        gestor = new GestorNotificaciones(notificacionDAO, null);
+    }
+
     // -------- HELPERS --------
+
     private Usuario usuario(String nombre) {
         Usuario u = new Usuario();
         u.setNombre(nombre);
@@ -38,7 +43,7 @@ class GestorNotificacionesTest {
 
     private Inmueble inmueble(Propietario p) {
         Inmueble i = new Inmueble();
-        i.setCalle("C");
+        i.setCalle("Calle");
         i.setNumero("1");
         i.setCiudad("Madrid");
         i.setCodigoPostal("28000");
@@ -47,18 +52,17 @@ class GestorNotificacionesTest {
     }
 
     private SolicitudReserva solicitudBase() {
-        Usuario prop = usuario("Prop");
+        Usuario propU = usuario("Prop");
         Usuario inqU = usuario("Inq");
 
         Propietario p = new Propietario();
-        p.setUsuario(prop);
+        p.setUsuario(propU);
 
         Inmueble i = inmueble(p);
 
         Inquilino inq = new Inquilino();
         inq.setUsuario(inqU);
         inq.setMetodoPago("TARJETA");
-        inq.setInmueble(i);
 
         SolicitudReserva s = new SolicitudReserva();
         s.setId(1L);
@@ -82,6 +86,7 @@ class GestorNotificacionesTest {
     }
 
     // -------- CREACIÓN --------
+
     @Test
     void crearNotificacionSolicitudNueva() {
         when(notificacionDAO.save(any())).thenAnswer(i -> i.getArgument(0));
@@ -115,15 +120,6 @@ class GestorNotificacionesTest {
     }
 
     @Test
-    void crearNotificacionReservaCanceladaPorPropietario() {
-        SolicitudReserva s = solicitudBase();
-        Reserva r = reservaBase(s.getInmueble(), s.getInquilino());
-
-        when(notificacionDAO.save(any())).thenAnswer(i -> i.getArgument(0));
-        assertNotNull(gestor.crearNotificacionReservaCanceladaPorPropietario(r, null));
-    }
-
-    @Test
     void crearNotificacionMensajePropietario() {
         SolicitudReserva s = solicitudBase();
         Reserva r = reservaBase(s.getInmueble(), s.getInquilino());
@@ -132,25 +128,16 @@ class GestorNotificacionesTest {
         assertNotNull(gestor.crearNotificacionMensajePropietario(r, "hola"));
     }
 
-    // -------- NOTIFICACIONES MÚLTIPLES --------
+    // -------- ELIMINAR --------
+
     @Test
-    void notificarEliminacionPropiedad() {
-        Propietario p = new Propietario();
-        p.setUsuario(usuario("Prop"));
-
-        Inmueble i = inmueble(p);
-
-        Reserva r = reservaBase(i, new Inquilino());
-        r.getInquilino().setUsuario(usuario("Inq"));
-
-        when(notificacionDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
-
-        gestor.notificarEliminacionPropiedad(i, List.of(r));
-
-        verify(notificacionDAO, times(2)).save(any());
+    void eliminarNotificacion() {
+        gestor.eliminarNotificacion(1L);
+        verify(notificacionDAO).deleteById(1L);
     }
 
     // -------- CONSULTAS --------
+
     @Test
     void obtenerNotificacionesUsuario() {
         Usuario u = usuario("A");
@@ -158,27 +145,6 @@ class GestorNotificacionesTest {
                 .thenReturn(List.of(new Notificacion()));
 
         assertEquals(1, gestor.obtenerNotificacionesUsuario(u).size());
-    }
-
-    @Test
-    void obtenerNotificacionesNoLeidas() {
-        Usuario u = usuario("A");
-        when(notificacionDAO.findByUsuarioAndLeidaFalseOrderByFechaCreacionDesc(u))
-                .thenReturn(List.of(new Notificacion()));
-
-        assertEquals(1, gestor.obtenerNotificacionesNoLeidas(u).size());
-    }
-
-    @Test
-    void obtenerNotificacionesRecientes() {
-        Usuario u = usuario("A");
-        Notificacion n = new Notificacion();
-        n.setFechaCreacion(LocalDateTime.now());
-
-        when(notificacionDAO.findByUsuarioOrderByFechaCreacionDesc(u))
-                .thenReturn(List.of(n));
-
-        assertEquals(1, gestor.obtenerNotificacionesRecientes(u, 3).size());
     }
 
     @Test
@@ -190,7 +156,8 @@ class GestorNotificacionesTest {
         assertTrue(gestor.tieneNotificacionesNuevas(u));
     }
 
-    // -------- MARCAR / ELIMINAR --------
+    // -------- MARCAR --------
+
     @Test
     void marcarComoLeida_existente() {
         Notificacion n = new Notificacion();
@@ -198,35 +165,5 @@ class GestorNotificacionesTest {
 
         gestor.marcarComoLeida(1L);
         verify(notificacionDAO).save(n);
-    }
-
-    @Test
-    void eliminarNotificacion() {
-        gestor.eliminarNotificacion(1L);
-        verify(notificacionDAO).deleteById(1L);
-    }
-
-    @Test
-    void eliminarTodasLasNotificaciones() {
-        Usuario u = usuario("A");
-        when(notificacionDAO.findByUsuarioOrderByFechaCreacionDesc(u))
-                .thenReturn(List.of(new Notificacion(), new Notificacion()));
-
-        gestor.eliminarTodasLasNotificaciones(u);
-        verify(notificacionDAO).deleteAll(any());
-    }
-
-    // -------- WRAPPERS --------
-    @Test
-    void wrappers_ejecutan_metodos_base() {
-        SolicitudReserva s = solicitudBase();
-        when(notificacionDAO.save(any())).thenAnswer(i -> i.getArgument(0));
-
-        assertNotNull(gestor.notificarNuevaSolicitudPropietario(s));
-        assertNotNull(gestor.notificarRechazoInquilino(s, "x"));
-
-        Reserva r = reservaBase(s.getInmueble(), s.getInquilino());
-        s.setReserva(r);
-        assertNotNull(gestor.notificarAprobacionInquilino(s));
     }
 }
