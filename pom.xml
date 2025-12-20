@@ -23,9 +23,8 @@
 
         <!-- SonarCloud -->
       <sonar.organization>MantecaSL</sonar.organization>
-      <!--sonar.host.url>http://172.20.48.132:9000</sonar.host.url-->
-      <!--sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin-->
-      <sonar.organization>mantecas-l</sonar.organization>
+      <sonar.host.url>http://172.20.48.132:9000</sonar.host.url>
+      <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
       <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
       <sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
