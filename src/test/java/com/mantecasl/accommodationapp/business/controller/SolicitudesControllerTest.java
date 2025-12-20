@@ -4,7 +4,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -58,6 +57,8 @@ class SolicitudesControllerTest {
                         Map<String, Object> model,
                         HttpServletRequest request,
                         HttpServletResponse response) {
+                    // This method is intentionally left empty because
+                    // the test context does not require actual view rendering.
                 }
             };
         }

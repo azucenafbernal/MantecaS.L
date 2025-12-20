@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -28,9 +27,10 @@ import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+//Cargar solo el controlador, no la aplicación completa
 @WebMvcTest(controllers = ReservasController.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
 class ReservasControllerTest {
-
+        // Simular peticiones HTTP y dependencias
         @Autowired
         private MockMvc mockMvc;
 
@@ -55,7 +55,7 @@ class ReservasControllerTest {
         @MockBean
         private GestorNotificaciones notificacion;
 
-        // ---------- ViewResolver dummy ----------
+        // Simular la resolución de vistas
         @TestConfiguration
         static class TestViewResolverConfig {
                 @Bean
@@ -66,6 +66,8 @@ class ReservasControllerTest {
                                                 Map<String, Object> model,
                                                 HttpServletRequest request,
                                                 HttpServletResponse response) {
+                                        // This method is intentionally left empty because
+                                        // the test context does not require actual view rendering.
                                 }
                         };
                 }

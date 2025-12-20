@@ -5,7 +5,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
-import com.mantecasl.accommodationapp.business.entity.*;
+import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.SolicitudReserva;
 import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
 import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
 
@@ -30,7 +31,7 @@ class GestorReservasTest {
     @Test
     void obtenerSolicitudesPendientesPropietario_devuelve_lista() {
         when(solicitudReservaDAO
-                .findByInmueblePropietarioIdAndEstado(1L, "PENDIENTE"))
+                .findByInmueblePropietarioUsuarioIdAndEstado(1L, "PENDIENTE"))
                 .thenReturn(List.of(new SolicitudReserva()));
 
         List<SolicitudReserva> resultado = gestorReservas.obtenerSolicitudesPendientesPropietario(1L);
@@ -41,7 +42,7 @@ class GestorReservasTest {
     @Test
     void obtenerSolicitudesAprobadasPropietario_devuelve_lista() {
         when(solicitudReservaDAO
-                .findByInmueblePropietarioIdAndEstado(1L, "APROBADA"))
+                .findByInmueblePropietarioUsuarioIdAndEstado(1L, "APROBADA"))
                 .thenReturn(List.of(new SolicitudReserva()));
 
         List<SolicitudReserva> resultado = gestorReservas.obtenerSolicitudesAprobadasPropietario(1L);
@@ -52,7 +53,7 @@ class GestorReservasTest {
     @Test
     void obtenerSolicitudesRechazadasPropietario_devuelve_lista() {
         when(solicitudReservaDAO
-                .findByInmueblePropietarioIdAndEstado(1L, "RECHAZADA"))
+                .findByInmueblePropietarioUsuarioIdAndEstado(1L, "RECHAZADA"))
                 .thenReturn(List.of(new SolicitudReserva()));
 
         List<SolicitudReserva> resultado = gestorReservas.obtenerSolicitudesRechazadasPropietario(1L);
@@ -61,26 +62,20 @@ class GestorReservasTest {
     }
 
     @Test
-    void obtenerHistorialReservasPropietario_filtra_por_propietario_y_limita() {
-        Propietario propietario = new Propietario();
-        propietario.setId(1L);
-
-        Inmueble inmueble = new Inmueble();
-        inmueble.setPropietario(propietario);
-
+    void obtenerHistorialReservasPropietario_filtra_y_limita() {
         Reserva r1 = new Reserva();
-        r1.setId(1L);
-        r1.setInmueble(inmueble);
+        r1.setId(2L);
 
         Reserva r2 = new Reserva();
-        r2.setId(2L);
-        r2.setInmueble(inmueble);
+        r2.setId(1L);
 
-        when(reservaDAO.findAll()).thenReturn(List.of(r1, r2));
+        when(reservaDAO
+                .findTop10ByInmueblePropietarioUsuarioIdOrderByIdDesc(1L))
+                .thenReturn(List.of(r1, r2));
 
         List<Reserva> resultado = gestorReservas.obtenerHistorialReservasPropietario(1L);
 
         assertEquals(2, resultado.size());
-        assertEquals(2L, resultado.get(0).getId()); // orden descendente
+        assertEquals(2L, resultado.get(0).getId());
     }
 }

@@ -54,6 +54,8 @@ class GestorInmueblesTest {
                         Map<String, Object> model,
                         HttpServletRequest request,
                         HttpServletResponse response) {
+                    // This method is intentionally left empty because
+                    // the test context does not require actual view rendering.
                 }
             };
         }
@@ -84,7 +86,8 @@ class GestorInmueblesTest {
                 .param("capacidad", "2")
                 .param("emailPropietario", "test@mail.com")
                 .param("telefonoContacto", "600")
-                .param("cuentaBancaria", "ES123456789012345"))
+                .param("cuentaBancaria", "ES123456789012345")
+                .param("politicaCancelacion", "Flexible"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("registro-propiedad"));
     }
@@ -110,7 +113,8 @@ class GestorInmueblesTest {
                 .param("capacidad", "2")
                 .param("emailPropietario", "test@mail.com")
                 .param("telefonoContacto", "600")
-                .param("cuentaBancaria", "ES123456789012345"))
+                .param("cuentaBancaria", "ES123456789012345")
+                .param("politicaCancelacion", "Flexible"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("resultado-propiedad"));
     }
@@ -138,7 +142,8 @@ class GestorInmueblesTest {
                 .param("capacidad", "3")
                 .param("emailPropietario", "test@mail.com")
                 .param("telefonoContacto", "600")
-                .param("cuentaBancaria", "ES123456789012345"))
+                .param("cuentaBancaria", "ES123456789012345")
+                .param("politicaCancelacion", "Moderada"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("resultado-propiedad"));
     }
@@ -158,7 +163,8 @@ class GestorInmueblesTest {
                 .param("capacidad", "2")
                 .param("emailPropietario", "test@mail.com")
                 .param("telefonoContacto", "600")
-                .param("cuentaBancaria", "ES123456789012345"))
+                .param("cuentaBancaria", "ES123456789012345")
+                .param("politicaCancelacion", "Flexible"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("registro-propiedad"));
     }
@@ -166,7 +172,10 @@ class GestorInmueblesTest {
     // ---------- LISTAR ----------
     @Test
     void listarPropiedades() throws Exception {
-        when(inmuebleDAO.findAll()).thenReturn(List.of(new Inmueble()));
+        Inmueble inmueble = new Inmueble();
+        inmueble.setPropietario(new Propietario());
+
+        when(inmuebleDAO.findAll()).thenReturn(List.of(inmueble));
 
         mockMvc.perform(get("/propiedades"))
                 .andExpect(status().isOk())
@@ -182,5 +191,4 @@ class GestorInmueblesTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("detalle-inmueble"));
     }
-
 }

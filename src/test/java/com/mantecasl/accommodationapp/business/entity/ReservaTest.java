@@ -1,13 +1,15 @@
 package com.mantecasl.accommodationapp.business.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.sql.Date;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ReservaTest {
+class ReservaTest {
 
     private Inquilino inquilino;
     private Inmueble inmueble;
@@ -55,7 +57,8 @@ public class ReservaTest {
     @Test
     void cancelar_cambiaEstadoACancelada() {
         Reserva r = new Reserva();
-        r.cancelar("no importa motivo");
+
+        r.cancelar();
 
         assertEquals("CANCELADA", r.getEstado());
     }

@@ -1,11 +1,12 @@
 package com.mantecasl.accommodationapp.business.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class InquilinoTest {
+class InquilinoTest {
 
     private Inquilino inquilino;
 

@@ -1,9 +1,8 @@
 package com.mantecasl.accommodationapp.business.persistance;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -51,8 +50,9 @@ class InmuebleDAOTest {
         List<Inmueble> resultado = inmuebleDAO.findByPropietarioUsuarioId(usuario.getId());
 
         // Verificación
-        assertThat(resultado).isNotNull();
-        assertThat(resultado).hasSize(1);
+        assertThat(resultado)
+            .isNotNull()
+            .hasSize(1);
         assertThat(resultado.get(0).getCiudad()).isEqualTo("Madrid");
     }
 
@@ -60,7 +60,8 @@ class InmuebleDAOTest {
     void findByPropietarioUsuarioId_sin_resultados() {
         List<Inmueble> resultado = inmuebleDAO.findByPropietarioUsuarioId(999L);
 
-        assertThat(resultado).isNotNull();
-        assertThat(resultado).isEmpty();
+        assertThat(resultado)
+            .isNotNull()
+            .isEmpty();
     }
 }
