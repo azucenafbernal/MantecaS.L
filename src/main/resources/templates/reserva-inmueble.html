@@ -14,15 +14,12 @@
             <h1>Reserva tu estancia</h1>
         </div>
 
-        <!-- Mensajes de error -->
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-        <!-- Verificación de sesión -->
         <div th:if="${usuario == null}" class="login-alert text-center">
             <h4>🔐 Inicia sesión para continuar</h4>
             <p>Necesitas tener una cuenta para realizar una reserva</p>
             
-            <!-- Usar "from" en lugar de "redirect" -->
             <a th:href="@{'/login?from=' + ${fromUrl}}" class="btn btn-primary">
                 🚪 Iniciar Sesión
             </a>
@@ -31,7 +28,6 @@
             </a>
         </div>
 
-        <!-- Tarjeta del inmueble -->
         <div class="card mb-4 property-card">
             <div class="row g-0">
                 <div class="col-md-4">
@@ -60,7 +56,6 @@
             </div>
         </div>
 
-        <!-- Información del usuario logueado -->
         <div th:if="${usuario != null}" class="user-info">
             <h5>👤 Información del usuario</h5>
             <p class="mb-1"><strong>Nombre:</strong> <span th:text="${usuario.nombre}"></span></p>
@@ -68,14 +63,12 @@
             <p class="mb-0"><small class="text-muted">Si necesitas actualizar tu información, ve a tu perfil</small></p>
         </div>
 
-        <!-- Formulario de reserva (solo visible si está logueado) -->
         <div th:if="${usuario != null}" class="card form-card">
             <div class="card-body">
                 <form th:action="@{/reservas/confirmar}" method="post">
                     <input type="hidden" name="inmuebleId" th:value="${inmueble.id}">
                     <input type="hidden" name="usuarioId" th:value="${usuario.id}">
 
-                    <!-- Paso 1: Fechas de la reserva -->
                     <div class="form-step">
                         <h4 class="section-title">📅 Selecciona tus fechas</h4>
                         <div class="row mb-3">
@@ -92,18 +85,15 @@
                         </div>
                     </div>
 
-                    <!-- Paso 2: Información del inquilino -->
                     <div class="form-step">
                         <h4 class="section-title">👤 Información del inquilino</h4>
                         
-                        <!-- Si ya es inquilino, mostrar info existente -->
                         <div th:if="${inquilino != null}" class="alert alert-info">
                             <p><strong>Información guardada:</strong> Usaremos tus datos de inquilino existentes.</p>
                             <p class="mb-1"><strong>Teléfono:</strong> <span th:text="${inquilino.telefono}"></span></p>
                             <p class="mb-0"><strong>Documento:</strong> <span th:text="${inquilino.documentoIdentidad}"></span></p>
                         </div>
                         
-                        <!-- Campos para nuevo inquilino o actualización -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">📞 Teléfono de contacto *</label>
@@ -130,9 +120,6 @@
                         </div>
                     </div>
 
-<!-- Reemplaza el Paso 3: Tipo de reserva con esto -->
-
-                    <!-- Paso 3: Información del tipo de reserva -->
                     <div class="form-step">
                         <h4 class="section-title">🎯 Tipo de reserva</h4>
                         <div class="alert" th:classappend="${inmueble.reservaDirecta} ? 'alert-success' : 'alert-info'">
@@ -209,7 +196,6 @@
                     </div>
 
 
-                    <!-- Resumen y confirmación -->
                     <div class="form-step">
                         <h4 class="section-title">✅ Resumen de la reserva</h4>
                         <div class="alert alert-warning">
@@ -222,7 +208,6 @@
                         </div>
                     </div>
 
-                    <!-- Botones de acción -->
                     <div class="d-flex justify-content-between mt-4">
                         <a th:href="@{/inmueble/{id}(id=${inmueble.id})}" class="btn-volver">
                             ⬅ Volver al detalle
@@ -235,7 +220,6 @@
             </div>
         </div>
 
-        <!-- Mensaje si no está logueado -->
         <div th:if="${usuario == null}" class="text-center mt-4">
             <p class="text-muted">Una vez que inicies sesión, podrás completar el formulario de reserva</p>
         </div>

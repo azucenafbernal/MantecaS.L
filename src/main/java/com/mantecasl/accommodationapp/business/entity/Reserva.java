@@ -34,6 +34,9 @@ public class Reserva {
     @Column(nullable = false)
     private double precioTotal;
 
+    @Column(nullable = true)
+    private String observacionesInquilino;
+
     @Column(nullable = false)
     private String estado; // "CONFIRMADA", "CANCELADA", "COMPLETADA"
 
@@ -84,6 +87,14 @@ public class Reserva {
 
     public String getMetodoPagoUsado() { return metodoPagoUsado; }
     public void setMetodoPagoUsado(String metodoPagoUsado) { this.metodoPagoUsado = metodoPagoUsado; }
+
+    public String getObservacionesInquilino() {
+        return observacionesInquilino;
+    }
+
+    public void setObservacionesInquilino(String observacionesInquilino) {
+        this.observacionesInquilino = observacionesInquilino;
+    }
 
     // Métodos de negocio
     public void confirmar() {

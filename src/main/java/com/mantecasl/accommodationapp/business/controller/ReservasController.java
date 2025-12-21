@@ -82,6 +82,7 @@ public class ReservasController {
             @PathVariable Long inmuebleId,
             @RequestParam(required = false) String fechaInicio,
             @RequestParam(required = false) String fechaFin,
+            @RequestParam(value = "observaciones", required = false) String observaciones,
             HttpSession session,
             Model model) {
 
