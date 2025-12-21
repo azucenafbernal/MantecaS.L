@@ -12,14 +12,16 @@ class DisponibilidadTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"2025-01-10", "2025-01-15", "2025-01-20"})
-    void esValida_devuelveTrue_paraFechasDentroOEnElBorde(String fechaStr) {
+    void esValida_devuelveTrue_paraFechasDentroOIgualAlRango(String fechaStr) {
         Disponibilidad disp = new Disponibilidad();
         disp.setFechaInicio(Date.valueOf("2025-01-10"));
         disp.setFechaFin(Date.valueOf("2025-01-20"));
 
         Date fecha = Date.valueOf(fechaStr);
 
-        assertTrue(disp.esValida(fecha));
+        boolean resultado = disp.esValida(fecha);
+
+        assertTrue(resultado);
     }
 
     @Test

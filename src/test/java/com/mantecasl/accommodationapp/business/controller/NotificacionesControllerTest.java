@@ -1,28 +1,31 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.mantecasl.accommodationapp.business.entity.Usuario;
-
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
+
+import com.mantecasl.accommodationapp.business.entity.Usuario;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,25 +37,23 @@ class NotificacionesControllerTest {
         @Autowired
         private MockMvc mockMvc;
 
-        @MockBean
+        @MockitoBean
         private GestorNotificaciones gestorNotificaciones;
 
-        @MockBean
+        @MockitoBean
         private GestorReservas gestorReservas;
 
         // ---------- ViewResolver dummy ----------
-        @TestConfiguration
         static class TestViewResolverConfig {
                 @Bean
                 ViewResolver viewResolver() {
                         return (String viewName, Locale locale) -> new AbstractView() {
                                 @Override
                                 protected void renderMergedOutputModel(
-                                                Map<String, Object> model,
-                                                HttpServletRequest request,
-                                                HttpServletResponse response) {
-                                        // This method is intentionally left empty because
-                                        // the test context does not require actual view rendering.
+                                                @NonNull Map<String, Object> model,
+                                                @NonNull HttpServletRequest request,
+                                                @NonNull HttpServletResponse response) {
+                                                        //This method is intentionally left blank for testing purposes.
                                 }
                         };
                 }
@@ -76,7 +77,6 @@ class NotificacionesControllerTest {
 
                 when(gestorNotificaciones.obtenerNotificacionesUsuario(u))
                                 .thenReturn(List.of());
-
                 when(gestorNotificaciones.contarNotificacionesNoLeidas(u))
                                 .thenReturn(0L);
 
@@ -86,7 +86,6 @@ class NotificacionesControllerTest {
         }
 
         // ---------- PROPIETARIO ----------
-
         @Test
         void verNotificacionesPropietario_sin_usuario() throws Exception {
                 mockMvc.perform(get("/notificaciones/propietario/notificaciones"))

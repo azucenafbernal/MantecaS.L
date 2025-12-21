@@ -1,73 +1,84 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.AbstractView;
+
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.entity.Inquilino;
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+import com.mantecasl.accommodationapp.business.persistance.DisponibilidadDAO;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.InquilinoDAO;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.view.AbstractView;
-import org.springframework.boot.test.mock.mockito.MockBean;
-
-//Cargar solo el controlador, no la aplicación completa
 @WebMvcTest(controllers = ReservasController.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
+@Import(ReservasControllerTest.TestViewResolverConfig.class)
 class ReservasControllerTest {
-        // Simular peticiones HTTP y dependencias
+
         @Autowired
         private MockMvc mockMvc;
 
-        @MockBean
+        @MockitoBean
         private GestorDisponibilidad gestorDisponibilidad;
 
-        @MockBean
+        @MockitoBean
         private InmuebleDAO inmuebleDAO;
 
-        @MockBean
+        @MockitoBean
         private ReservaDAO reservaDAO;
 
-        @MockBean
+        @MockitoBean
         private InquilinoDAO inquilinoDAO;
 
-        @MockBean
+        @MockitoBean
         private SolicitudReservaDAO solicitudReservaDAO;
 
-        @MockBean
+        @MockitoBean
         private DisponibilidadDAO disponibilidadDAO;
 
-        @MockBean
+        @MockitoBean
         private GestorNotificaciones notificacion;
 
-        // Simular la resolución de vistas
-        @TestConfiguration
+        // ---------- ViewResolver dummy ----------
         static class TestViewResolverConfig {
                 @Bean
                 ViewResolver viewResolver() {
                         return (String viewName, Locale locale) -> new AbstractView() {
                                 @Override
                                 protected void renderMergedOutputModel(
-                                                Map<String, Object> model,
-                                                HttpServletRequest request,
-                                                HttpServletResponse response) {
-                                        // This method is intentionally left empty because
-                                        // the test context does not require actual view rendering.
+                                                @NonNull Map<String, Object> model,
+                                                @NonNull HttpServletRequest request,
+                                                @NonNull HttpServletResponse response) {
+                                                        //This method is intentionally left blank for testing purposes.
                                 }
                         };
                 }
@@ -78,7 +89,7 @@ class ReservasControllerTest {
         @Test
         void mostrarFormulario_no_logueado() throws Exception {
                 mockMvc.perform(get("/reservas/nueva/1"))
-                                .andExpect(status().isOk()); // Spring no entra al controller
+                                .andExpect(status().isOk());
         }
 
         @Test
@@ -90,12 +101,14 @@ class ReservasControllerTest {
                                 .andExpect(status().isOk());
         }
 
+        // ---------- POST /reservas/confirmar ----------
+
         @Test
         void confirmarReserva_error_validar_fechas() throws Exception {
                 Usuario usuario = new Usuario();
                 usuario.setId(1L);
 
-                when(gestorDisponibilidad.validarFechas(any(), any()))
+                when(gestorDisponibilidad.validarFechas(anyString(), anyString()))
                                 .thenThrow(new RuntimeException("Fechas inválidas"));
 
                 mockMvc.perform(post("/reservas/confirmar")
@@ -120,17 +133,22 @@ class ReservasControllerTest {
                 inmueble.setReservaDirecta(true);
 
                 when(inmuebleDAO.findById(1L)).thenReturn(Optional.of(inmueble));
-                when(gestorDisponibilidad.validarFechas(any(), any()))
+
+                when(gestorDisponibilidad.validarFechas(anyString(), anyString()))
                                 .thenReturn(new Date[] {
                                                 Date.valueOf(LocalDate.now().plusDays(1)),
                                                 Date.valueOf(LocalDate.now().plusDays(3))
                                 });
 
-                when(gestorDisponibilidad.verificarDisponibilidad(any(), any(), any()))
+                when(gestorDisponibilidad.verificarDisponibilidad(
+                                anyLong(),
+                                any(Date.class),
+                                any(Date.class)))
                                 .thenReturn(true);
 
                 when(inquilinoDAO.findByUsuario(usuario)).thenReturn(Optional.empty());
-                when(inquilinoDAO.save(any())).thenAnswer(inv -> inv.getArgument(0));
+                when(inquilinoDAO.save(isA(Inquilino.class)))
+                                .thenAnswer(inv -> inv.getArgument(0));
 
                 mockMvc.perform(post("/reservas/confirmar")
                                 .sessionAttr("usuario", usuario)
@@ -141,5 +159,8 @@ class ReservasControllerTest {
                                 .param("documentoIdentidad", "DNI")
                                 .param("metodoPago", "TARJETA"))
                                 .andExpect(status().isOk());
+
+                verify(inquilinoDAO, atLeastOnce()).save(isA(Inquilino.class));
+
         }
 }

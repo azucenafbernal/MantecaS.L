@@ -1,46 +1,52 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.Locale;
 import java.util.Map;
-
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
+
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.entity.Propietario;
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.PropietarioDAO;
+import com.mantecasl.accommodationapp.business.persistance.UsuarioDAO;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebMvcTest(controllers = GestorInmuebles.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
-@Import(GestorInmueblesTest.TestViewResolverConfig.class)
 class GestorInmueblesTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private InmuebleDAO inmuebleDAO;
 
-    @MockBean
+    @MockitoBean
     private UsuarioDAO usuarioDAO;
 
-    @MockBean
+    @MockitoBean
     private PropietarioDAO propietarioDAO;
 
     // ---------- ViewResolver dummy ----------
@@ -51,11 +57,10 @@ class GestorInmueblesTest {
             return (String viewName, Locale locale) -> new AbstractView() {
                 @Override
                 protected void renderMergedOutputModel(
-                        Map<String, Object> model,
-                        HttpServletRequest request,
-                        HttpServletResponse response) {
-                    // This method is intentionally left empty because
-                    // the test context does not require actual view rendering.
+                        @NonNull Map<String, Object> model,
+                        @NonNull HttpServletRequest request,
+                        @NonNull HttpServletResponse response) {
+                                //This method is intentionally left blank for testing purposes.
                 }
             };
         }
@@ -97,10 +102,12 @@ class GestorInmueblesTest {
         Usuario usuario = new Usuario();
         usuario.setId(1L);
 
-        when(usuarioDAO.findByEmail(any())).thenReturn(usuario);
+        when(usuarioDAO.findByEmail(isA(String.class))).thenReturn(usuario);
         when(propietarioDAO.findByUsuarioId(1L)).thenReturn(null);
-        when(propietarioDAO.save(any())).thenAnswer(i -> i.getArgument(0));
-        when(inmuebleDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(propietarioDAO.save(isA(Propietario.class)))
+                .thenAnswer(i -> i.getArgument(0));
+        when(inmuebleDAO.save(isA(Inmueble.class)))
+                .thenAnswer(i -> i.getArgument(0));
 
         mockMvc.perform(post("/propiedades/registrar")
                 .param("calle", "Calle A")
@@ -127,9 +134,10 @@ class GestorInmueblesTest {
         Propietario propietario = new Propietario();
         propietario.setUsuario(usuario);
 
-        when(usuarioDAO.findByEmail(any())).thenReturn(usuario);
+        when(usuarioDAO.findByEmail(isA(String.class))).thenReturn(usuario);
         when(propietarioDAO.findByUsuarioId(1L)).thenReturn(propietario);
-        when(inmuebleDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(inmuebleDAO.save(isA(Inmueble.class)))
+                .thenAnswer(i -> i.getArgument(0));
 
         mockMvc.perform(post("/propiedades/registrar")
                 .param("calle", "Calle B")
@@ -150,7 +158,8 @@ class GestorInmueblesTest {
 
     @Test
     void registrarPropiedad_excepcion() throws Exception {
-        when(usuarioDAO.findByEmail(any())).thenThrow(new RuntimeException("boom"));
+        when(usuarioDAO.findByEmail(isA(String.class)))
+                .thenThrow(new RuntimeException("boom"));
 
         mockMvc.perform(post("/propiedades/registrar")
                 .param("calle", "Calle A")

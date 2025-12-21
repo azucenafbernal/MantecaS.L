@@ -52,8 +52,10 @@ class InmuebleDAOTest {
         // Verificación
         assertThat(resultado)
             .isNotNull()
-            .hasSize(1);
-        assertThat(resultado.get(0).getCiudad()).isEqualTo("Madrid");
+            .hasSize(1)
+            .element(0)
+            .extracting(Inmueble::getCiudad)
+            .isEqualTo("Madrid");
     }
 
     @Test

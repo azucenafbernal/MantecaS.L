@@ -10,24 +10,22 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import com.mantecasl.accommodationapp.business.entity.*;
 import com.mantecasl.accommodationapp.business.persistance.NotificacionDAO;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = GestorNotificaciones.class)
 class GestorNotificacionesTest {
 
-    @Mock
+    @MockitoBean
     private NotificacionDAO notificacionDAO;
 
     private GestorNotificaciones gestor;
 
     @BeforeEach
     void setUp() {
-        // Creamos el servicio SIN ObjectProvider
         gestor = new GestorNotificaciones(notificacionDAO, null);
     }
 
@@ -89,7 +87,9 @@ class GestorNotificacionesTest {
 
     @Test
     void crearNotificacionSolicitudNueva() {
-        when(notificacionDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(notificacionDAO.save(isA(Notificacion.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
         assertNotNull(gestor.crearNotificacionSolicitudNueva(solicitudBase()));
     }
 
@@ -99,14 +99,19 @@ class GestorNotificacionesTest {
         Reserva r = reservaBase(s.getInmueble(), s.getInquilino());
         s.setReserva(r);
 
-        when(notificacionDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(notificacionDAO.save(isA(Notificacion.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
         assertNotNull(gestor.crearNotificacionSolicitudAprobada(s));
     }
 
     @Test
     void crearNotificacionSolicitudRechazada_motivoNull() {
-        when(notificacionDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(notificacionDAO.save(isA(Notificacion.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
         Notificacion n = gestor.crearNotificacionSolicitudRechazada(solicitudBase(), null);
+
         assertTrue(n.getMensaje().contains("No especificado"));
     }
 
@@ -115,7 +120,9 @@ class GestorNotificacionesTest {
         SolicitudReserva s = solicitudBase();
         Reserva r = reservaBase(s.getInmueble(), s.getInquilino());
 
-        when(notificacionDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(notificacionDAO.save(isA(Notificacion.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
         assertNotNull(gestor.crearNotificacionPagoDevuelto(r, 50));
     }
 
@@ -124,7 +131,9 @@ class GestorNotificacionesTest {
         SolicitudReserva s = solicitudBase();
         Reserva r = reservaBase(s.getInmueble(), s.getInquilino());
 
-        when(notificacionDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(notificacionDAO.save(isA(Notificacion.class)))
+                .thenAnswer(i -> i.getArgument(0));
+
         assertNotNull(gestor.crearNotificacionMensajePropietario(r, "hola"));
     }
 
@@ -141,6 +150,7 @@ class GestorNotificacionesTest {
     @Test
     void obtenerNotificacionesUsuario() {
         Usuario u = usuario("A");
+
         when(notificacionDAO.findByUsuarioOrderByFechaCreacionDesc(u))
                 .thenReturn(List.of(new Notificacion()));
 
@@ -150,6 +160,7 @@ class GestorNotificacionesTest {
     @Test
     void contarNotificacionesNoLeidas() {
         Usuario u = usuario("A");
+
         when(notificacionDAO.countByUsuarioAndLeidaFalse(u)).thenReturn(2L);
 
         assertEquals(2, gestor.contarNotificacionesNoLeidas(u));
@@ -161,9 +172,11 @@ class GestorNotificacionesTest {
     @Test
     void marcarComoLeida_existente() {
         Notificacion n = new Notificacion();
+
         when(notificacionDAO.findById(1L)).thenReturn(Optional.of(n));
 
         gestor.marcarComoLeida(1L);
+
         verify(notificacionDAO).save(n);
     }
 }
