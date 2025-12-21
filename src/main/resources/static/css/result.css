@@ -1,0 +1,180 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: 
+        linear-gradient(135deg, rgba(35, 54, 73, 0.85) 0%, rgba(38, 65, 99, 0.85) 100%),
+        url('/images/fondoazul.jpg') center/cover no-repeat fixed;
+    min-height: 100vh;
+    padding: 20px;
+    color: #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 450px;
+}
+
+/* CARD */
+.card {
+    background: rgba(52, 84, 110, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(116, 130, 150, 0.5);
+    color: #e2e8f0;
+}
+
+/* CARD HOVER */
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    background: rgba(52, 84, 110, 0.95);
+}
+
+/* HEADER */
+.header {
+    background: linear-gradient(135deg, rgba(45, 55, 72, 0.9) 0%, rgba(74, 85, 104, 0.9) 100%);
+    color: white;
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.header p {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* ICONO SUCCESS */
+.success-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: #68d391; /* Verde tipo aprobado */
+    text-shadow: 0 2px 10px rgba(104, 211, 145, 0.3);
+}
+
+/* CONTENT */
+.content {
+    padding: 30px;
+}
+
+/* USER INFO */
+.user-info {
+    background: rgba(45, 55, 72, 0.5);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(247, 250, 252, 0.1);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #c5cdda;
+    font-size: 14px;
+}
+
+.info-value {
+    color: #e2e8f0;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* BOTONES */
+.btn-primary {
+    background: linear-gradient(135deg, #4299e1, #3182ce);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 14px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 15px;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #3182ce, #2c5282);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-secondary {
+    background: rgba(113, 128, 150, 0.9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: block;
+    text-align: center;
+}
+
+.btn-secondary:hover {
+    background: rgba(74, 85, 104, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    color: #c1c9d6;
+    border-top: 1px solid rgba(116, 130, 150, 0.3);
+}
+
+.footer a {
+    color: #4299e1;
+    text-decoration: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+    .container {
+        max-width: 100%;
+    }
+    
+    .content {
+        padding: 20px;
+    }
+}

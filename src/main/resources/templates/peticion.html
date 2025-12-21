@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Reserva</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/peticion.css">
+</head>
+<body>
+    <div class="container py-4">
+        <div class="header">
+            <h1>📝 Detalle de Solicitud</h1>
+            <p>Revisa los detalles y gestiona esta solicitud de reserva</p>
+        </div>
+
+        <!-- Estado de la solicitud -->
+        <div class="status-badge" 
+            th:class="${'status-badge ' + 
+                    (reserva.estado == 'PENDIENTE' ? 'status-pending' : 
+                    reserva.estado == 'APROBADA' ? 'status-confirmed' : 
+                    reserva.estado == 'RECHAZADA' ? 'status-cancelled' : '')}">
+            Estado: <span th:text="${reserva.estado}"></span>
+        </div>
+
+        <!-- Tarjeta principal -->
+        <div class="card">
+            <div class="detail-header">
+                <div class="detail-title">Solicitud #<span th:text="${reserva.id}"></span></div>
+                <div class="detail-subtitle">
+                    Creada el <span th:text="${reserva.fechaCreacion}"></span> · 
+                    Última actualización: <span th:text="${reserva.fechaDecision != null ? reserva.fechaDecision : reserva.fechaCreacion}"></span>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <!-- Información del inquilino -->
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h5>👤 Información del Inquilino</h5>
+                        <div class="info-item">
+                            <span class="info-label">Nombre</span>
+                            <span class="info-value" th:text="${reserva.inquilino.usuario.nombre}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email</span>
+                            <span class="info-value" th:text="${reserva.inquilino.usuario.email}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Teléfono</span>
+                            <span class="info-value" th:text="${reserva.inquilino.telefono}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Documento</span>
+                            <span class="info-value" th:text="${reserva.inquilino.documentoIdentidad}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Información de la reserva -->
+                    <div class="info-card">
+                        <h5>📅 Detalles de la Reserva</h5>
+                        <div class="info-item">
+                            <span class="info-label">Fecha entrada</span>
+                            <span class="info-value" th:text="${reserva.fechaInicio}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Fecha salida</span>
+                            <span class="info-value" th:text="${reserva.fechaFin}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Noches</span>
+                            <span class="info-value" th:text="${reserva.numeroNoches}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Precio/noche</span>
+                            <span class="info-value" th:text="'€' + ${reserva.inmueble.precioNoche}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- En la sección de información financiera -->
+                <div class="info-card">
+                    <h5>💰 Información Financiera</h5>
+                    <div class="info-item">
+                        <span class="info-label">Precio total</span>
+                        <span class="info-value highlight-value" th:text="'€' + ${#numbers.formatDecimal(reserva.precioTotal, 1, 2)}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Método de pago</span>
+                        <span class="info-value" th:text="${reserva.inquilino.metodoPago}"></span>
+                    </div>
+                    <!-- Datos de pago detallados (solo si son relevantes) -->
+                    <div th:if="${reserva.inquilino.metodoPago == 'TARJETA'}">
+                        <div class="info-item">
+                            <span class="info-label">Número de tarjeta</span>
+                            <span class="info-value" th:text="${reserva.inquilino.numeroTarjeta}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Caducidad</span>
+                            <span class="info-value" th:text="${reserva.inquilino.fechaCaducidad}"></span>
+                        </div>
+                    </div>
+                    <div th:if="${reserva.inquilino.metodoPago == 'PAYPAL'}">
+                        <div class="info-item">
+                            <span class="info-label">Email PayPal</span>
+                            <span class="info-value" th:text="${reserva.inquilino.paypalEmail}"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de la propiedad -->
+                <div class="info-card">
+                    <h5>🏠 Información de la Propiedad</h5>
+                    <div class="info-item">
+                        <span class="info-label">Dirección</span>
+                        <span class="info-value" th:text="${reserva.inmueble.direccion}"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Capacidad</span>
+                        <span class="info-value" th:text="${reserva.inmueble.capacidad} + ' personas'"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Propietario</span>
+                        <span class="info-value" th:text="${reserva.inmueble.propietario.usuario.nombre}"></span>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div th:if="${reserva.observacionesInquilino}" class="message-box">
+                    <h5>📝 Observaciones del Inquilino</h5>
+                    <div class="message-content" th:text="${reserva.observacionesInquilino}"></div>
+                </div>
+
+                <!-- Sección de acciones (solo para pendientes) -->
+                <div th:if="${reserva.estado == 'PENDIENTE'}" class="actions-section">
+                    <div class="actions-title">¿Qué deseas hacer con esta solicitud?</div>
+                    
+                    <form th:action="@{/propietario/reserva/{id}/aprobar(id=${reserva.id})}" method="post" class="mb-4">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Mensaje para el inquilino (opcional):</label>
+                            <textarea name="mensaje" class="form-control" rows="3" 
+                                      placeholder="Puedes enviar un mensaje personalizado al inquilino..."></textarea>
+                            <div class="form-text">Este mensaje se enviará junto con la confirmación.</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-action btn-approve">
+                                ✅ Aprobar Reserva
+                            </button>
+                        </div>
+                    </form>
+
+                    <form th:action="@{/propietario/reserva/{id}/rechazar(id=${reserva.id})}" method="post">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Motivo del rechazo (requerido):</label>
+                            <input type="text" name="motivo" class="form-control" required
+                                   placeholder="Ej: Fechas no disponibles, información incompleta...">
+                            <div class="form-text">El inquilino recibirá este motivo.</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button type="submit" class="btn-action btn-reject">
+                                ❌ Rechazar Solicitud
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Estado ya decidido -->
+                <div th:if="${reserva.estado != 'PENDIENTE'}" class="actions-section">
+                    <div class="actions-title">Esta solicitud ya ha sido procesada</div>
+                    <div class="text-center mt-3">
+                        <div th:if="${reserva.estado == 'APROBADA'}" class="message-box">
+                            <h5>✅ Solicitud Aprobada</h5>
+                            <div class="message-content">
+                                Aprobada el <span th:text="${reserva.fechaDecision}"></span>
+                                <div th:if="${reserva.mensajePropietario}">
+                                    <br>Mensaje: <span th:text="${reserva.mensajePropietario}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${reserva.estado == 'RECHAZADA'}" class="message-box">
+                            <h5>❌ Solicitud Rechazada</h5>
+                            <div class="message-content">
+                                Rechazada el <span th:text="${reserva.fechaDecision}"></span>
+                                <div th:if="${reserva.motivoRechazo}">
+                                    <br>Motivo: <span th:text="${reserva.motivoRechazo}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de navegación -->
+        <div class="text-center mt-4">
+            <a th:href="@{/propietario/notificaciones}" class="btn-back">
+                ← Volver a Notificaciones
+            </a>
+            <a th:href="@{/propietario/dashboard}" class="btn-back ms-3">
+                📊 Panel de Control
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Confirmación antes de acciones importantes
+        document.addEventListener('DOMContentLoaded', function() {
+            const approveBtn = document.querySelector('.btn-approve');
+            const rejectBtn = document.querySelector('.btn-reject');
+            
+            if (approveBtn) {
+                approveBtn.closest('form').addEventListener('submit', function(e) {
+                    if (!confirm('¿Estás seguro de que deseas aprobar esta reserva?\n\nEsta acción bloqueará las fechas en tu calendario.')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+            
+            if (rejectBtn) {
+                rejectBtn.closest('form').addEventListener('submit', function(e) {
+                    const motivo = this.querySelector('input[name="motivo"]').value;
+                    if (!motivo.trim()) {
+                        alert('Por favor, ingresa un motivo para el rechazo.');
+                        e.preventDefault();
+                    } else if (!confirm('¿Estás seguro de que deseas rechazar esta solicitud?\n\nEl inquilino recibirá una notificación.')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

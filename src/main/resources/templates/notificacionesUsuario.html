@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Notificaciones</title>
+    <link rel="stylesheet" href="/css/notificacionesUsuario.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                📨 Mis Notificaciones
+                <span class="badge-notificaciones" th:text="${noLeidas} + ' sin leer'"></span>
+            </h1>
+            
+            <form th:action="@{/notificaciones/leer-todas}" method="post" style="display: inline;">
+                <button type="submit" class="btn-leer-todas">✓ Marcar todas como leídas</button>
+            </form>
+        </div>
+
+        <div class="notificaciones-lista">
+            <div th:if="${#lists.isEmpty(notificaciones)}" class="empty-state">
+                <div>📭</div>
+                <h3>No tienes notificaciones</h3>
+                <p>Tus notificaciones aparecerán aquí cuando tengas actualizaciones</p>
+            </div>
+            
+            <div th:each="notificacion : ${notificaciones}" 
+                 class="notificacion" 
+                 th:classappend="${notificacion.leida} ? '' : 'no-leida'">
+                
+                <div class="notificacion-header">
+                    <div class="notificacion-titulo">
+                        <span th:text="${notificacion.titulo}"></span>
+                        <span class="notificacion-tipo" th:text="${notificacion.tipo}"></span>
+                    </div>
+                    <div class="notificacion-fecha" th:text="${notificacion.fechaFormateada}"></div>
+                </div>
+                
+                <div class="notificacion-mensaje" th:text="${notificacion.mensaje}"></div>
+                
+                <div class="notificacion-acciones">
+                    <form th:action="@{/notificaciones/{id}/leer(id=${notificacion.id})}" 
+                        method="post" 
+                        th:if="${not notificacion.leida}">
+                        <button type="submit" class="btn-accion">✓ Marcar como leída</button>
+                    </form>
+                    
+                    <form th:action="@{/notificaciones/{id}/eliminar(id=${notificacion.id})}" 
+                        method="post" 
+                        onsubmit="return confirm('¿Eliminar esta notificación?')">
+                        <button type="submit" class="btn-eliminar">🗑️ Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="back-link">
+            <a th:href="@{/}">← Volver al inicio</a>
+        </div>
+    </div>
+</body>
+</html>

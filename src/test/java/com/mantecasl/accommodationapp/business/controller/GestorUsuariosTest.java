@@ -1,0 +1,112 @@
+package com.mantecasl.accommodationapp.business.controller;
+
+import java.util.Locale;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.AbstractView;
+
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+import com.mantecasl.accommodationapp.business.persistance.UsuarioDAO;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebMvcTest(controllers = GestorUsuarios.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
+@Import(GestorUsuariosTest.TestViewResolverConfig.class)
+class GestorUsuariosTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private UsuarioDAO usuarioDAO;
+
+    // ---------- ViewResolver dummy ----------
+    static class TestViewResolverConfig {
+        @Bean
+        ViewResolver viewResolver() {
+            return (String viewName, Locale locale) -> new AbstractView() {
+                @Override
+                protected void renderMergedOutputModel(
+                        @NonNull Map<String, Object> model,
+                        @NonNull HttpServletRequest request,
+                        @NonNull HttpServletResponse response) {
+                            //This method is intentionally left blank for testing purposes.
+                }
+            };
+        }
+    }
+
+    // -------------------- GET --------------------
+
+    @Test
+    void mostrarFormulario_devuelve_vista_greeting_y_usuario_vacio() throws Exception {
+        mockMvc.perform(get("/usuarios"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("greeting"))
+                .andExpect(model().attributeExists("usuario"));
+    }
+
+    // -------------------- POST --------------------
+
+    @Test
+    void registrarUsuario_email_ya_existe_devuelve_error() throws Exception {
+        Usuario existente = new Usuario();
+        existente.setEmail("test@test.com");
+
+        when(usuarioDAO.findByEmail("test@test.com")).thenReturn(existente);
+
+        mockMvc.perform(post("/usuarios")
+                .param("nombre", "Alejandro")
+                .param("email", "test@test.com")
+                .param("contrasena", "1234"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("greeting"))
+                .andExpect(model().attributeExists("error"));
+
+        verify(usuarioDAO, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    void registrarUsuario_email_nuevo_guarda_y_redirige_a_login() throws Exception {
+        when(usuarioDAO.findByEmail("nuevo@test.com")).thenReturn(null);
+
+        Usuario guardado = new Usuario();
+        guardado.setId(1L);
+        guardado.setEmail("nuevo@test.com");
+
+        when(usuarioDAO.save(isA(Usuario.class))).thenReturn(guardado);
+
+        mockMvc.perform(post("/usuarios")
+                .param("nombre", "Nuevo")
+                .param("email", "nuevo@test.com")
+                .param("contrasena", "1234"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"))
+                .andExpect(model().attributeExists("usuario"))
+                .andExpect(model().attributeExists("mensaje"));
+
+        verify(usuarioDAO, times(1)).save(isA(Usuario.class));
+    }
+}

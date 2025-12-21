@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Deseos</title>
+    <link rel="stylesheet" href="/css/lista-deseos.css">
+</head>
+
+<body>
+<div class="container">
+    <h1>❤️ Mi Lista de Deseos</h1>
+
+    <div th:if="${favoritos.isEmpty()}" class="empty-msg">
+        No tienes propiedades en tu lista de deseos aún.
+        <br><br>
+
+        <div style="text-align: center;">
+            <a class="volver-btn" th:href="@{/catalogo}">🏠 Volver al catálogo</a>
+        </div>
+    </div>
+
+    <div th:unless="${favoritos.isEmpty()}" class="properties-grid">
+
+        <div th:each="fav : ${favoritos}">
+            
+            
+            <a th:href="@{/gestor/propiedad/{id}(id=${fav.inmueble.id})}" 
+               class="property-card">
+
+                <div class="property-header">
+                    <h3 th:text="${fav.inmueble.direccion}"></h3>
+                    <p th:text="|€${fav.inmueble.precioNoche}/noche|"></p>
+                </div>
+
+                <div class="property-content">
+                    <p><strong>Capacidad:</strong>
+                        <span th:text="${fav.inmueble.capacidad}"></span> personas
+                    </p>
+
+                    <p><strong>Propietario:</strong>
+                        <span th:text="${fav.inmueble != null && fav.inmueble.usuario != null} ? 
+                                      ${fav.inmueble.usuario.nombre} : 
+                                      'Propietario no disponible'"></span>
+                    </p>
+                </div>
+            </a>
+
+            
+            <form th:action="@{/favoritos/eliminar/{id}(id=${fav.id})}" method="post">
+                <button type="submit" class="btn">🗑 Eliminar de Favoritos</button>
+            </form>
+
+        </div>
+
+    </div>
+
+    <div style="text-align: center;">
+        <a class="volver-btn" th:href="@{/}">⬅️ Volver al inicio</a>
+    </div>
+
+</div>
+</body>
+</html>

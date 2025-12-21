@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Reserva</title>
+    <link rel="stylesheet" href="/css/confirmacion-reserva.css">
+</head>
+<body>
+    <div class="container py-4">
+        <div class="header">
+            <h1>Confirmación de Reserva</h1>
+        </div>
+
+        <!-- RESERVA DIRECTA -->
+        <div th:if="${esDirecta}">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon-large icon-success">✅</span>
+                    <h2>¡Reserva Confirmada!</h2>
+                    <p class="text-muted">Tu reserva ha sido procesada exitosamente</p>
+                    <span class="status-badge badge-confirmed">CONFIRMADA</span>
+                </div>
+
+                <div class="card-content">
+                    <div class="info-grid">
+                        <!-- Información de la reserva -->
+                        <div class="info-card">
+                            <h5>📋 Detalles de la Reserva</h5>
+                            <div class="info-item">
+                                <span class="info-label">ID de Reserva</span>
+                                <span class="info-value" th:text="${reserva?.id ?: 'No disponible'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Estado</span>
+                                <span class="info-value" th:text="${reserva?.estado ?: 'No disponible'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Método de pago</span>
+                                <span class="info-value" th:text="${reserva?.metodoPagoUsado ?: 'No disponible'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Fecha actual</span>
+                                <span class="info-value" th:text="${#dates.createNow()}"></span>
+                            </div>
+                        </div>
+
+                        <!-- Información del inmueble -->
+                        <div class="info-card">
+                            <h5>🏠 Información del Inmueble</h5>
+                            <div class="info-item">
+                                <span class="info-label">Dirección</span>
+                                <span class="info-value" th:text="${inmueble?.calle ?: 'No disponible'} + ' ' + ${inmueble?.numero ?: ''} + ', ' + ${inmueble?.ciudad ?: ''}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Propietario</span>
+                                <span class="info-value" th:text="${inmueble?.propietario?.usuario?.nombre ?: 'Propietario no disponible'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Capacidad</span>
+                                <span class="info-value" th:text="${(inmueble?.capacidad ?: 0) + ' personas'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Precio/noche</span>
+                                <span class="info-value" th:text="${'€' + (inmueble?.precioNoche ?: 0)}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de fechas y precios -->
+                    <div class="info-card">
+                        <h5>📅 Información de Fechas y Precio</h5>
+                        <div class="info-item">
+                            <span class="info-label">Fecha entrada</span>
+                            <span class="info-value" th:text="${#dates.format(reserva?.fechaInicio, 'dd/MM/yyyy')}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Fecha salida</span>
+                            <span class="info-value" th:text="${#dates.format(reserva?.fechaFin, 'dd/MM/yyyy')}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Noches</span>
+                            <span class="info-value" th:text="${reserva?.numeroNoches ?: 0}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Precio total</span>
+                            <span class="info-value highlight-value" th:text="${'€' + (reserva?.precioTotal != null ? #numbers.formatDecimal(reserva.precioTotal, 1, 2) : '0,00')}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Información de contacto -->
+                    <div class="contact-box">
+                        <h6>📧 Información de Contacto</h6>
+                        <div class="info-item">
+                            <span class="info-label">Propietario</span>
+                            <span class="info-value" th:text="${inmueble?.propietario?.usuario?.nombre ?: 'Propietario no disponible'}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email</span>
+                            <span class="info-value" th:text="${inmueble?.propietario?.usuario?.email ?: 'Email no disponible'}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Teléfono</span>
+                            <span class="info-value" th:text="${inmueble?.propietario?.telefonoContacto ?: 'Teléfono no disponible'}"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Datos de pago -->
+                    <div class="info-card">
+                        <h5>💳 Información de Pago</h5>
+                        <div class="info-item">
+                            <span class="info-label">Método de pago</span>
+                            <span class="info-value" th:text="${reserva?.metodoPagoUsado ?: 'No disponible'}"></span>
+                        </div>
+                        <div th:if="${reserva?.metodoPagoUsado == 'TARJETA' and reserva?.numeroTarjeta != null}" class="info-item">
+                            <span class="info-label">Tarjeta terminada en</span>
+                            <span class="info-value" th:text="${reserva?.numeroTarjeta != null ? '****' + reserva.numeroTarjeta.substring(reserva.numeroTarjeta.length() - 4) : 'No disponible'}"></span>
+                        </div>
+                        <div th:if="${reserva?.metodoPagoUsado == 'PAYPAL' and reserva?.paypalEmail != null}" class="info-item">
+                            <span class="info-label">Email PayPal</span>
+                            <span class="info-value" th:text="${reserva?.paypalEmail ?: 'No disponible'}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOLICITUD PENDIENTE -->
+        <div th:if="${not esDirecta}">
+            <div class="card">
+                <div class="card-header">
+                    <span class="icon-large icon-pending">📨</span>
+                    <h2>¡Solicitud Enviada!</h2>
+                    <p class="text-muted">Tu solicitud de reserva ha sido enviada al propietario</p>
+                    <span class="status-badge badge-pending">PENDIENTE</span>
+                </div>
+
+                <div class="card-content">
+                    <div class="info-grid">
+                        <!-- Información de la solicitud -->
+                        <div class="info-card">
+                            <h5>📋 Detalles de la Solicitud</h5>
+                            <div class="info-item">
+                                <span class="info-label">ID de Solicitud</span>
+                                <span class="info-value" th:text="${solicitud?.id ?: 'No disponible'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Estado</span>
+                                <span class="info-value" th:text="${solicitud?.estado ?: 'No disponible'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Inquilino</span>
+                                <span class="info-value" th:text="${solicitud?.inquilino?.usuario?.nombre ?: 'No disponible'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Fecha actual</span>
+                                <span class="info-value" th:text="${#dates.createNow()}"></span>
+                            </div>
+                        </div>
+
+                        <!-- Información del inmueble -->
+                        <div class="info-card">
+                            <h5>🏠 Información del Inmueble</h5>
+                            <div class="info-item">
+                                <span class="info-label">Dirección</span>
+                                <span class="info-value" th:text="${inmueble?.calle ?: 'No disponible'} + ' ' + ${inmueble?.numero ?: ''} + ', ' + ${inmueble?.ciudad ?: ''}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Propietario</span>
+                                <span class="info-value" th:text="${inmueble?.propietario?.usuario?.nombre ?: 'Propietario no disponible'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Capacidad</span>
+                                <span class="info-value" th:text="${(inmueble?.capacidad ?: 0) + ' personas'}"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Precio/noche</span>
+                                <span class="info-value" th:text="${'€' + (inmueble?.precioNoche ?: 0)}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de fechas y precios -->
+                    <div class="info-card">
+                        <h5>📅 Información de Fechas y Precio</h5>
+                        <div class="info-item">
+                            <span class="info-label">Fecha entrada</span>
+                            <span class="info-value" th:text="${#dates.format(solicitud?.fechaInicio, 'dd/MM/yyyy')}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Fecha salida</span>
+                            <span class="info-value" th:text="${#dates.format(solicitud?.fechaFin, 'dd/MM/yyyy')}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Noches</span>
+                            <span class="info-value" th:text="${solicitud?.numeroNoches ?: 0}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Precio total</span>
+                            <span class="info-value highlight-value" th:text="${'€' + (solicitud?.precioTotal != null ? #numbers.formatDecimal(solicitud.precioTotal, 1, 2) : '0,00')}"></span>
+                        </div>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div th:if="${solicitud.observacionesInquilino}" class="info-card">
+                        <h5>💬 Observaciones</h5>
+                        <p class="info-value" style="text-align: left;" th:text="${solicitud.observacionesInquilino}"></p>
+                    </div>
+
+                    <!-- Pasos a seguir -->
+                    <div class="steps-container">
+                        <div class="steps-title">📋 ¿Qué pasa ahora?</div>
+                        <div class="step-item">
+                            <div class="step-number">1</div>
+                            <div class="step-text">El propietario revisará tu solicitud (24-48 horas)</div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">2</div>
+                            <div class="step-text">Recibirás una notificación cuando responda</div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">3</div>
+                            <div class="step-text">Puedes revisar el estado en tu perfil</div>
+                        </div>
+                        <div class="step-item">
+                            <div class="step-number">4</div>
+                            <div class="step-text">Si es aprobada, se confirmará tu reserva</div>
+                        </div>
+                    </div>
+
+                    <!-- Advertencia importante -->
+                    <div class="warning-note">
+                        ⚠️ <strong>Importante:</strong> Las fechas no están bloqueadas hasta que el propietario apruebe la solicitud. 
+                        Otras personas podrían reservar las mismas fechas mientras tanto.
+                    </div>
+
+                    <!-- Información de contacto -->
+                    <div class="contact-box">
+                        <h6>📧 Información de Contacto</h6>
+                        <div class="info-item">
+                            <span class="info-label">Propietario</span>
+                            <span class="info-value" th:text="${inmueble?.propietario?.usuario?.nombre ?: 'Propietario no disponible'}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Email</span>
+                            <span class="info-value" th:text="${inmueble?.propietario?.usuario?.email ?: 'Email no disponible'}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Teléfono</span>
+                            <span class="info-value" th:text="${inmueble?.propietario?.telefonoContacto ?: 'Teléfono no disponible'}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <a th:href="@{/}" class="btn-action btn-primary">
+                🏠 Volver al Inicio
+            </a>
+            
+            <a th:href="@{/propiedades}" class="btn-action btn-secondary">
+                🔍 Buscar Más Alojamientos
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar alerta para recordar revisar notificaciones
+        document.addEventListener('DOMContentLoaded', function() {
+            // Solo mostrar alerta para solicitudes pendientes
+            if (document.querySelector('div[th\\:if="${not esDirecta}"]')) {
+                setTimeout(() => {
+                    alert('📢 Recuerda revisar tus notificaciones para ver el estado de tu solicitud.');
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

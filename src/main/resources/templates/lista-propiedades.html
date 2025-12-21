@@ -4,302 +4,268 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo de Propiedades</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            color: white;
-        }
-        
-        .header h1 {
-            font-size: 32px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        
-        .properties-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        
-        .property-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .property-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        }
-        
-        .property-header {
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        
-        .property-id {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-bottom: 5px;
-        }
-        
-        .property-address {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        
-        .property-price {
-            font-size: 24px;
-            font-weight: 700;
-        }
-        
-        .property-content {
-            padding: 25px;
-        }
-        
-        .property-info {
-            margin-bottom: 20px;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .info-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        
-        .info-label {
-            font-weight: 600;
-            color: #495057;
-            font-size: 14px;
-        }
-        
-        .info-value {
-            color: #6c757d;
-            text-align: right;
-            font-size: 14px;
-        }
-        
-        .property-description {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-        }
-        
-        .description-text {
-            color: #495057;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .property-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn-details {
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 10px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            flex: 1;
-            text-decoration: none;
-            text-align: center;
-        }
-        
-        .btn-details:hover {
-            background: linear-gradient(to right, #5a6fd8, #6a4190);
-            transform: translateY(-2px);
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 30px 20px;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 14px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
-            margin: 0 10px;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(to right, #5a6fd8, #6a4190e3);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-secondary {
-            display: inline-block;
-            background: linear-gradient(135deg, #2575fc, #6a11cb); /* Gradiente del primero */
-            color: white;
-            text-decoration: none;
-            padding: 12px 28px; /* Tamaño del secondary */
-            font-size: 16px;     /* Tamaño del secondary */
-            font-weight: 600;    /* Peso del secondary */
-            border: 2px solid white; /* Borde del secondary */
-            border-radius: 6px;       /* Radio del secondary */
-            cursor: pointer;
-            transition: all 0.3s ease; /* Transición del secondary */
-            margin: 0 10px;            /* Margen del secondary */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* Sombra del primero */
-            position: relative;
-            overflow: hidden;
-
-        }
-        
-        .btn-secondary:hover {
-            background: white;
-            color: #667eea;
-            transform: translateY(-2px);
-        }
-        
-        .no-properties {
-            text-align: center;
-            color: white;
-            padding: 60px 20px;
-        }
-        
-        .no-properties h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
-        }
-        
-        .no-properties p {
-            font-size: 16px;
-            opacity: 0.9;
-            margin-bottom: 25px;
-        }
-        
-        @media (max-width: 768px) {
-            .properties-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .property-actions {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/lista-propiedades.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🏠 Catálogo de Propiedades</h1>
-            <p>Descubre los mejores alojamientos para tus vacaciones</p>
+            <h1>Catálogo de Propiedades</h1>
+            <p>Descubre alojamientos exclusivos para tus próximas vacaciones</p>
         </div>
         
+        <!-- Desplegable de más filtros -->
+        <div class="filtros-avanzados-wrapper">
+            <button type="button" class="btn-mas-filtros" onclick="toggleFiltrosAvanzados()">
+                🔧 Más filtros
+                <span class="toggle-icon-small">▼</span>
+            </button>
+            
+            <form th:action="@{/catalogo}" method="get" class="filtros-avanzados-dropdown" id="filtrosAvanzadosForm">
+                <!-- Mantener filtros básicos -->
+                <input type="hidden" name="ciudad" th:value="${filtroCiudad}">
+                <input type="hidden" name="fechaInicio" th:value="${filtroFechaInicio}">
+                <input type="hidden" name="fechaFin" th:value="${filtroFechaFin}">
+                <input type="hidden" name="capacidad" th:value="${filtroCapacidad}">
+                
+                <!-- Filtro: Rango de precios -->
+                <div class="filtro-grupo">
+                    <div class="filtro-grupo-titulo">💰 Precio/noche</div>
+                    <div class="rango-precios">
+                        <div class="input-precios">
+                            <label for="precioMinimo">Mín</label>
+                            <input type="number" id="precioMinimo" name="precioMinimo" min="0" step="10">
+                        </div>
+                        <div class="input-precios">
+                            <label for="precioMaximo">Máx</label>
+                            <input type="number" id="precioMaximo" name="precioMaximo" min="0" step="10">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filtro: Política de cancelación -->
+                <div class="filtro-grupo">
+                    <div class="filtro-grupo-titulo">📋 Cancelación</div>
+                    <select name="politicaCancelacion" id="politicaCancelacion" style="width: 100%; padding: 6px 8px; background: rgba(52, 84, 110, 0.7); border: 1px solid rgba(116, 130, 150, 0.3); border-radius: 4px; color: #b4bccc; font-size: 12px;" onchange="this.style.color = this.value ? '#b4bccc' : '#9eaabe';">
+                        <option value="" style="color: #9eaabe;">Cualquiera</option>
+                        <option th:each="politica : ${politicasCancelacion}" th:value="${politica}" th:text="${politica}" style="color: #b4bccc;"></option>
+                    </select>
+                </div>
+                
+                <!-- Filtro: Comodidades -->
+                <div class="filtro-grupo">
+                    <div class="filtro-grupo-titulo">🏠 Comodidades</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div class="checkbox-item"><input type="checkbox" id="wifi-filter" name="comodidades" value="WiFi"><label for="wifi-filter">WiFi</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="cocina-filter" name="comodidades" value="Cocina completa"><label for="cocina-filter">Cocina</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="lavadora-filter" name="comodidades" value="Lavadora"><label for="lavadora-filter">Lavadora</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="aire-filter" name="comodidades" value="Aire acondicionado"><label for="aire-filter">Aire acond.</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="calefaccion-filter" name="comodidades" value="Calefacción"><label for="calefaccion-filter">Calefacción</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="parking-filter" name="comodidades" value="Parking"><label for="parking-filter">Parking</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="piscina-filter" name="comodidades" value="Piscina"><label for="piscina-filter">Piscina</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="terraza-filter" name="comodidades" value="Terraza"><label for="terraza-filter">Terraza</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="television-filter" name="comodidades" value="Televisión"><label for="television-filter">TV</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="mascotas-filter" name="comodidades" value="Mascotas permitidas"><label for="mascotas-filter">Mascotas</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="jardin-filter" name="comodidades" value="Jardín"><label for="jardin-filter">Jardín</label></div>
+                        <div class="checkbox-item"><input type="checkbox" id="acceso-filter" name="comodidades" value="Acceso para personas con movilidad reducida"><label for="acceso-filter">Accesible</label></div>
+                    </div>
+                </div>
+                
+                <!-- Filtro: Tipo de Reserva -->
+                <div class="filtro-grupo">
+                    <div class="filtro-grupo-titulo">🔖 Tipo de Reserva</div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="reservaDirecta" name="reservaDirecta" value="true">
+                        <label for="reservaDirecta">Reserva directa (sin confirmación)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="reservaConfirmacion" name="reservaConfirmacion" value="true">
+                        <label for="reservaConfirmacion">Requiere confirmación</label>
+                    </div>
+                </div>
+                
+                <!-- Botones -->
+                <div class="filtros-botones">
+                    <button type="submit" class="btn-aplicar-filtros">Aplicar</button>
+                    <button type="reset" class="btn-limpiar-avanzados">Limpiar</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Filtros activos - diseño minimalista -->
+
+        <div th:if="${filtroCiudad != null or filtroCapacidad != null}" class="filtros-activos">
+            <div class="filtros-header">
+                <h3>Filtros aplicados</h3>
+                <a th:href="@{/catalogo}" class="limpiar-filtros">
+                    Limpiar filtros
+                </a>
+            </div>
+            <div class="filtros-lista">
+                <div th:if="${filtroCiudad != null}" class="filtro-item">
+                    📍 <span th:text="${filtroCiudad}"></span>
+                </div>
+                <div th:if="${filtroCapacidad != null}" class="filtro-item">
+                    👥 <span th:text="${filtroCapacidad}"></span>+ huéspedes
+                </div>
+                <div th:if="${filtroFechaInicio != null}" class="filtro-item">
+                    📅 Entrada: <span th:text="${filtroFechaInicio}"></span>
+                </div>
+                <div th:if="${filtroFechaFin != null}" class="filtro-item">
+                    📅 Salida: <span th:text="${filtroFechaFin}"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Estado sin propiedades -->
+
         <div th:if="${propiedades.empty}" class="no-properties">
-            <h2>No hay propiedades registradas aún</h2>
-            <p>Sé el primero en registrar una propiedad y empieza a alquilar</p>
-            <a th:href="@{/propiedades/registro}" class="btn-primary">Registrar Primera Propiedad</a>
+            <h2>No se encontraron propiedades</h2>
+            <p>Modifica tus criterios de búsqueda o explora todas las propiedades disponibles</p>
+            <a th:href="@{/catalogo}" class="btn-primary">Ver catálogo completo</a>
         </div>
         
+        <!-- Grid de propiedades -->
+
         <div th:unless="${propiedades.empty}" class="properties-grid">
             <div th:each="inmueble : ${propiedades}" class="property-card">
                 <div class="property-header">
-                    <div class="property-id">ID: <span th:text="${inmueble.id}">123</span></div>
-                    <div class="property-address" th:text="${inmueble.direccion}">Calle Ejemplo 123</div>
-                    <div class="property-price" th:text="|€${inmueble.precioNoche}/noche|">€50/noche</div>
+                    <div class="property-id">PROPIEDAD #<span th:text="${inmueble.id}"></span></div>
+                    <div class="property-address" th:text="${inmueble.direccion}">Dirección de la propiedad</div>
+                    <div class="property-price" th:text="'€' + ${inmueble.precioNoche} + '/noche'">€50/noche</div>
                 </div>
                 
                 <div class="property-content">
                     <div class="property-info">
                         <div class="info-item">
-                            <span class="info-label">📍 Dirección:</span>
-                            <span class="info-value" th:text="${inmueble.direccion}">Calle Ejemplo 123</span>
+                            <span class="info-label">📍 Dirección</span>
+                            <span class="info-value" th:text="${inmueble.direccion}">Dirección completa</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">💰 Precio/noche:</span>
-                            <span class="info-value" th:text="|€${inmueble.precioNoche}|">€50.00</span>
+                            <span class="info-label">💰 Precio/noche</span>
+                            <span class="info-value" th:text="'€' + ${inmueble.precioNoche}">€50.00</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">👥 Capacidad:</span>
-                            <span class="info-value" th:text="|${inmueble.capacidad} personas|">4 personas</span>
+                            <span class="info-label">👥 Capacidad</span>
+                            <span class="info-value" th:text="${inmueble.capacidad} + ' personas'">4 personas</span>
                         </div>
                         <div class="info-item">
+                            <span class="info-label">👤 Propietario</span>
+                            <span class="info-value" th:text="${inmueble.propietario.usuario.nombre}">Juan Pérez</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">📧 Contacto</span>
+                            <span class="info-value" th:text="${inmueble.propietario.usuario.email}">juan@ejemplo.com</span>
                             <span class="info-label">👤 Propietario:</span>
-                            <span class="info-value" th:text="${inmueble.usuario.nombre}">Juan Pérez</span>
+                            <span class="info-value" 
+                                  th:text="${inmueble.propietario != null && inmueble.propietario.usuario != null} ? 
+                                           ${inmueble.propietario.usuario.nombre} : 
+                                           'Propietario no disponible'">
+                                Juan Pérez
+                            </span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">📧 Contacto:</span>
-                            <span class="info-value" th:text="${inmueble.usuario.email}">juan@ejemplo.com</span>
+                            <span class="info-value" 
+                                  th:text="${inmueble.propietario != null && inmueble.propietario.usuario != null} ? 
+                                           ${inmueble.propietario.usuario.email} : 
+                                           'Contacto no disponible'">
+                                juan@ejemplo.com
+                            </span>
                         </div>
                     </div>
                     
                     <div th:if="${inmueble.descripcion}" class="property-description">
                         <div class="description-text" th:text="${inmueble.descripcion}">
-                            Hermosa propiedad con vistas al mar, perfecta para vacaciones en familia.
+                            Descripción de la propiedad con detalles exclusivos.
                         </div>
                     </div>
                     
                     <div class="property-actions">
-                        <a th:href="@{gestor/propiedad/{id}(id=${inmueble.id})}" class="btn-details">
-                            Ver Detalles
+                        <a th:href="@{/propiedades/{id}(id=${inmueble.id})}" class="btn-details">
+                            👁️ Ver Detalles
                         </a>
+                        <form th:action="@{/favoritos/agregar/{idInmueble}(idInmueble=${inmueble.id})}" method="post" style="flex: 1;">
+                            <button type="submit" class="btn-favoritos">
+                                ❤️ Favoritos
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
         
+        <!-- Footer -->
+
         <div class="footer">
-            <a th:href="@{/propiedades/registro}" class="btn-secondary">➕ Registrar Nueva Propiedad</a>
-            <a th:href="@{/}" class="btn-secondary">🏠 Volver al Inicio</a>
+            <div class="footer-buttons">
+                <a th:href="@{/propiedades/registro}" class="btn-footer">
+                    ➕ Nueva Propiedad
+                </a>
+                <a th:href="@{/}" class="btn-footer secondary">
+                    🏠 Inicio
+                </a>
+            </div>
         </div>
     </div>
+    
+    <script>
+        // Toggle para mostrar/ocultar los filtros avanzados
+        function toggleFiltrosAvanzados() {
+            const dropdown = document.getElementById('filtrosAvanzadosForm');
+            const toggle = document.querySelector('.toggle-icon-small');
+            
+            dropdown.classList.toggle('visible');
+            toggle.classList.toggle('open');
+        }
+        
+        // Cerrar dropdown si se hace click fuera
+        document.addEventListener('click', function(event) {
+            const wrapper = document.querySelector('.filtros-avanzados-wrapper');
+            const dropdown = document.getElementById('filtrosAvanzadosForm');
+            const btn = document.querySelector('.btn-mas-filtros');
+            
+            if (!wrapper.contains(event.target)) {
+                dropdown.classList.remove('visible');
+                document.querySelector('.toggle-icon-small').classList.remove('open');
+            }
+        });
+        
+        // Restaurar estado de filtros al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Restaurar checkbox reserva inmediata
+            if (urlParams.get('reservaInmediata') === 'true') {
+                document.getElementById('reservaInmediata').checked = true;
+            }
+            
+            // Restaurar precios
+            if (urlParams.get('precioMinimo')) {
+                document.getElementById('precioMinimo').value = urlParams.get('precioMinimo');
+            }
+            if (urlParams.get('precioMaximo')) {
+                document.getElementById('precioMaximo').value = urlParams.get('precioMaximo');
+            }
+            
+            // Restaurar política de cancelación
+            if (urlParams.get('politicaCancelacion')) {
+                document.getElementById('politicaCancelacion').value = urlParams.get('politicaCancelacion');
+            }
+            
+            // Mostrar dropdown si hay filtros activos
+            const tieneFilteros = 
+                urlParams.get('reservaInmediata') === 'true' ||
+                urlParams.get('precioMinimo') ||
+                urlParams.get('precioMaximo') ||
+                urlParams.get('politicaCancelacion');
+            
+            if (tieneFilteros) {
+                const dropdown = document.getElementById('filtrosAvanzadosForm');
+                const toggle = document.querySelector('.toggle-icon-small');
+                dropdown.classList.add('visible');
+                toggle.classList.add('open');
+            }
+        });
+    </script>
 </body>
 </html>

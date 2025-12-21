@@ -1,0 +1,123 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: 
+        linear-gradient(135deg, rgba(30, 58, 138, 0.85) 0%, rgba(66, 153, 225, 0.85) 100%),
+        url('/images/fondoazul.jpg') center/cover no-repeat fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #e2e8f0;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+}
+
+.card {
+    background: rgba(52, 84, 110, 0.9);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    text-align: center;
+    border: 1px solid rgba(66, 153, 225, 0.5);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    background: rgba(52, 84, 110, 0.95);
+}
+
+.header {
+    background: linear-gradient(135deg, rgba(56, 161, 105, 0.9) 0%, rgba(72, 187, 120, 0.9) 100%);
+    color: white;
+    padding: 30px 20px;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.header p {
+    font-size: 15px;
+    opacity: 0.9;
+}
+
+.search-section {
+    padding: 40px 30px;
+}
+
+.btn-catalogo {
+    background: linear-gradient(135deg, #38a169, #48bb78);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 18px 35px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-catalogo:hover {
+    background: linear-gradient(135deg, #2f855a, #38a169);
+    transform: translateY(-2px);
+}
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.btn-action {
+    background: rgba(56, 161, 105, 0.9);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 25px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-action:hover {
+    background: rgba(46, 139, 87, 0.9);
+}
+
+.footer {
+    padding: 20px;
+    border-top: 1px solid #eee;
+    color: #c1c9d6;
+    font-size: 14px;
+}
+
+.footer a {
+    color: #38a169;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: #48bb78;
+}
+
+@media (max-width: 600px) {
+    .btn-catalogo {
+        width: 100%;
+    }
+}

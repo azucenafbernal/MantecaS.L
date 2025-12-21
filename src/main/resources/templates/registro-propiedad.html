@@ -4,181 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Propiedad</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 600px;
-        }
-        
-        .card {
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-        
-        .header {
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: white;
-            padding: 25px 20px;
-            text-align: center;
-        }
-        
-        .header h1 {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        
-        .form-container {
-            padding: 30px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
-            transition: all 0.3s;
-        }
-        
-        .input-field:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-            outline: none;
-        }
-        
-        textarea.input-field {
-            resize: vertical;
-            min-height: 80px;
-        }
-        
-        .btn-submit {
-            background: linear-gradient(to right, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 14px;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        
-        .btn-submit:hover {
-            background: linear-gradient(to right, #5a6fd8, #6a4190);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #f5c6cb;
-            text-align: center;
-        }
-        
-        .footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 14px;
-            color: #666;
-            border-top: 1px solid #eee;
-        }
-        
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        
-        @media (max-width: 480px) {
-            .container {
-                max-width: 100%;
-            }
-            
-            .form-container {
-                padding: 20px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/css/registro-propiedad.css">
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <div class="header">
-                <h1>Registro de Propiedad</h1>
-                <p>Registra tu propiedad para empezar a alquilar</p>
-            </div>
-            
-            <div class="form-container">
-                <!-- Mensaje de error -->
-                <div th:if="${error}" class="error" th:text="${error}"></div>
-                
-                <form th:action="@{/propiedades/registrar}" method="post">
-                    <div class="form-group">
-                        <label for="emailPropietario">Email del Usuario *</label>
-                        <input type="email" id="emailPropietario" name="emailPropietario" 
-                            class="input-field" placeholder="usuario@ejemplo.com" required>
-                    </div>
+        <div class="header">
+            <h1>🏠 Registro de Propiedad</h1>
+            <p>Completa el formulario para registrar tu propiedad y empezar a alquilar</p>
+        </div>
 
-                    <!-- NUEVOS CAMPOS PARA DATOS DE PROPIETARIO -->
-                    <div class="form-group">
-                        <label for="telefonoContacto">Teléfono de Contacto *</label>
-                        <input type="tel" id="telefonoContacto" name="telefonoContacto" 
-                            class="input-field" placeholder="+34 123 456 789" required>
-                    </div>
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+
+        <form th:action="@{/propiedades/registrar}" method="post">
+            <!-- SECCIÓN 1: Datos del Propietario -->
+            <div class="form-section">
+                <h2 class="section-title">👤 Datos del Propietario</h2>
+                
+                <div class="form-group">
+                    <label for="emailPropietario">Email del Usuario *</label>
+                    <input type="email" id="emailPropietario" name="emailPropietario" 
+                        class="input-field" placeholder="usuario@ejemplo.com" required>
+                </div>
+
+                <div class="row">
+                    <!-- COMPONENTE TELÉFONO CON PREFIJO -->
+                    <div th:replace="~{components/phone-input :: phone-input}"></div>
+                    <input type="hidden" id="telefonoConPrefijo" name="telefonoContacto">
 
                     <div class="form-group">
                         <label for="cuentaBancaria">Cuenta Bancaria (IBAN) *</label>
                         <input type="text" id="cuentaBancaria" name="cuentaBancaria" 
                             class="input-field" placeholder="ES12 3456 7890 1234 5678 9012" required>
                     </div>
+                </div>
+            </div>
 
-                    <div class="form-group">
-                        <label for="direccion">Dirección Completa *</label>
-                        <input type="text" id="direccion" name="direccion" 
-                               class="input-field" placeholder="Calle, número, ciudad, código postal" required>
+            <!-- SECCIÓN 2: Dirección de la Propiedad -->
+            <div class="form-section">
+                <h2 class="section-title">📍 Dirección de la Propiedad</h2>
+                
+                <div class="row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="calle">Calle *</label>
+                        <input type="text" id="calle" name="calle"
+                            class="input-field" placeholder="Ej: Avenida del Sol" required>
                     </div>
 
+                    <div class="form-group" style="flex: 1;">
+                        <label for="numero">Número *</label>
+                        <input type="text" id="numero" name="numero"
+                            class="input-field" placeholder="12B" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="ciudad">Ciudad *</label>
+                        <input type="text" id="ciudad" name="ciudad"
+                            class="input-field" placeholder="Madrid" required>
+                    </div>
+
+                    <div class="form-group" style="flex: 1;">
+                        <label for="codigoPostal">Código Postal *</label>
+                        <input type="text" id="codigoPostal" name="codigoPostal"
+                            class="input-field" placeholder="28080" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3: Detalles del Alquiler -->
+            <div class="form-section">
+                <h2 class="section-title">💰 Detalles del Alquiler</h2>
+                
+                <div class="row">
                     <div class="form-group">
                         <label for="precioNoche">Precio por Noche (€) *</label>
                         <input type="number" id="precioNoche" name="precioNoche" 
@@ -190,23 +89,165 @@
                         <input type="number" id="capacidad" name="capacidad" 
                                class="input-field" placeholder="4" min="1" required>
                     </div>
+                </div>
 
-                    <div class="form-group">
-                        <label for="descripcion">Descripción de la Propiedad</label>
-                        <textarea id="descripcion" name="descripcion" 
-                                  class="input-field" 
-                                  placeholder="Describe tu propiedad, características, ambiente..."></textarea>
+                <div class="form-group">
+                    <label for="politicaCancelacion">Política de Cancelación *</label>
+                    <select id="politicaCancelacion" name="politicaCancelacion" class="input-field" required style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">
+                        <option value="" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">-- Selecciona una política --</option>
+                        <option value="Flexible - Cancelación gratuita hasta 7 días antes del check-in" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">Flexible - 7 días antes</option>
+                        <option value="Moderada - Cancelación gratuita hasta 30 días antes del check-in" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">Moderada - 30 días antes</option>
+                        <option value="Estricta - Cancelación gratuita hasta 60 días antes del check-in" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">Estricta - 60 días antes</option>
+                        <option value="No reembolsable - Sin devoluciones" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">No reembolsable</option>
+                        <option value="Flexible moderada - Cancelación gratuita hasta 48 horas antes del check-in" style="color: #ffffff; background-color: rgba(52, 84, 110, 0.9);">Flexible moderada - 48 horas</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 3.5: Comodidades -->
+            <div class="form-section">
+                <h2 class="section-title">🏠 Comodidades</h2>
+                <p style="color: #8a96a6; margin-bottom: 15px; font-size: 14px;">Selecciona las comodidades disponibles en tu propiedad</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-items: start;">
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="wifi" name="comodidades" value="WiFi" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="wifi" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">📶 WiFi</label>
                     </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="cocina" name="comodidades" value="Cocina completa" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="cocina" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🍳 Cocina</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="lavadora" name="comodidades" value="Lavadora" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="lavadora" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🧺 Lavadora</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="aire" name="comodidades" value="Aire acondicionado" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="aire" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">❄️ Aire acond.</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="calefaccion" name="comodidades" value="Calefacción" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="calefaccion" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🔥 Calefacción</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="aparcamiento" name="comodidades" value="Parking" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="aparcamiento" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🅿️ Parking</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="piscina" name="comodidades" value="Piscina" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="piscina" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🏊 Piscina</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="terraza" name="comodidades" value="Terraza" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="terraza" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🌳 Terraza</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="television" name="comodidades" value="Televisión" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="television" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">📺 TV</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="mascotas" name="comodidades" value="Mascotas permitidas" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="mascotas" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🐾 Mascotas</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="jardin" name="comodidades" value="Jardín" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="jardin" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">🌿 Jardín</label>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; padding: 8px 0;">
+                        <input type="checkbox" id="acceso" name="comodidades" value="Acceso para personas con movilidad reducida" style="width: 18px; height: 18px; cursor: pointer;">
+                        <label for="acceso" style="margin: 0; cursor: pointer; white-space: normal; font-size: 13px;">♿ Accesible</label>
+                    </div>
+                </div>
+            </div>
 
-                    <button type="submit" class="btn-submit">Registrar Propiedad</button>
-                </form>
+            <!-- SECCIÓN 4: Tipo de Reserva -->
+            <div class="form-section">
+                <h2 class="section-title">🎯 Tipo de Reserva</h2>
+                
+                <div class="radio-options">
+                    <div class="radio-option">
+                        <input type="radio" name="reservaDirecta" id="directa" value="true" checked>
+                        <div class="radio-label">
+                            <div class="radio-title">
+                                <span>Reserva Directa</span>
+                                <span class="badge badge-directa">Recomendado</span>
+                            </div>
+                            <div class="radio-description">
+                                Los usuarios pueden reservar y pagar inmediatamente. La reserva se confirma automáticamente.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="radio-option">
+                        <input type="radio" name="reservaDirecta" id="confirmacion" value="false">
+                        <div class="radio-label">
+                            <div class="radio-title">
+                                <span>Reserva por Confirmación</span>
+                                <span class="badge badge-confirmacion">Mayor Control</span>
+                            </div>
+                            <div class="radio-description">
+                                Los usuarios solicitan reserva y tú decides aprobarla o rechazarla antes del pago.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h4>💡 Información importante</h4>
+                    <ul>
+                        <li><strong>Reserva Directa:</strong> Más reservas, menos trabajo administrativo</li>
+                        <li><strong>Reserva por Confirmación:</strong> Mayor control sobre quién se aloja</li>
+                        <li>Puedes cambiar esta configuración más adelante</li>
+                        <li>Esta opción se mostrará claramente a los usuarios</li>
+                    </ul>
+                </div>
             </div>
-            
-            <div class="footer">
-                <a th:href="@{/propiedades}">Ver todas las propiedades</a> | 
-                <a th:href="@{/}">Volver al inicio</a>
+
+            <!-- SECCIÓN 5: Descripción -->
+            <div class="form-section">
+                <h2 class="section-title">📝 Descripción de la Propiedad</h2>
+                
+                <div class="form-group">
+                    <label for="descripcion">Describe tu propiedad para los usuarios</label>
+                    <textarea id="descripcion" name="descripcion" 
+                              class="input-field" 
+                              placeholder="Describe tu propiedad, características principales, ambiente, comodidades, servicios incluidos, normas de la casa..."></textarea>
+                    <div style="font-size: 12px; color: #8a96a6; margin-top: 5px;">
+                        Una buena descripción aumenta las probabilidades de alquiler.
+                    </div>
+                </div>
             </div>
+
+            <button type="submit" class="btn-submit">
+                <span>🏠 Registrar Propiedad</span>
+            </button>
+        </form>
+
+        <div class="footer">
+            <p>
+                <a th:href="@{/propiedades}">📋 Ver todas las propiedades</a> • 
+                <a th:href="@{/}">🏠 Volver al inicio</a>
+            </p>
+            <p style="margin-top: 10px; font-size: 12px; opacity: 0.7;">
+                Todos los campos marcados con * son obligatorios
+            </p>
         </div>
     </div>
+
+    <script>
+        // Capturar el número de teléfono con prefijo en el formulario de registro
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const fullPhone = window.getFullPhoneNumber ? window.getFullPhoneNumber() : '';
+                    if (fullPhone) {
+                        document.getElementById('telefonoConPrefijo').value = fullPhone;
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

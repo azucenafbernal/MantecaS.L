@@ -1,0 +1,162 @@
+package com.mantecasl.accommodationapp.business.controller;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.AbstractView;
+
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebMvcTest(controllers = NotificacionesController.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
+@Import(NotificacionesControllerTest.TestViewResolverConfig.class)
+class NotificacionesControllerTest {
+
+        @Autowired
+        private MockMvc mockMvc;
+
+        @MockitoBean
+        private GestorNotificaciones gestorNotificaciones;
+
+        @MockitoBean
+        private GestorReservas gestorReservas;
+
+        // ---------- ViewResolver dummy ----------
+        static class TestViewResolverConfig {
+                @Bean
+                ViewResolver viewResolver() {
+                        return (String viewName, Locale locale) -> new AbstractView() {
+                                @Override
+                                protected void renderMergedOutputModel(
+                                                @NonNull Map<String, Object> model,
+                                                @NonNull HttpServletRequest request,
+                                                @NonNull HttpServletResponse response) {
+                                                        //This method is intentionally left blank for testing purposes.
+                                }
+                        };
+                }
+        }
+
+        // ---------- LISTAR ----------
+        @Test
+        void listarNotificaciones_sin_usuario() throws Exception {
+                mockMvc.perform(get("/notificaciones"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("redirect:/login"));
+        }
+
+        @Test
+        void listarNotificaciones_con_usuario() throws Exception {
+                Usuario u = new Usuario();
+                u.setId(1L);
+
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("usuario", u);
+
+                when(gestorNotificaciones.obtenerNotificacionesUsuario(u))
+                                .thenReturn(List.of());
+                when(gestorNotificaciones.contarNotificacionesNoLeidas(u))
+                                .thenReturn(0L);
+
+                mockMvc.perform(get("/notificaciones").session(session))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("notificacionesUsuario"));
+        }
+
+        // ---------- PROPIETARIO ----------
+        @Test
+        void verNotificacionesPropietario_sin_usuario() throws Exception {
+                mockMvc.perform(get("/notificaciones/propietario/notificaciones"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("redirect:/login"));
+        }
+
+        @Test
+        void verNotificacionesPropietario_con_usuario() throws Exception {
+                Usuario u = new Usuario();
+                u.setId(1L);
+
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("usuario", u);
+
+                when(gestorReservas.obtenerSolicitudesPendientesPropietario(1L))
+                                .thenReturn(List.of());
+                when(gestorReservas.obtenerSolicitudesAprobadasPropietario(1L))
+                                .thenReturn(List.of());
+                when(gestorReservas.obtenerSolicitudesRechazadasPropietario(1L))
+                                .thenReturn(List.of());
+                when(gestorReservas.obtenerHistorialReservasPropietario(1L))
+                                .thenReturn(List.of());
+
+                mockMvc.perform(get("/notificaciones/propietario/notificaciones").session(session))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("notificaciones"));
+        }
+
+        // ---------- LEER ----------
+        @Test
+        void marcarComoLeida_con_usuario() throws Exception {
+                Usuario u = new Usuario();
+                u.setId(1L);
+
+                MockHttpSession session = new MockHttpSession();
+                session.setAttribute("usuario", u);
+
+                mockMvc.perform(post("/notificaciones/1/leer").session(session))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("redirect:/notificaciones"));
+
+                verify(gestorNotificaciones).marcarComoLeida(1L);
+        }
+
+        @Test
+        void marcarComoLeida_sin_usuario() throws Exception {
+                mockMvc.perform(post("/notificaciones/1/leer"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("redirect:/notificaciones"));
+
+                verify(gestorNotificaciones, never()).marcarComoLeida(any());
+        }
+
+        // ---------- LEER TODAS ----------
+        @Test
+        void marcarTodasComoLeidas_sin_usuario() throws Exception {
+                mockMvc.perform(post("/notificaciones/leer-todas"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("redirect:/notificaciones"));
+
+                verify(gestorNotificaciones, never()).marcarTodasComoLeidas(any());
+        }
+
+        // ---------- ELIMINAR ----------
+        @Test
+        void eliminarNotificacion_sin_usuario() throws Exception {
+                mockMvc.perform(post("/notificaciones/5/eliminar"))
+                                .andExpect(status().isOk())
+                                .andExpect(view().name("redirect:/notificaciones"));
+
+                verify(gestorNotificaciones, never()).eliminarNotificacion(any());
+        }
+}

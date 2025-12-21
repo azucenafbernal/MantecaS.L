@@ -1,0 +1,142 @@
+<!-- Phone Input Component with Country Flag, Prefix and Number -->
+<!-- Usage: <div th:replace="~{components/phone-input :: phone-input}"></div> -->
+
+<div th:fragment="phone-input" class="form-group">
+    <label for="telefonoCompleto">📞 Teléfono de Contacto *</label>
+    <div class="phone-input-box">
+        <!-- Country Flag & Prefix Dropdown -->
+        <select id="countryPrefix" name="countryPrefix" class="prefix-dropdown-with-flag">
+            <option value="ES" data-flag="🇪🇸">🇪🇸 +34</option>
+            <option value="FR" data-flag="🇫🇷">🇫🇷 +33</option>
+            <option value="DE" data-flag="🇩🇪">🇩🇪 +49</option>
+            <option value="IT" data-flag="🇮🇹">🇮🇹 +39</option>
+            <option value="PT" data-flag="🇵🇹">🇵🇹 +351</option>
+            <option value="UK" data-flag="🇬🇧">🇬🇧 +44</option>
+            <option value="NL" data-flag="🇳🇱">🇳🇱 +31</option>
+            <option value="BE" data-flag="🇧🇪">🇧🇪 +32</option>
+            <option value="CH" data-flag="🇨🇭">🇨🇭 +41</option>
+            <option value="AT" data-flag="🇦🇹">🇦🇹 +43</option>
+            <option value="PL" data-flag="🇵🇱">🇵🇱 +48</option>
+            <option value="SE" data-flag="🇸🇪">🇸🇪 +46</option>
+            <option value="NO" data-flag="🇳🇴">🇳🇴 +47</option>
+            <option value="DK" data-flag="🇩🇰">🇩🇰 +45</option>
+            <option value="GR" data-flag="🇬🇷">🇬🇷 +30</option>
+            <option value="US" data-flag="🇺🇸">🇺🇸 +1</option>
+            <option value="MX" data-flag="🇲🇽">🇲🇽 +52</option>
+            <option value="CA" data-flag="🇨🇦">🇨🇦 +1</option>
+            <option value="BR" data-flag="🇧🇷">🇧🇷 +55</option>
+            <option value="AR" data-flag="🇦🇷">🇦🇷 +54</option>
+            <option value="CO" data-flag="🇨🇴">🇨🇴 +57</option>
+            <option value="CL" data-flag="🇨🇱">🇨🇱 +56</option>
+            <option value="PE" data-flag="🇵🇪">🇵🇪 +51</option>
+            <option value="CN" data-flag="🇨🇳">🇨🇳 +86</option>
+            <option value="JP" data-flag="🇯🇵">🇯🇵 +81</option>
+            <option value="IN" data-flag="🇮🇳">🇮🇳 +91</option>
+            <option value="TH" data-flag="🇹🇭">🇹🇭 +66</option>
+            <option value="SG" data-flag="🇸🇬">🇸🇬 +65</option>
+            <option value="KR" data-flag="🇰🇷">🇰🇷 +82</option>
+            <option value="AU" data-flag="🇦🇺">🇦🇺 +61</option>
+            <option value="NZ" data-flag="🇳🇿">🇳🇿 +64</option>
+        </select>
+        
+        <!-- Phone Number Input -->
+        <input type="tel" id="telefonoCompleto" name="telefonoCompleto" 
+               placeholder="612345678" 
+               pattern="[0-9]{6,15}"
+               required>
+    </div>
+</div>
+
+<style>
+    .form-group .phone-input-box {
+        display: flex !important;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: nowrap;
+        width: 100%;
+    }
+
+    .prefix-dropdown-with-flag {
+        padding: 12px 15px;
+        background: rgba(197, 205, 218, 0.1);
+        border: 1px solid rgba(116, 130, 150, 0.4);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        white-space: nowrap;
+        flex-shrink: 0 !important;
+        width: auto;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s;
+        color: #e2e8f0;
+    }
+
+    .prefix-dropdown-with-flag:focus {
+        border-color: #4299e1;
+        box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+        outline: none;
+        background: rgba(197, 205, 218, 0.15);
+    }
+
+    #telefonoCompleto {
+        flex: 1 1 auto !important;
+        padding: 12px 15px;
+        background: rgba(197, 205, 218, 0.1);
+        border: 1px solid rgba(116, 130, 150, 0.4);
+        border-radius: 8px;
+        color: #e2e8f0;
+        font-size: 15px;
+        width: auto;
+        box-sizing: border-box;
+        transition: all 0.3s;
+    }
+
+    #telefonoCompleto:focus {
+        border-color: #4299e1;
+        box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
+        outline: none;
+        background: rgba(197, 205, 218, 0.15);
+    }
+
+    #telefonoCompleto::placeholder {
+        color: #8a96a6;
+    }
+
+    @media (max-width: 768px) {
+        .form-group .phone-input-box {
+            flex-wrap: wrap;
+        }
+
+        .prefix-dropdown-with-flag,
+        #telefonoCompleto {
+            width: 100%;
+            height: auto;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const countryPrefix = document.getElementById('countryPrefix');
+        const phoneInput = document.getElementById('telefonoCompleto');
+
+        // Map of prefixes
+        const prefixMap = {
+            'ES': '+34', 'FR': '+33', 'DE': '+49', 'IT': '+39', 'PT': '+351',
+            'UK': '+44', 'NL': '+31', 'BE': '+32', 'CH': '+41', 'AT': '+43',
+            'PL': '+48', 'SE': '+46', 'NO': '+47', 'DK': '+45', 'GR': '+30',
+            'US': '+1', 'MX': '+52', 'CA': '+1', 'BR': '+55', 'AR': '+54',
+            'CO': '+57', 'CL': '+56', 'PE': '+51', 'CN': '+86', 'JP': '+81',
+            'IN': '+91', 'TH': '+66', 'SG': '+65', 'KR': '+82', 'AU': '+61',
+            'NZ': '+64'
+        };
+
+        // Create function to get full phone number
+        window.getFullPhoneNumber = function() {
+            const prefix = prefixMap[countryPrefix.value];
+            const phone = phoneInput.value.trim();
+            return prefix && phone ? prefix + phone : '';
+        };
+    });
+</script>

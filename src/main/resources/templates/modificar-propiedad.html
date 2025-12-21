@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Propiedades - MantecaS.L</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link rel="stylesheet" href="/css/modificar-propiedad.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>
+                <i data-lucide="home" class="w-10 h-10"></i>
+                Mis Propiedades
+            </h1>
+            <p>Gestiona y administra todos tus alojamientos publicados en MantecaS.L</p>
+        </div>
+        
+        <!-- Estado vacío -->
+        <div th:if="${propiedades == null or propiedades.empty}" class="no-properties">
+            <div style="margin-bottom: 30px;">
+                <i data-lucide="home" class="w-20 h-20 text-[var(--primary-color)] opacity-50"></i>
+            </div>
+            <h2>No tienes propiedades publicadas</h2>
+            <p>Comienza publicando tu primer alojamiento y comparte tu espacio con viajeros de todo el mundo</p>
+            <a th:href="@{/propiedades/registro}" class="btn-footer" style="margin-top: 20px;">
+                <i data-lucide="plus" class="w-5 h-5"></i>
+                Publicar mi primera propiedad
+            </a>
+        </div>
+        
+        <!-- Grid de propiedades -->
+        <div th:unless="${propiedades == null or propiedades.empty}" class="properties-grid">
+            <div th:each="inmueble, iter : ${propiedades}" class="property-card">
+                <!-- Header de la propiedad -->
+                <div class="property-header">
+                    <div class="property-id">
+                        <i data-lucide="hash" class="w-4 h-4"></i>
+                        <span th:text="${inmueble.id}"></span>
+                    </div>
+                    <div class="property-address" th:text="${inmueble.ciudad}"></div>
+                    <div class="property-price">
+                        <i data-lucide="euro" class="w-6 h-6"></i>
+                        <span th:text="${inmueble.precioNoche}"></span>/noche
+                    </div>
+                </div>
+                
+                <!-- Contenido de la propiedad -->
+                <div class="property-content">
+                    <!-- Información básica -->
+                    <div class="property-info">
+                        <div class="info-item">
+                            <span class="info-label">📍 Dirección:</span>
+                            <span class="info-value" th:text="|${inmueble.calle} ${inmueble.numero}, ${inmueble.ciudad}|">
+                                Calle Ejemplo 123, Ciudad
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i data-lucide="euro" class="w-4 h-4"></i>
+                                Precio/noche:
+                            </span>
+                            <span class="info-value" th:text="'€' + ${inmueble.precioNoche}"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i data-lucide="users" class="w-4 h-4"></i>
+                                Capacidad:
+                            </span>
+                            <span class="info-value" th:text="${inmueble.capacidad} + ' personas'"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                                Tu email:
+                            </span>
+                            <span class="info-value" th:text="${usuario.email}"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Descripción (si existe) -->
+                    <div th:if="${inmueble.descripcion}" class="property-description">
+                        <div class="description-text" th:text="${inmueble.descripcion}"></div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
+                    <div class="property-actions">
+                        <button class="btn-modificar" 
+                                th:onclick="|modificarPropiedad(${inmueble.id})|"
+                                th:title="'Modificar ' + ${inmueble.direccion}">
+                            <i data-lucide="edit-3" class="w-4 h-4"></i>
+                            Modificar
+                        </button>
+                        <button class="btn-eliminar" 
+                                th:onclick="|eliminarPropiedad(${inmueble.id})|"
+                                th:title="'Eliminar ' + ${inmueble.direccion}">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Badge de estado (opcional) -->
+                <div style="position: absolute; top: 15px; right: 15px;">
+                    <span style="background: rgba(255,255,255,0.2); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                        <i data-lucide="check-circle" class="w-3 h-3 inline mr-1"></i>
+                        Activa
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer con acciones -->
+        <div class="footer">
+            <div class="footer-buttons">
+                <a th:href="@{/propiedades/registro}" class="btn-footer">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    Agregar Nueva Propiedad
+                </a>
+                <a th:href="@{/}" class="btn-footer secondary">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    Volver al Inicio
+                </a>
+            </div>
+            
+            <!-- Estadísticas (opcional) -->
+            <div style="text-align: center; margin-top: 30px; color: var(--text-secondary); font-size: 14px;">
+                <div style="display: inline-flex; gap: 25px; flex-wrap: wrap; justify-content: center;">
+                    <div>
+                        <i data-lucide="home" class="w-4 h-4 inline mr-2"></i>
+                        <span th:text="${propiedades.size()} ?: 0"></span> propiedades
+                    </div>
+                    <div>
+                        <i data-lucide="users" class="w-4 h-4 inline mr-2"></i>
+                        <span th:text="${#aggregates.sum(propiedades.![capacidad])} ?: 0"></span> capacidad total
+                    </div>
+                    <div>
+                        <i data-lucide="euro" class="w-4 h-4 inline mr-2"></i>
+                        €<span th:text="${#aggregates.sum(propiedades.![precioNoche])} ?: 0"></span> valor total/noche
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Inicializar iconos
+        document.addEventListener('DOMContentLoaded', function() {
+            lucide.createIcons();
+            
+            // Animar tarjetas al hacer scroll
+            const cards = document.querySelectorAll('.property-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            cards.forEach(card => observer.observe(card));
+        });
+
+        // Función para modificar propiedad
+        function modificarPropiedad(id) {
+            const card = event.target.closest('.property-card');
+            if (card) {
+                card.style.transform = 'scale(0.95)';
+                card.style.opacity = '0.7';
+                
+                setTimeout(() => {
+                    if (confirm('¿Deseas modificar esta propiedad?')) {
+                        window.location.href = '/editar-propiedad/' + id;
+                    } else {
+                        card.style.transform = '';
+                        card.style.opacity = '';
+                    }
+                }, 200);
+            }
+        }
+        
+        // Función para eliminar propiedad
+        function eliminarPropiedad(id) {
+            const card = event.target.closest('.property-card');
+            if (card) {
+                card.style.transform = 'scale(0.95)';
+                card.style.opacity = '0.7';
+                
+                setTimeout(() => {
+                    if (confirm('⚠️ ¿ESTÁS SEGURO DE QUE QUIERES ELIMINAR ESTA PROPIEDAD?\n\nEsta acción es permanente y eliminará todos los datos asociados.')) {
+                        card.style.transition = 'all 0.5s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateX(100%) rotate(10deg)';
+                        
+                        setTimeout(() => {
+                            window.location.href = '/eliminar-propiedad/' + id;
+                        }, 500);
+                    } else {
+                        card.style.transform = '';
+                        card.style.opacity = '';
+                    }
+                }, 200);
+            }
+        }
+        
+        // Efecto de confirmación para modificar
+        function animateModify(card) {
+            card.style.transform = 'scale(0.95)';
+            card.style.boxShadow = '0 0 0 4px rgba(66, 153, 225, 0.5)';
+            
+            setTimeout(() => {
+                card.style.transform = '';
+                card.style.boxShadow = '';
+            }, 300);
+        }
+    </script>
+</body>
+</html>
