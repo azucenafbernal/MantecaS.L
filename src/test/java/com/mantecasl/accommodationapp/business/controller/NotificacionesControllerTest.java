@@ -15,11 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
@@ -34,23 +34,22 @@ class NotificacionesControllerTest {
         @Autowired
         private MockMvc mockMvc;
 
-        @MockBean
+        @MockitoBean
         private GestorNotificaciones gestorNotificaciones;
 
-        @MockBean
+        @MockitoBean
         private GestorReservas gestorReservas;
 
         // ---------- ViewResolver dummy ----------
-        @TestConfiguration
         static class TestViewResolverConfig {
                 @Bean
                 ViewResolver viewResolver() {
                         return (String viewName, Locale locale) -> new AbstractView() {
                                 @Override
                                 protected void renderMergedOutputModel(
-                                                Map<String, Object> model,
-                                                HttpServletRequest request,
-                                                HttpServletResponse response) {
+                                                @NonNull Map<String, Object> model,
+                                                @NonNull HttpServletRequest request,
+                                                @NonNull HttpServletResponse response) {
                                 }
                         };
                 }
@@ -74,7 +73,6 @@ class NotificacionesControllerTest {
 
                 when(gestorNotificaciones.obtenerNotificacionesUsuario(u))
                                 .thenReturn(List.of());
-
                 when(gestorNotificaciones.contarNotificacionesNoLeidas(u))
                                 .thenReturn(0L);
 
@@ -84,7 +82,6 @@ class NotificacionesControllerTest {
         }
 
         // ---------- PROPIETARIO ----------
-
         @Test
         void verNotificacionesPropietario_sin_usuario() throws Exception {
                 mockMvc.perform(get("/notificaciones/propietario/notificaciones"))

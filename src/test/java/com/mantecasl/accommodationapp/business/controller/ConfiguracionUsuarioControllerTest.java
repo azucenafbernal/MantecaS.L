@@ -1,9 +1,10 @@
 package com.mantecasl.accommodationapp.business.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import org.springframework.lang.NonNull;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,13 +33,13 @@ class ConfiguracionUsuarioControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UsuarioDAO usuarioDAO;
 
-    @MockBean
+    @MockitoBean
     private PropietarioDAO propietarioDAO;
 
-    @MockBean
+    @MockitoBean
     private FavoritoDAO favoritoDAO;
 
     // ---------- ViewResolver dummy ----------
@@ -49,15 +50,17 @@ class ConfiguracionUsuarioControllerTest {
             return (String viewName, Locale locale) -> new AbstractView() {
                 @Override
                 protected void renderMergedOutputModel(
-                        Map<String, Object> model,
-                        HttpServletRequest request,
-                        HttpServletResponse response) {
+                        @NonNull Map<String, Object> model,
+                        @NonNull HttpServletRequest request,
+                        @NonNull HttpServletResponse response) {
+                    // no-op
                 }
             };
         }
     }
 
     // ---------- GET CONFIGURACIÓN ----------
+
     @Test
     void mostrarConfiguracion_usuarioExiste() throws Exception {
         Usuario u = new Usuario();
@@ -69,6 +72,9 @@ class ConfiguracionUsuarioControllerTest {
         mockMvc.perform(get("/configuracion").param("idUsuario", "1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("configuracionusuario"));
+
+        verify(usuarioDAO).findById(1L);
+        verify(propietarioDAO).findByUsuarioId(1L);
     }
 
     @Test
@@ -78,6 +84,9 @@ class ConfiguracionUsuarioControllerTest {
         mockMvc.perform(get("/configuracion").param("idUsuario", "99"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("error"));
+
+        verify(usuarioDAO).findById(99L);
+        verifyNoInteractions(propietarioDAO);
     }
 
     @Test
@@ -87,9 +96,12 @@ class ConfiguracionUsuarioControllerTest {
         mockMvc.perform(get("/configuracion").param("idUsuario", "1"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("error"));
+
+        verify(usuarioDAO).findById(1L);
     }
 
     // ---------- ACTUALIZAR USUARIO ----------
+
     @Test
     void actualizarUsuario_correcto() throws Exception {
         Usuario u = new Usuario();
@@ -104,6 +116,9 @@ class ConfiguracionUsuarioControllerTest {
                 .param("contrasena", "1234"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("redirect:/configuracion?idUsuario=1"));
+
+        verify(usuarioDAO).findById(1L);
+        verify(usuarioDAO).save(u);
     }
 
     @Test
@@ -117,9 +132,13 @@ class ConfiguracionUsuarioControllerTest {
                 .param("contrasena", "1234"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("error"));
+
+        verify(usuarioDAO).findById(1L);
+        verify(usuarioDAO, never()).save(any());
     }
 
     // ---------- ACTUALIZAR PROPIETARIO ----------
+
     @Test
     void actualizarPropietario_noEsPropietario() throws Exception {
         when(propietarioDAO.findByUsuarioId(1L)).thenReturn(null);
@@ -129,9 +148,12 @@ class ConfiguracionUsuarioControllerTest {
                 .param("telefono", "123"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("error"));
+
+        verify(propietarioDAO).findByUsuarioId(1L);
     }
 
     // ---------- CUENTA BANCARIA ----------
+
     @Test
     void actualizarCuentaBancaria_cuentaVacia() throws Exception {
         when(propietarioDAO.findByUsuarioId(1L)).thenReturn(new Propietario());
@@ -142,6 +164,8 @@ class ConfiguracionUsuarioControllerTest {
                 .param("cuenta", " "))
                 .andExpect(status().isOk())
                 .andExpect(view().name("configuracionusuario"));
+
+        verify(propietarioDAO).findByUsuarioId(1L);
     }
 
     @Test
@@ -157,6 +181,7 @@ class ConfiguracionUsuarioControllerTest {
     }
 
     // ---------- TARJETA ----------
+
     @Test
     void actualizarTarjeta_numeroInvalido() throws Exception {
         when(propietarioDAO.findByUsuarioId(1L)).thenReturn(new Propietario());
@@ -170,6 +195,7 @@ class ConfiguracionUsuarioControllerTest {
     }
 
     // ---------- CONTRASEÑA ----------
+
     @Test
     void cambiarContrasena_passwordIncorrecta() throws Exception {
         Usuario u = new Usuario();
@@ -185,6 +211,8 @@ class ConfiguracionUsuarioControllerTest {
                 .param("passwordConfirm", "nueva"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("configuracionusuario"));
+
+        verify(usuarioDAO, never()).save(any());
     }
 
     @Test
@@ -202,9 +230,12 @@ class ConfiguracionUsuarioControllerTest {
                 .param("passwordConfirm", "b"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("configuracionusuario"));
+
+        verify(usuarioDAO, never()).save(any());
     }
 
     // ---------- ELIMINAR CUENTA ----------
+
     @Test
     void eliminarCuenta_correcto() throws Exception {
         when(favoritoDAO.findByUsuarioId(1L)).thenReturn(List.of(new Favorito()));
@@ -213,6 +244,9 @@ class ConfiguracionUsuarioControllerTest {
         mockMvc.perform(post("/configuracion/eliminarCuenta")
                 .param("idUsuario", "1"))
                 .andExpect(status().isOk());
+
+        verify(favoritoDAO).findByUsuarioId(1L);
+        verify(propietarioDAO).findByUsuarioId(1L);
     }
 
     @Test
@@ -225,6 +259,7 @@ class ConfiguracionUsuarioControllerTest {
     }
 
     // ---------- LOGOUT ----------
+
     @Test
     void logout_ok() throws Exception {
         mockMvc.perform(post("/configuracion/logout"))

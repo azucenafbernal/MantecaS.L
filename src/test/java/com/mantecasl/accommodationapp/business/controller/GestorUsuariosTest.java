@@ -11,17 +11,44 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.servlet.ViewResolver;
+import org.springframework.web.servlet.view.AbstractView;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.Locale;
+import java.util.Map;
 
 @WebMvcTest(controllers = GestorUsuarios.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
+@Import(GestorUsuariosTest.TestViewResolverConfig.class)
 class GestorUsuariosTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UsuarioDAO usuarioDAO;
+
+    // ---------- ViewResolver dummy ----------
+    static class TestViewResolverConfig {
+        @Bean
+        ViewResolver viewResolver() {
+            return (String viewName, Locale locale) -> new AbstractView() {
+                @Override
+                protected void renderMergedOutputModel(
+                        @NonNull Map<String, Object> model,
+                        @NonNull HttpServletRequest request,
+                        @NonNull HttpServletResponse response) {
+                }
+            };
+        }
+    }
 
     // -------------------- GET --------------------
 
@@ -50,7 +77,7 @@ class GestorUsuariosTest {
                 .andExpect(view().name("greeting"))
                 .andExpect(model().attributeExists("error"));
 
-        verify(usuarioDAO, never()).save(any());
+        verify(usuarioDAO, never()).save(any(Usuario.class));
     }
 
     @Test
@@ -61,7 +88,7 @@ class GestorUsuariosTest {
         guardado.setId(1L);
         guardado.setEmail("nuevo@test.com");
 
-        when(usuarioDAO.save(any(Usuario.class))).thenReturn(guardado);
+        when(usuarioDAO.save(isA(Usuario.class))).thenReturn(guardado);
 
         mockMvc.perform(post("/usuarios")
                 .param("nombre", "Nuevo")
@@ -72,6 +99,6 @@ class GestorUsuariosTest {
                 .andExpect(model().attributeExists("usuario"))
                 .andExpect(model().attributeExists("mensaje"));
 
-        verify(usuarioDAO, times(1)).save(any(Usuario.class));
+        verify(usuarioDAO, times(1)).save(isA(Usuario.class));
     }
 }

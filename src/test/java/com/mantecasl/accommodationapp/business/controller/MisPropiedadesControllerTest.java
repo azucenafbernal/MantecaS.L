@@ -19,10 +19,10 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
@@ -39,50 +39,49 @@ class MisPropiedadesControllerTest {
 
     // ======= DEPENDENCIAS DEL CONTROLADOR =======
 
-    @MockBean
+    @MockitoBean
     private PropertiesDAOConfig daoConfig;
 
-    @MockBean
+    @MockitoBean
     private GestorNotificaciones gestorNotificaciones;
 
-    @MockBean
+    @MockitoBean
     private ObjectProvider<MisPropiedadesController> selfProvider;
 
     // ======= DAOs USADOS A TRAVÉS DE daoConfig =======
 
-    @MockBean
+    @MockitoBean
     private InmuebleDAO inmuebleDAO;
 
-    @MockBean
+    @MockitoBean
     private ReservaDAO reservaDAO;
 
-    @MockBean
+    @MockitoBean
     private SolicitudReservaDAO solicitudReservaDAO;
 
-    @MockBean
+    @MockitoBean
     private FavoritoDAO favoritoDAO;
 
-    @MockBean
+    @MockitoBean
     private DisponibilidadDAO disponibilidadDAO;
 
-    @MockBean
+    @MockitoBean
     private NotificacionDAO notificacionDAO;
 
-    @MockBean
+    @MockitoBean
     private InquilinoDAO inquilinoDAO;
 
     // ======= CONFIGURACIÓN VIEW RESOLVER =======
 
-    @TestConfiguration
     static class TestViewResolverConfig {
         @Bean
         ViewResolver viewResolver() {
             return (String viewName, Locale locale) -> new AbstractView() {
                 @Override
                 protected void renderMergedOutputModel(
-                        Map<String, Object> model,
-                        HttpServletRequest request,
-                        HttpServletResponse response) {
+                        @NonNull Map<String, Object> model,
+                        @NonNull HttpServletRequest request,
+                        @NonNull HttpServletResponse response) {
                 }
             };
         }

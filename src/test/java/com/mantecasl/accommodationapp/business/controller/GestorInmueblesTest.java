@@ -17,9 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
@@ -28,19 +28,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebMvcTest(controllers = GestorInmuebles.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
-@Import(GestorInmueblesTest.TestViewResolverConfig.class)
 class GestorInmueblesTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private InmuebleDAO inmuebleDAO;
 
-    @MockBean
+    @MockitoBean
     private UsuarioDAO usuarioDAO;
 
-    @MockBean
+    @MockitoBean
     private PropietarioDAO propietarioDAO;
 
     // ---------- ViewResolver dummy ----------
@@ -51,9 +50,9 @@ class GestorInmueblesTest {
             return (String viewName, Locale locale) -> new AbstractView() {
                 @Override
                 protected void renderMergedOutputModel(
-                        Map<String, Object> model,
-                        HttpServletRequest request,
-                        HttpServletResponse response) {
+                        @NonNull Map<String, Object> model,
+                        @NonNull HttpServletRequest request,
+                        @NonNull HttpServletResponse response) {
                 }
             };
         }
@@ -95,10 +94,12 @@ class GestorInmueblesTest {
         Usuario usuario = new Usuario();
         usuario.setId(1L);
 
-        when(usuarioDAO.findByEmail(any())).thenReturn(usuario);
+        when(usuarioDAO.findByEmail(isA(String.class))).thenReturn(usuario);
         when(propietarioDAO.findByUsuarioId(1L)).thenReturn(null);
-        when(propietarioDAO.save(any())).thenAnswer(i -> i.getArgument(0));
-        when(inmuebleDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(propietarioDAO.save(isA(Propietario.class)))
+                .thenAnswer(i -> i.getArgument(0));
+        when(inmuebleDAO.save(isA(Inmueble.class)))
+                .thenAnswer(i -> i.getArgument(0));
 
         mockMvc.perform(post("/propiedades/registrar")
                 .param("calle", "Calle A")
@@ -125,9 +126,10 @@ class GestorInmueblesTest {
         Propietario propietario = new Propietario();
         propietario.setUsuario(usuario);
 
-        when(usuarioDAO.findByEmail(any())).thenReturn(usuario);
+        when(usuarioDAO.findByEmail(isA(String.class))).thenReturn(usuario);
         when(propietarioDAO.findByUsuarioId(1L)).thenReturn(propietario);
-        when(inmuebleDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(inmuebleDAO.save(isA(Inmueble.class)))
+                .thenAnswer(i -> i.getArgument(0));
 
         mockMvc.perform(post("/propiedades/registrar")
                 .param("calle", "Calle B")
@@ -148,7 +150,8 @@ class GestorInmueblesTest {
 
     @Test
     void registrarPropiedad_excepcion() throws Exception {
-        when(usuarioDAO.findByEmail(any())).thenThrow(new RuntimeException("boom"));
+        when(usuarioDAO.findByEmail(isA(String.class)))
+                .thenThrow(new RuntimeException("boom"));
 
         mockMvc.perform(post("/propiedades/registrar")
                 .param("calle", "Calle A")

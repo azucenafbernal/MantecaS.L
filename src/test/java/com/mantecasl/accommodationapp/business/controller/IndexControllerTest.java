@@ -5,6 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import com.mantecasl.accommodationapp.business.entity.*;
 import com.mantecasl.accommodationapp.business.persistance.*;
@@ -13,50 +15,47 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.View;
+import org.springframework.context.annotation.Import;
+import org.springframework.lang.NonNull;
+import org.springframework.mock.web.MockHttpSession;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.mock.web.MockHttpSession;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.util.Locale;
-import java.util.Map;
 
 @WebMvcTest(controllers = IndexController.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
+@Import(IndexControllerTest.TestViewResolverConfig.class)
 class IndexControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private SolicitudReservaDAO solicitudReservaDAO;
 
-    @MockBean
+    @MockitoBean
     private PropietarioDAO propietarioDAO;
 
-    @MockBean
+    @MockitoBean
     private InmuebleDAO inmuebleDAO;
 
-    @MockBean
+    @MockitoBean
     private GestorNotificaciones gestorNotificaciones;
 
-    // 👇 ViewResolver falso para evitar el error circular
-    @TestConfiguration
+    // ---------- ViewResolver dummy ----------
     static class TestViewResolverConfig {
         @Bean
         ViewResolver viewResolver() {
             return (String viewName, Locale locale) -> new AbstractView() {
                 @Override
                 protected void renderMergedOutputModel(
-                        Map<String, Object> model,
-                        HttpServletRequest request,
-                        HttpServletResponse response) {
-                    // No hace nada
+                        @NonNull Map<String, Object> model,
+                        @NonNull HttpServletRequest request,
+                        @NonNull HttpServletResponse response) {
                 }
             };
         }
@@ -126,11 +125,9 @@ class IndexControllerTest {
         Propietario propietario = new Propietario();
         propietario.setId(50L);
 
-        // Inmueble SIN propietario (rama false)
         Inmueble inmuebleSinPropietario = new Inmueble();
         inmuebleSinPropietario.setId(1L);
 
-        // Inmueble de OTRO propietario (equals false)
         Propietario otroPropietario = new Propietario();
         otroPropietario.setId(99L);
 
@@ -138,7 +135,6 @@ class IndexControllerTest {
         inmuebleOtroPropietario.setId(2L);
         inmuebleOtroPropietario.setPropietario(otroPropietario);
 
-        // Solicitud NO pendiente (rama false)
         SolicitudReserva solicitudNoPendiente = new SolicitudReserva();
         solicitudNoPendiente.setEstado("APROBADA");
         solicitudNoPendiente.setInmueble(inmuebleOtroPropietario);
@@ -156,5 +152,4 @@ class IndexControllerTest {
         mockMvc.perform(get("/index").session(session))
                 .andExpect(status().isOk());
     }
-
 }

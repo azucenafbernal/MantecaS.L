@@ -1,5 +1,7 @@
 package com.mantecasl.accommodationapp.business.controller;
 
+import org.springframework.lang.NonNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -19,45 +21,51 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 @WebMvcTest(controllers = SolicitudesController.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
+@Import(SolicitudesControllerTest.TestViewResolverConfig.class)
 class SolicitudesControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private SolicitudReservaDAO solicitudReservaDAO;
-    @MockBean
+
+    @MockitoBean
     private ReservaDAO reservaDAO;
-    @MockBean
+
+    @MockitoBean
     private DisponibilidadDAO disponibilidadDAO;
-    @MockBean
+
+    @MockitoBean
     private GestorDisponibilidad gestorDisponibilidad;
-    @MockBean
+
+    @MockitoBean
     private PropietarioDAO propietarioDAO;
-    @MockBean
+
+    @MockitoBean
     private GestorNotificaciones notificacion;
-    @MockBean
+
+    @MockitoBean
     private InmuebleDAO inmuebleDAO;
 
     // ---------- ViewResolver dummy ----------
-    @TestConfiguration
     static class TestViewResolverConfig {
         @Bean
         ViewResolver viewResolver() {
             return (String viewName, Locale locale) -> new AbstractView() {
                 @Override
                 protected void renderMergedOutputModel(
-                        Map<String, Object> model,
-                        HttpServletRequest request,
-                        HttpServletResponse response) {
+                        @NonNull Map<String, Object> model,
+                        @NonNull HttpServletRequest request,
+                        @NonNull HttpServletResponse response) {
                 }
             };
         }

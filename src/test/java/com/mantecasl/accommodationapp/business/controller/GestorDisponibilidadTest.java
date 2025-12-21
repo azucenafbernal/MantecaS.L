@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import com.mantecasl.accommodationapp.business.entity.*;
 import com.mantecasl.accommodationapp.business.persistance.*;
@@ -18,213 +19,225 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class GestorDisponibilidadTest {
 
-    @Mock
-    private DisponibilidadDAO disponibilidadDAO;
+        @Mock
+        private DisponibilidadDAO disponibilidadDAO;
 
-    @Mock
-    private ReservaDAO reservaDAO;
+        @Mock
+        private ReservaDAO reservaDAO;
 
-    @Mock
-    private InmuebleDAO inmuebleDAO;
+        @Mock
+        private InmuebleDAO inmuebleDAO;
 
-    @Mock
-    private SolicitudReservaDAO solicitudReservaDAO;
+        @Mock
+        private SolicitudReservaDAO solicitudReservaDAO;
 
-    @InjectMocks
-    private GestorDisponibilidad gestor;
+        @InjectMocks
+        private GestorDisponibilidad gestor;
 
-    // ---------- VALIDAR FECHAS ----------
+        // ---------- VALIDAR FECHAS ----------
 
-    @Test
-    void validarFechas_correctas() {
-        Date[] fechas = gestor.validarFechas("2025-01-10", "2025-01-15");
-        assertEquals(Date.valueOf("2025-01-10"), fechas[0]);
-        assertEquals(Date.valueOf("2025-01-15"), fechas[1]);
-    }
+        @Test
+        void validarFechas_correctas() {
+                Date[] fechas = gestor.validarFechas("2025-01-10", "2025-01-15");
 
-    @Test
-    void validarFechas_null_lanzaExcepcion() {
-        assertThrows(RuntimeException.class, () -> gestor.validarFechas(null, null));
-    }
+                assertEquals(Date.valueOf("2025-01-10"), fechas[0]);
+                assertEquals(Date.valueOf("2025-01-15"), fechas[1]);
+        }
 
-    @Test
-    void validarFechas_formatoInvalido() {
-        assertThrows(RuntimeException.class, () -> gestor.validarFechas("10-01-2025", "15-01-2025"));
-    }
+        @Test
+        void validarFechas_null_lanzaExcepcion() {
+                assertThrows(RuntimeException.class, () -> gestor.validarFechas(null, null));
+        }
 
-    @Test
-    void validarFechas_finAntes() {
-        assertThrows(RuntimeException.class, () -> gestor.validarFechas("2025-01-15", "2025-01-10"));
-    }
+        @Test
+        void validarFechas_formatoInvalido() {
+                assertThrows(RuntimeException.class,
+                                () -> gestor.validarFechas("10-01-2025", "15-01-2025"));
+        }
 
-    // ---------- CREAR RESERVA ----------
+        @Test
+        void validarFechas_finAntes() {
+                assertThrows(RuntimeException.class,
+                                () -> gestor.validarFechas("2025-01-15", "2025-01-10"));
+        }
 
-    @Test
-    void crearReserva_correcta() {
-        Inmueble inmueble = new Inmueble();
-        inmueble.setId(1L);
+        @Test
+        void validarFechas_mismoDia() {
+                assertThrows(RuntimeException.class,
+                                () -> gestor.validarFechas("2025-01-10", "2025-01-10"));
+        }
 
-        when(inmuebleDAO.findById(1L)).thenReturn(java.util.Optional.of(inmueble));
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of());
-        when(disponibilidadDAO.save(any())).thenAnswer(i -> i.getArgument(0));
+        // ---------- CREAR RESERVA ----------
 
-        Disponibilidad d = gestor.crearReserva(
-                1L,
-                Date.valueOf("2025-01-10"),
-                Date.valueOf("2025-01-15"),
-                true);
+        @Test
+        void crearReserva_correcta() {
+                Inmueble inmueble = new Inmueble();
+                inmueble.setId(1L);
 
-        assertNotNull(d);
-        assertFalse(d.isDisponible());
-    }
+                when(inmuebleDAO.findById(1L)).thenReturn(Optional.of(inmueble));
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of());
+                when(disponibilidadDAO.save(isA(Disponibilidad.class)))
+                                .thenAnswer(i -> i.getArgument(0));
 
-    @Test
-    void crearReserva_inmuebleNoExiste() {
-        when(inmuebleDAO.findById(1L)).thenReturn(java.util.Optional.empty());
+                Disponibilidad d = gestor.crearReserva(
+                                1L,
+                                Date.valueOf("2025-01-10"),
+                                Date.valueOf("2025-01-15"),
+                                true);
 
-        assertThrows(RuntimeException.class, () -> gestor.crearReserva(
-                1L,
-                Date.valueOf("2025-01-10"),
-                Date.valueOf("2025-01-15"),
-                false));
-    }
+                assertNotNull(d);
+                assertFalse(d.isDisponible());
 
-    @Test
-    void crearReserva_noDisponible() {
-        Inmueble inmueble = new Inmueble();
-        inmueble.setId(1L);
+                verify(disponibilidadDAO).save(isA(Disponibilidad.class));
+        }
 
-        Disponibilidad d = new Disponibilidad();
-        d.setFechaInicio(Date.valueOf("2025-01-12"));
-        d.setFechaFin(Date.valueOf("2025-01-20"));
+        @Test
+        void crearReserva_inmuebleNoExiste() {
+                when(inmuebleDAO.findById(1L)).thenReturn(Optional.empty());
 
-        when(inmuebleDAO.findById(1L)).thenReturn(java.util.Optional.of(inmueble));
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of(d));
+                assertThrows(RuntimeException.class, () -> gestor.crearReserva(
+                                1L,
+                                Date.valueOf("2025-01-10"),
+                                Date.valueOf("2025-01-15"),
+                                false));
+        }
 
-        assertThrows(RuntimeException.class, () -> gestor.crearReserva(
-                1L,
-                Date.valueOf("2025-01-10"),
-                Date.valueOf("2025-01-15"),
-                false));
-    }
+        @Test
+        void crearReserva_noDisponible() {
+                Inmueble inmueble = new Inmueble();
+                inmueble.setId(1L);
 
-    // ---------- VERIFICAR DISPONIBILIDAD ----------
+                Disponibilidad d = new Disponibilidad();
+                d.setFechaInicio(Date.valueOf("2025-01-12"));
+                d.setFechaFin(Date.valueOf("2025-01-20"));
 
-    @Test
-    void verificarDisponibilidad_sinSolapamientos() {
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of());
+                when(inmuebleDAO.findById(1L)).thenReturn(Optional.of(inmueble));
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of(d));
 
-        assertTrue(gestor.verificarDisponibilidad(
-                1L,
-                Date.valueOf("2025-01-10"),
-                Date.valueOf("2025-01-15")));
-    }
+                assertThrows(RuntimeException.class, () -> gestor.crearReserva(
+                                1L,
+                                Date.valueOf("2025-01-10"),
+                                Date.valueOf("2025-01-15"),
+                                false));
+        }
 
-    @Test
-    void verificarDisponibilidad_conSolapamiento() {
-        Disponibilidad d = new Disponibilidad();
-        d.setFechaInicio(Date.valueOf("2025-01-12"));
-        d.setFechaFin(Date.valueOf("2025-01-20"));
+        // ---------- VERIFICAR DISPONIBILIDAD ----------
 
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of(d));
+        @Test
+        void verificarDisponibilidad_sinSolapamientos() {
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of());
 
-        assertFalse(gestor.verificarDisponibilidad(
-                1L,
-                Date.valueOf("2025-01-10"),
-                Date.valueOf("2025-01-15")));
-    }
+                assertTrue(gestor.verificarDisponibilidad(
+                                1L,
+                                Date.valueOf("2025-01-10"),
+                                Date.valueOf("2025-01-15")));
+        }
 
-    // ---------- DISPONIBILIDAD PARA SOLICITUD ----------
+        @Test
+        void verificarDisponibilidad_conSolapamiento() {
+                Disponibilidad d = new Disponibilidad();
+                d.setFechaInicio(Date.valueOf("2025-01-12"));
+                d.setFechaFin(Date.valueOf("2025-01-20"));
 
-    @Test
-    void verificarDisponibilidadParaSolicitud_disponible() {
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of());
-        when(reservaDAO.findByInmuebleIdAndEstado(1L, "CONFIRMADA"))
-                .thenReturn(List.of());
-        when(solicitudReservaDAO.findByInmuebleIdAndEstado(1L, "APROBADA"))
-                .thenReturn(List.of());
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of(d));
 
-        assertTrue(gestor.verificarDisponibilidadParaSolicitud(
-                1L,
-                Date.valueOf("2025-01-10"),
-                Date.valueOf("2025-01-15")));
-    }
+                assertFalse(gestor.verificarDisponibilidad(
+                                1L,
+                                Date.valueOf("2025-01-10"),
+                                Date.valueOf("2025-01-15")));
+        }
 
-    @Test
-    void verificarDisponibilidadParaSolicitud_conSolapamiento() {
-        Disponibilidad d = new Disponibilidad();
-        d.setFechaInicio(Date.valueOf("2025-01-10"));
-        d.setFechaFin(Date.valueOf("2025-01-20"));
+        // ---------- DISPONIBILIDAD PARA SOLICITUD ----------
 
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of(d));
-        when(reservaDAO.findByInmuebleIdAndEstado(1L, "CONFIRMADA"))
-                .thenReturn(List.of());
-        when(solicitudReservaDAO.findByInmuebleIdAndEstado(1L, "APROBADA"))
-                .thenReturn(List.of());
+        @Test
+        void verificarDisponibilidadParaSolicitud_disponible() {
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of());
+                when(reservaDAO.findByInmuebleIdAndEstado(1L, "CONFIRMADA"))
+                                .thenReturn(List.of());
+                when(solicitudReservaDAO.findByInmuebleIdAndEstado(1L, "APROBADA"))
+                                .thenReturn(List.of());
 
-        assertFalse(gestor.verificarDisponibilidadParaSolicitud(
-                1L,
-                Date.valueOf("2025-01-12"),
-                Date.valueOf("2025-01-13")));
-    }
+                assertTrue(gestor.verificarDisponibilidadParaSolicitud(
+                                1L,
+                                Date.valueOf("2025-01-10"),
+                                Date.valueOf("2025-01-15")));
+        }
 
-    // ---------- BUSCAR INMUEBLES DISPONIBLES ----------
+        @Test
+        void verificarDisponibilidadParaSolicitud_conSolapamiento() {
+                Disponibilidad d = new Disponibilidad();
+                d.setFechaInicio(Date.valueOf("2025-01-10"));
+                d.setFechaFin(Date.valueOf("2025-01-20"));
 
-    @Test
-    void buscarInmueblesDisponibles_filtraTodo() {
-        Inmueble i = new Inmueble();
-        i.setId(1L);
-        i.setCiudad("Madrid");
-        i.setCapacidad(4);
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of(d));
+                when(reservaDAO.findByInmuebleIdAndEstado(1L, "CONFIRMADA"))
+                                .thenReturn(List.of());
+                when(solicitudReservaDAO.findByInmuebleIdAndEstado(1L, "APROBADA"))
+                                .thenReturn(List.of());
 
-        when(inmuebleDAO.findAll()).thenReturn(List.of(i));
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of());
+                assertFalse(gestor.verificarDisponibilidadParaSolicitud(
+                                1L,
+                                Date.valueOf("2025-01-12"),
+                                Date.valueOf("2025-01-13")));
+        }
 
-        List<Inmueble> resultado = gestor.buscarInmueblesDisponibles(
-                Date.valueOf("2025-01-10"),
-                Date.valueOf("2025-01-15"),
-                "Madrid",
-                2);
+        // ---------- BUSCAR INMUEBLES DISPONIBLES ----------
 
-        assertEquals(1, resultado.size());
-    }
+        @Test
+        void buscarInmueblesDisponibles_filtraTodo() {
+                Inmueble i = new Inmueble();
+                i.setId(1L);
+                i.setCiudad("Madrid");
+                i.setCapacidad(4);
 
-    @Test
-    void buscarInmueblesDisponibles_noCumpleFiltros() {
-        Inmueble i = new Inmueble();
-        i.setId(1L);
-        i.setCiudad("Barcelona");
-        i.setCapacidad(1);
+                when(inmuebleDAO.findAll()).thenReturn(List.of(i));
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of());
 
-        when(inmuebleDAO.findAll()).thenReturn(List.of(i));
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of());
+                List<Inmueble> resultado = gestor.buscarInmueblesDisponibles(
+                                Date.valueOf("2025-01-10"),
+                                Date.valueOf("2025-01-15"),
+                                "Madrid",
+                                2);
 
-        List<Inmueble> resultado = gestor.buscarInmueblesDisponibles(
-                Date.valueOf("2025-01-10"),
-                Date.valueOf("2025-01-15"),
-                "Madrid",
-                2);
+                assertEquals(1, resultado.size());
+        }
 
-        assertTrue(resultado.isEmpty());
-    }
+        @Test
+        void buscarInmueblesDisponibles_noCumpleFiltros() {
+                Inmueble i = new Inmueble();
+                i.setId(1L);
+                i.setCiudad("Barcelona");
+                i.setCapacidad(1);
 
-    // ---------- OBTENER RESERVAS ----------
+                when(inmuebleDAO.findAll()).thenReturn(List.of(i));
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of());
 
-    @Test
-    void obtenerReservasPorInmueble() {
-        when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
-                .thenReturn(List.of(new Disponibilidad()));
+                List<Inmueble> resultado = gestor.buscarInmueblesDisponibles(
+                                Date.valueOf("2025-01-10"),
+                                Date.valueOf("2025-01-15"),
+                                "Madrid",
+                                2);
 
-        List<Disponibilidad> res = gestor.obtenerReservasPorInmueble(1L);
+                assertTrue(resultado.isEmpty());
+        }
 
-        assertEquals(1, res.size());
-    }
+        // ---------- OBTENER RESERVAS ----------
+
+        @Test
+        void obtenerReservasPorInmueble() {
+                when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
+                                .thenReturn(List.of(new Disponibilidad()));
+
+                List<Disponibilidad> res = gestor.obtenerReservasPorInmueble(1L);
+
+                assertEquals(1, res.size());
+        }
 }
