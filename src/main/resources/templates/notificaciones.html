@@ -119,14 +119,11 @@
             
             filterButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    // Remover clase active de todos los botones
                     filterButtons.forEach(btn => btn.classList.remove('active'));
-                    // Agregar clase active al botón clickeado
                     this.classList.add('active');
                     
                     const filter = this.getAttribute('data-filter');
                     
-                    // Mostrar/ocultar notificaciones según el filtro
                     notificationItems.forEach(item => {
                         if (filter === 'all') {
                             item.style.display = 'flex';
