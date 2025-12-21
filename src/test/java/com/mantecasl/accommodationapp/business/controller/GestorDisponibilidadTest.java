@@ -1,20 +1,29 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.isA;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.mantecasl.accommodationapp.business.entity.Disponibilidad;
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.persistance.DisponibilidadDAO;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+import com.mantecasl.accommodationapp.business.persistance.SolicitudReservaDAO;
 
 @ExtendWith(MockitoExtension.class)
 class GestorDisponibilidadTest {
@@ -96,11 +105,11 @@ class GestorDisponibilidadTest {
         void crearReserva_inmuebleNoExiste() {
                 when(inmuebleDAO.findById(1L)).thenReturn(Optional.empty());
 
-                assertThrows(RuntimeException.class, () -> gestor.crearReserva(
-                                1L,
-                                Date.valueOf("2025-01-10"),
-                                Date.valueOf("2025-01-15"),
-                                false));
+                assertThrows(RuntimeException.class, this::callCrearReservaInmuebleNoExiste);
+        }
+
+        private void callCrearReservaInmuebleNoExiste() {
+                gestor.crearReserva(1L, Date.valueOf("2025-01-10"), Date.valueOf("2025-01-15"), false);
         }
 
         @Test
@@ -116,11 +125,11 @@ class GestorDisponibilidadTest {
                 when(disponibilidadDAO.findByInmuebleIdAndDisponibleFalse(1L))
                                 .thenReturn(List.of(d));
 
-                assertThrows(RuntimeException.class, () -> gestor.crearReserva(
-                                1L,
-                                Date.valueOf("2025-01-10"),
-                                Date.valueOf("2025-01-15"),
-                                false));
+                assertThrows(RuntimeException.class, this::callCrearReservaNoDisponible);
+        }
+
+        private void callCrearReservaNoDisponible() {
+                gestor.crearReserva(1L, Date.valueOf("2025-01-10"), Date.valueOf("2025-01-15"), false);
         }
 
         // ---------- VERIFICAR DISPONIBILIDAD ----------

@@ -1,10 +1,11 @@
 package com.mantecasl.accommodationapp.business.entity;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
-public class PropietarioTest {
+class PropietarioTest {
 
     @Test
     void constructor_y_getters_basicos_funcionan() {

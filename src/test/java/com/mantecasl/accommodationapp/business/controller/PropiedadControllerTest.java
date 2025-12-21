@@ -1,24 +1,20 @@
 package com.mantecasl.accommodationapp.business.controller;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Objects;
-
-import com.mantecasl.accommodationapp.business.entity.*;
-import com.mantecasl.accommodationapp.business.persistance.*;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -27,8 +23,23 @@ import org.springframework.context.annotation.Import;
 import org.springframework.lang.NonNull;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.view.AbstractView;
+
+import com.mantecasl.accommodationapp.business.entity.Inmueble;
+import com.mantecasl.accommodationapp.business.entity.Propietario;
+import com.mantecasl.accommodationapp.business.entity.Reserva;
+import com.mantecasl.accommodationapp.business.entity.Usuario;
+import com.mantecasl.accommodationapp.business.persistance.InmuebleDAO;
+import com.mantecasl.accommodationapp.business.persistance.ReservaDAO;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @WebMvcTest(controllers = PropiedadController.class, excludeAutoConfiguration = ThymeleafAutoConfiguration.class)
 @Import(PropiedadControllerTest.TestViewResolverConfig.class)
@@ -60,6 +71,7 @@ class PropiedadControllerTest {
                                                 @NonNull Map<String, Object> model,
                                                 @NonNull HttpServletRequest request,
                                                 @NonNull HttpServletResponse response) {
+                                                        //This method is intentionally left blank for testing purposes.
                                 }
                         };
                 }
@@ -190,7 +202,7 @@ class PropiedadControllerTest {
                 verify(notificacion).notificarEliminacionPropiedad(
                                 eq(i),
                                 argThat(Objects::nonNull));
-                verify(notificacion).crearNotificacionPagoDevuelto(eq(r), eq(100.0));
+                verify(notificacion).crearNotificacionPagoDevuelto(r,100.0);
                 verify(inmuebleDAO).delete(i);
         }
 
